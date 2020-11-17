@@ -1,3 +1,5 @@
+Mates: A web application for roommate life. Assign chores, track bills, communicate, and socialize on this one-of-a-kind platform. Still a work in progress.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
