@@ -26,6 +26,8 @@ import { Users } from './Common/constants';
 //when our front-end data
 //changes, our back end data must change too
 
+//TO DO:
+
 const tabNames = [
     'Profile',
     'Bills',
@@ -67,7 +69,11 @@ const App: React.FC = () => {
             assertUnreachable(tab);
     }
 
-    const [user, setUser] = useState(Users.Mark);
+    const [user, setUser] = useState(Users.Jeremy);
+
+    //NOTE TO SELF: if we want everything to run through the database, make our setUser
+    //instead include the call to the database, and then set the user to the database's result.
+    //of course, i've put all the logic here in javascript, so idrk
 
     return (
         <UserContext.Provider value={{ user: user, setUser: setUser }}>

@@ -21,7 +21,7 @@ import {
     getCurrentDateTime,
 } from '../../Common/components/DateTimeInputCell';
 
-const tabNames = ['Past', 'Present', 'Future'] as const;
+const tabNames = ['Create New Event', 'Past', 'Present', 'Future', 'Event Invitations'] as const;
 type EventsTabType = typeof tabNames[number];
 
 // TO DO: go to new tab when an event invitation is accepted the way i do when one is created
@@ -29,13 +29,53 @@ type EventsTabType = typeof tabNames[number];
 const Events: React.FC = () => {
     const [tab, setTab] = useState<EventsTabType>('Present');
 
+    const { user } = useContext(UserContext) as UserContextType;
+    const events = user.apartment.eventsInfo.events;
+    const getFutureEvents = () =>
+        events
+            .filter((event) => event.time.getTime() > Date.now() + convertHoursToMS(24))
+            .sort((a, b) => a.time.getTime() - b.time.getTime());
+
+    const getPastEvents = () =>
+        events
+            .filter((event) => event.time.getTime() < Date.now() - convertHoursToMS(24))
+            .sort((a, b) => b.time.getTime() - a.time.getTime());
+
+    const getPresentEvents = () =>
+        events
+            .filter(
+                (event) =>
+                    Date.now() - convertHoursToMS(24) <= event.time.getTime() &&
+                    event.time.getTime() <= Date.now() + convertHoursToMS(24),
+            )
+            .sort((a, b) => a.time.getTime() - b.time.getTime());
+
+    let content: JSX.Element;
+    switch (tab) {
+        case 'Create New Event':
+            content = <CreateEventCell setTab={setTab} />;
+            break;
+        case 'Past':
+            content = <EventsComponent displayEvents={getPastEvents()} />;
+            break;
+        case 'Present':
+            content = <EventsComponent displayEvents={getPresentEvents()} />;
+            break;
+        case 'Future':
+            content = <EventsComponent displayEvents={getFutureEvents()} />;
+            break;
+        case 'Event Invitations':
+            content = <IncomingInvitationsCell setTab={setTab} />;
+            break;
+        default:
+            assertUnreachable(tab);
+    }
+
     return (
         <div>
             <Tabs currentTab={tab} setTab={setTab} tabNames={tabNames} />
-            <CreateEventCell setTab={setTab} />
-            <IncomingInvitationsCell />
             <Description tab={tab} />
-            <EventsComponent tab={tab} />
+            {content}
         </div>
     );
 };
@@ -45,22 +85,30 @@ interface DescriptionProps {
 }
 
 const Description: React.FC<DescriptionProps> = ({ tab }) => {
+    let content: string;
     switch (tab) {
         case 'Future':
-            return <p>{'All events more than 24 hours in the future.'}</p>;
+            content =
+                'All events more than 24 hours in the future. Events hosted by your apartment are highlighted in red. Events hosted by other apartments are highlighted in blue.';
+            break;
         case 'Past':
-            return (
-                <p>
-                    {
-                        'All events more than 24 hours in the past. Other apartments cannot be invited to these events.'
-                    }
-                </p>
-            );
+            content =
+                'All events more than 24 hours in the past. Other apartments cannot be invited to these events, but enjoy a trip down memory lane. Events hosted by your apartment are highlighted in red. Events hosted by other apartments are highlighted in blue.';
+            break;
         case 'Present':
-            return <p>{'All events within 24 hours of now.'}</p>;
+            content =
+                'All events within 24 hours of now. Events hosted by your apartment are highlighted in red. Events hosted by other apartments are highlighted in blue.';
+            break;
+        case 'Create New Event':
+            content = '*other apartments can be invited after the event is created.';
+            break;
+        case 'Event Invitations':
+            content = '';
+            break;
         default:
             assertUnreachable(tab);
     }
+    return <p style={{ fontWeight: 'bold' }}>{content}</p>;
 };
 
 interface CreateEventInputType {
@@ -75,7 +123,6 @@ interface CreateEventCellProps {
 
 const CreateEventCell: React.FC<CreateEventCellProps> = ({ setTab }) => {
     const { user, setUser } = useContext(UserContext) as UserContextType;
-    const [showCreateEvent, setShowCreateEvent] = useState(false);
 
     const initialInput: CreateEventInputType = {
         title: '',
@@ -116,7 +163,6 @@ const CreateEventCell: React.FC<CreateEventCellProps> = ({ setTab }) => {
                 description: input.description,
             };
             user.apartment.eventsInfo.events.push(newEvent);
-            setShowCreateEvent(false);
             setInput(initialInput);
 
             let newTab: EventsTabType;
@@ -135,54 +181,56 @@ const CreateEventCell: React.FC<CreateEventCellProps> = ({ setTab }) => {
 
     return (
         <div>
-            <button onClick={() => setShowCreateEvent(!showCreateEvent)}>
-                {showCreateEvent ? 'Cancel' : 'Create New Event'}
-            </button>
-            {showCreateEvent ? (
-                <div>
-                    <p>{'*other apartments can be invited AFTER the event is created.'}</p>
-                    <label>
-                        {'Event Title: '}
-                        <input
-                            type="text"
-                            name="title"
-                            placeholder={'required'}
-                            value={input.title}
-                            onChange={handleChange}
-                        />
-                    </label>
-                    <br />
-                    <label>
-                        {'Event Description:'}
-                        <input
-                            type="text"
-                            name="description"
-                            placeholder={'optional'}
-                            value={input.description}
-                            onChange={handleChange}
-                        />
-                    </label>
-                    <br />
-                    <br />
-                    <DateTimeInputCell state={input.time} setState={setDateTimeState} />
-                    <br />
-                    <br />
-                    <button onClick={handleCreateEvent}>{'Create Event'}</button>
-                </div>
-            ) : null}
+            <label>
+                {'Event Title: '}
+                <input
+                    type="text"
+                    name="title"
+                    placeholder={'required'}
+                    value={input.title}
+                    onChange={handleChange}
+                />
+            </label>
+            <br />
+            <label>
+                {'Event Description:'}
+                <input
+                    type="text"
+                    name="description"
+                    placeholder={'optional'}
+                    value={input.description}
+                    onChange={handleChange}
+                />
+            </label>
+            <br />
+            <br />
+            <DateTimeInputCell state={input.time} setState={setDateTimeState} />
+            <br />
+            <br />
+            <button onClick={handleCreateEvent}>{'Create Event'}</button>
         </div>
     );
 };
 
-const IncomingInvitationsCell: React.FC = () => {
+interface IncomingInvitationsCellProps {
+    setTab: React.Dispatch<React.SetStateAction<EventsTabType>>;
+}
+
+const IncomingInvitationsCell: React.FC<IncomingInvitationsCellProps> = ({ setTab }) => {
     const { user, setUser } = useContext(UserContext) as UserContextType;
     const invitations = user.apartment.eventsInfo.invitations;
-    const [showInvitations, setShowInvitations] = useState(false);
 
     const handleAcceptInvitation = (invitation: ApartmentEvent) => {
         handleDeleteInvitation(invitation);
         user.apartment.eventsInfo.events.push(invitation);
         setUser({ ...user });
+        if (isPastEvent(invitation)) {
+            setTab('Past');
+        } else if (isPresentEvent(invitation)) {
+            setTab('Present');
+        } else {
+            setTab('Future');
+        }
         //TO DO: update back end.
     };
 
@@ -196,13 +244,8 @@ const IncomingInvitationsCell: React.FC = () => {
     return (
         <div>
             {invitations.length === 0 ? (
-                <p>{'You have not been invited to any events.'}</p>
+                <p style={{ fontWeight: 'bold' }}>{'You have not been invited to any events.'}</p>
             ) : (
-                <button onClick={() => setShowInvitations(!showInvitations)}>
-                    {showInvitations ? 'Close' : 'Show Invitations'}
-                </button>
-            )}
-            {showInvitations ? (
                 <div>
                     {invitations.map((invitation) => (
                         <Invitation
@@ -212,7 +255,7 @@ const IncomingInvitationsCell: React.FC = () => {
                         />
                     ))}
                 </div>
-            ) : null}
+            )}
         </div>
     );
 };
@@ -236,10 +279,10 @@ const Invitation: React.FC<InvitationProps> = ({ invitation, handleAccept, handl
 };
 
 interface EventsComponentProps {
-    tab: EventsTabType;
+    displayEvents: ApartmentEvent[];
 }
 
-const EventsComponent: React.FC<EventsComponentProps> = ({ tab }) => {
+const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents }) => {
     const { user, setUser } = useContext(UserContext) as UserContextType;
     const allEvents = user.apartment.eventsInfo.events;
 
@@ -274,21 +317,6 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ tab }) => {
         //or in this method
     };
 
-    let displayEvents: ApartmentEvent[];
-
-    switch (tab) {
-        case 'Future':
-            displayEvents = getFutureEvents(allEvents);
-            break;
-        case 'Present':
-            displayEvents = getPresentEvents(allEvents);
-            break;
-        case 'Past':
-            displayEvents = getPastEvents(allEvents);
-            break;
-        default:
-            assertUnreachable(tab);
-    }
     return (
         <div>
             <h3>{'Scheduled Events:'}</h3>
@@ -331,11 +359,19 @@ const EventCell: React.FC<EventCellProps> = ({
     const [showInviteCell, setShowInviteCell] = useState(false);
     const presentOrFuture = isFutureEvent(event) || isPresentEvent(event);
     return (
-        <div style={hosting ? { border: '.5px solid blue' } : { border: '.5px solid red' }}>
+        <div style={{ borderTop: '1px solid black' }}>
             {canRemoveEvent ? (
                 <button onClick={() => handleRemoveEvent(event)}>{'DELETE EVENT'}</button>
             ) : null}
-            <p style={{ fontWeight: 'bold' }}>{event.title}</p>
+            <p
+                style={
+                    hosting
+                        ? { fontWeight: 'bold', color: 'red' }
+                        : { fontWeight: 'bold', color: 'blue' }
+                }
+            >
+                {event.title}
+            </p>
             <h5>{getFormattedDateTimeString(event.time)}</h5>
             <p>{'Created by ' + event.creator}</p>
             <p>{event.description ? 'Description: ' + event.description : null}</p>
@@ -429,28 +465,6 @@ const AttendeesInviteesCell: React.FC<AttendeesInviteesCellProps> = ({
             )}
         </div>
     );
-};
-
-const getPastEvents = (events: ApartmentEvent[]) => {
-    return events
-        .filter((event) => event.time.getTime() < Date.now() - convertHoursToMS(24))
-        .sort((a, b) => b.time.getTime() - a.time.getTime());
-};
-
-const getPresentEvents = (events: ApartmentEvent[]) => {
-    return events
-        .filter(
-            (event) =>
-                Date.now() - convertHoursToMS(24) <= event.time.getTime() &&
-                event.time.getTime() <= Date.now() + convertHoursToMS(24),
-        )
-        .sort((a, b) => a.time.getTime() - b.time.getTime());
-};
-
-const getFutureEvents = (events: ApartmentEvent[]) => {
-    return events
-        .filter((event) => event.time.getTime() > Date.now() + convertHoursToMS(24))
-        .sort((a, b) => a.time.getTime() - b.time.getTime());
 };
 
 const isPastEvent = (event: ApartmentEvent) =>

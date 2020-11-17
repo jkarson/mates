@@ -62,7 +62,9 @@ const ApartmentProfileBody: React.FC<ApartmentProfileBodyProps> = ({ apartment }
 );
 
 const ApartmentProfileInput: React.FC<StateProps<Apartment>> = ({ state, setState }) => {
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (
+        event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>,
+    ) => {
         const name = event.target.name;
         const value = event.target.value;
         setState({ ...state, [name]: value });
@@ -95,7 +97,13 @@ const ApartmentProfileInput: React.FC<StateProps<Apartment>> = ({ state, setStat
             <br />
             <label>
                 {'Quote: '}
-                <input name="quote" type="text" onChange={handleChange} value={state.quote} />
+                <textarea
+                    name="quote"
+                    onChange={handleChange}
+                    value={state.quote}
+                    cols={50}
+                    rows={1}
+                />
             </label>
         </form>
     );
@@ -113,9 +121,9 @@ const Tenants: React.FC<TenantsProps> = ({ tenants, includesUser, userId }) => {
         <div>
             {tenants.map((tenant: Tenant) => {
                 if (includesUser && userId === tenant.id) {
-                    return <ModifiableTenantCell />;
+                    return <ModifiableTenantCell key={tenant.id} />;
                 } else {
-                    return <TenantCellBody tenant={tenant} />;
+                    return <TenantCellBody tenant={tenant} key={tenant.id} />;
                 }
             })}
         </div>

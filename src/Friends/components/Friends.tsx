@@ -4,6 +4,8 @@ import { Apartment } from '../../Common/models';
 import { Apartments } from '../../Common/constants';
 import { StaticApartmentProfile } from '../../Profile/components/Profile';
 import { FriendSummaryCell } from './FriendSummaryCell';
+import Tabs from '../../Common/components/Tabs';
+import { assertUnreachable } from '../../Common/utilities';
 
 //TO DO: all add/delete/create friend request actions are bi-directional.
 //on the front end, we only need to display changes for current user. but on the back-end,
@@ -13,21 +15,48 @@ import { FriendSummaryCell } from './FriendSummaryCell';
 
 // bug - able to search for self
 
-const Friends: React.FC = () => (
-    <div>
-        <p>
-            {
-                'Connect with other apartments to view their public profile, access their contact information, and invite them to events.'
-            }
-        </p>
-        <CreateRequestCell />
-        <RequestsCell incoming={false} />
-        <RequestsCell incoming={true} />
-        <FriendsCell />
-    </div>
-);
+const tabNames = ['Friends', 'Incoming Requests', 'Outgoing Requests', 'Add New Friend'] as const;
+type FriendsTabType = typeof tabNames[number];
 
-const CreateRequestCell: React.FC = () => {
+const Friends: React.FC = () => {
+    const [tab, setTab] = useState<FriendsTabType>('Friends');
+
+    let content: JSX.Element;
+    switch (tab) {
+        case 'Friends':
+            content = <FriendsCell />;
+            break;
+        case 'Incoming Requests':
+            content = <RequestsCell incoming={true} />;
+            break;
+        case 'Outgoing Requests':
+            content = <RequestsCell incoming={false} />;
+            break;
+        case 'Add New Friend':
+            content = <CreateRequestCell setTab={setTab} />;
+            break;
+        default:
+            assertUnreachable(tab);
+    }
+
+    return (
+        <div>
+            <Tabs<FriendsTabType> currentTab={tab} setTab={setTab} tabNames={tabNames} />
+            <p style={{ fontWeight: 'bold' }}>
+                {
+                    'Connect with other apartments to view their public profile, access their contact information, and invite them to events.'
+                }
+            </p>
+            {content}
+        </div>
+    );
+};
+
+interface CreateRequestCellProps {
+    setTab: React.Dispatch<React.SetStateAction<FriendsTabType>>;
+}
+
+const CreateRequestCell: React.FC<CreateRequestCellProps> = ({ setTab }) => {
     const { user, setUser } = useContext(UserContext) as UserContextType;
     const { friends, outgoingRequests, incomingRequests } = user.apartment.friendsInfo;
     const allApartments = Object.values(Apartments);
@@ -42,6 +71,7 @@ const CreateRequestCell: React.FC = () => {
         user.apartment.friendsInfo.outgoingRequests.push(apartment);
         //TO DO: SAVE TO DATABASE
         setUser({ ...user });
+        setTab('Outgoing Requests');
     };
 
     return (
@@ -167,7 +197,7 @@ const FriendsCell: React.FC = () => {
                 <>
                     <p>{'Your friends:'}</p>
                     {friends.map((friend) => (
-                        <Friend friend={friend} handleDelete={handleDelete} />
+                        <Friend key={friend.id} friend={friend} handleDelete={handleDelete} />
                     ))}
                 </>
             )}

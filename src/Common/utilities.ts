@@ -1,5 +1,5 @@
-import { Month, ObjectWithId, TenantId } from '../Common/types';
-import { months } from './constants';
+import { Month, ObjectWithId, TenantId, Weekday } from '../Common/types';
+import { months, weekdays } from './constants';
 import { Tenant, User } from './models';
 
 function assertUnreachable(x: never): never {
@@ -13,6 +13,9 @@ are is something you're struggling with right now. I think a good thing to remem
 to embrace the struggle. The struggle is the process of you getting smarter and your
 code getting better. The time crunch is imaginary. Do your work and do it with art */
 function getNewId<T extends ObjectWithId>(objects: T[]): string {
+    if (objects.length === 0) {
+        return '1';
+    }
     const maxId = Math.max(...objects.map((object) => parseInt(object.id, 10)));
     const newId = maxId + 1;
     return newId.toString();
@@ -22,9 +25,9 @@ function getNewIds<T extends ObjectWithId>(objects: T[], quantity: number): stri
     const newId = getNewId(objects);
     const newIds: string[] = [];
 
-    let ID = newId;
+    let ID = parseInt(newId, 10);
     for (quantity; quantity > 0; quantity--) {
-        newIds.push(ID);
+        newIds.push(ID.toString());
         ID += 1;
     }
     return newIds;
@@ -34,15 +37,12 @@ function isLetter(c: string): boolean {
     return c.length === 1 && c.toLocaleLowerCase() !== c.toLocaleUpperCase();
 }
 
-// Given a user and an optional tenantId, returns the tenant
-// in the user's apartment with the given tenantId, or the tenant
-// corresponding to the user themself if none is given.
-function getTenant(user: User, tenantId?: TenantId): Tenant | undefined {
-    if (tenantId) {
-        return user.apartment.tenants.find((tenant) => tenant.id === tenantId);
-    } else {
-        return user.apartment.tenants.find((tenant) => tenant.id === user.tenantId);
-    }
+function getTenant(user: User): Tenant {
+    return user.apartment.tenants.find((tenant) => tenant.id === user.tenantId) as Tenant;
+}
+
+function getTenantByTenantId(user: User, tenantId: TenantId): Tenant | undefined {
+    return user.apartment.tenants.find((tenant) => tenant.id === tenantId);
 }
 
 function convertDaysToMS(days: number) {
@@ -127,10 +127,143 @@ function isFutureDate(dateOne: Date, dateTwo: Date) {
     return dateOne.getTime() > dateTwo.getTime() && !isSameDayMonthYear(dateOne, dateTwo);
 }
 
+function getTodaysDate() {
+    return new Date(Date.now());
+}
+
 function getYesterdaysDate() {
     const yesterday = new Date(Date.now());
     yesterday.setDate(yesterday.getDate() - 1);
     return yesterday;
+}
+
+function getYesterdaysDateFromDate(date: Date) {
+    const yesterday = new Date(date.getTime());
+    yesterday.setDate(yesterday.getDate() - 1);
+    return yesterday;
+}
+
+function getDayFromDayIndex(dayIndex: number): Weekday {
+    return weekdays[dayIndex];
+}
+
+function getNextMonthDayIndicesMonthly(currentDate: Date): [number, number] {
+    const currentMonth = currentDate.getMonth();
+    const currentDay = currentDate.getDate();
+    const currentYear = currentDate.getFullYear();
+    const nextMonth = currentMonth + 1;
+    const nextYear = nextMonth > 11 ? currentYear + 1 : currentYear;
+    const daysInNextMonth = getDaysInMonth(getMonthByIndex(nextMonth % 12), nextYear);
+    if (currentDay < daysInNextMonth) {
+        return [nextMonth, currentDay];
+    } else {
+        return [nextMonth, daysInNextMonth];
+    }
+}
+
+function getNextMonthDayIndicesBiMonthly(currentDate: Date): [number, number] {
+    const currentMonth = currentDate.getMonth();
+    const currentDay = currentDate.getDate();
+    const currentYear = currentDate.getFullYear();
+    const nextMonth = currentMonth + 2;
+    const nextYear = nextMonth > 11 ? currentYear + 1 : currentYear;
+    const daysInNextMonth = getDaysInMonth(getMonthByIndex(nextMonth % 12), nextYear);
+    if (currentDay < daysInNextMonth) {
+        return [nextMonth, currentDay];
+    } else {
+        return [nextMonth, daysInNextMonth];
+    }
+}
+
+function getNextMonthDayIndicesQuarterly(currentDate: Date): [number, number] {
+    const currentMonth = currentDate.getMonth();
+    const currentDay = currentDate.getDate();
+    const currentYear = currentDate.getFullYear();
+    const nextMonth = currentMonth + 3;
+    const nextYear = nextMonth > 11 ? currentYear + 1 : currentYear;
+    const daysInNextMonth = getDaysInMonth(getMonthByIndex(nextMonth % 12), nextYear);
+    if (currentDay < daysInNextMonth) {
+        return [nextMonth, currentDay];
+    } else {
+        return [nextMonth, daysInNextMonth];
+    }
+}
+
+function getNextMonthDayIndicesTriAnnually(currentDate: Date): [number, number] {
+    const currentMonth = currentDate.getMonth();
+    const currentDay = currentDate.getDate();
+    const currentYear = currentDate.getFullYear();
+    const nextMonth = currentMonth + 4;
+    const nextYear = nextMonth > 11 ? currentYear + 1 : currentYear;
+    const daysInNextMonth = getDaysInMonth(getMonthByIndex(nextMonth % 12), nextYear);
+    if (currentDay < daysInNextMonth) {
+        return [nextMonth, currentDay];
+    } else {
+        return [nextMonth, daysInNextMonth];
+    }
+}
+
+function getNextMonthDayIndicesBiAnnually(currentDate: Date): [number, number] {
+    const currentMonth = currentDate.getMonth();
+    const currentDay = currentDate.getDate();
+    const currentYear = currentDate.getFullYear();
+    const nextMonth = currentMonth + 6;
+    const nextYear = nextMonth > 11 ? currentYear + 1 : currentYear;
+    const daysInNextMonth = getDaysInMonth(getMonthByIndex(nextMonth % 12), nextYear);
+    if (currentDay < daysInNextMonth) {
+        return [nextMonth, currentDay];
+    } else {
+        return [nextMonth, daysInNextMonth];
+    }
+}
+
+function divideMoneyTotal(amount: number, splitNumber: number): number[] {
+    const pennies = Math.round(amount * 100);
+    const baseAmount = Math.floor(pennies / splitNumber);
+    const leftOver = Math.round(pennies % splitNumber);
+
+    const pennyValues: number[] = [];
+    let i: number;
+    for (i = 0; i < splitNumber; i++) {
+        const amount = i < leftOver ? baseAmount + 1 : baseAmount;
+        pennyValues.push(amount);
+    }
+    const dollarValues = pennyValues.map((pennyValue) => pennyValue / 100);
+    return dollarValues;
+}
+
+function getPercent(amount: number, total: number): number {
+    return total !== 0 ? (amount / total) * 100 : 0;
+}
+
+function getAmountFromPercent(percent: number, total: number): number {
+    return (total * percent) / 100;
+}
+
+function roundToTenth(num: number) {
+    return Math.round(num * 10) / 10;
+}
+
+function roundToHundredth(num: number) {
+    return Math.round(num * 100) / 100;
+}
+
+const handleFocusNumericInput = (input: React.RefObject<HTMLInputElement>) => {
+    if (input.current && input.current.value === '0') {
+        input.current.value = '';
+    }
+    return;
+};
+
+const handleBlurNumericInput = (input: React.RefObject<HTMLInputElement>) => {
+    if (input.current && input.current.value === '') {
+        input.current.value = '0';
+    }
+    return;
+};
+
+const isNotEmpty = (str: string) => {
+    return
 }
 
 export {
@@ -139,6 +272,7 @@ export {
     getNewIds,
     isLetter,
     getTenant,
+    getTenantByTenantId,
     convertDaysToMS,
     convertHoursToMS,
     getDaysInMonth,
@@ -149,5 +283,20 @@ export {
     isSameDayMonthYear,
     isPreviousDate,
     isFutureDate,
+    getTodaysDate,
     getYesterdaysDate,
+    getYesterdaysDateFromDate,
+    getDayFromDayIndex,
+    getNextMonthDayIndicesMonthly,
+    getNextMonthDayIndicesBiMonthly,
+    getNextMonthDayIndicesQuarterly,
+    getNextMonthDayIndicesTriAnnually,
+    getNextMonthDayIndicesBiAnnually,
+    divideMoneyTotal,
+    getPercent,
+    getAmountFromPercent,
+    roundToTenth,
+    roundToHundredth,
+    handleBlurNumericInput,
+    handleFocusNumericInput,
 };

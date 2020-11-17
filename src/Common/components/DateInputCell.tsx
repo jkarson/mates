@@ -1,7 +1,13 @@
 import React from 'react';
 import { months } from '../constants';
 import { Month, StateProps } from '../types';
-import { getDaysInMonth, getMonthByIndex, getMonthIndexByMonth } from '../utilities';
+import {
+    getDayFromDayIndex,
+    getDaysInMonth,
+    getMonthByIndex,
+    getMonthIndexByMonth,
+    getTodaysDate,
+} from '../utilities';
 
 interface DateInputCellProps extends StateProps<Date> {
     showReset?: boolean;
@@ -18,8 +24,9 @@ const DateInputCell: React.FC<DateInputCellProps> = ({ state, setState, showRese
         if (newDay > daysInNewMonth) {
             newDay = daysInNewMonth;
         }
-        dateInput.setMonth(newMonthIndex, newDay);
-        setDateInput(dateInput);
+        const tempDate = new Date(dateInput.getTime());
+        tempDate.setMonth(newMonthIndex, newDay);
+        setDateInput(tempDate);
     };
 
     const handleChangeYear = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,38 +38,32 @@ const DateInputCell: React.FC<DateInputCellProps> = ({ state, setState, showRese
         if (currentDay > daysInNewMonth) {
             currentDay = daysInNewMonth;
         }
-        dateInput.setFullYear(newYear, monthIndex, currentDay);
-        setDateInput(dateInput);
+        const tempDate = new Date(dateInput.getTime());
+        tempDate.setFullYear(newYear, monthIndex, currentDay);
+        setDateInput(tempDate);
     };
 
     const handleChangeDay = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const value = parseInt(event.target.value, 10);
-        dateInput.setDate(value);
-        setDateInput(dateInput);
+        const tempDate = new Date(dateInput.getTime());
+        tempDate.setDate(value);
+        setDateInput(tempDate);
     };
 
     const handleClickReset = () => {
-        setDateInput(new Date(Date.now()));
+        setDateInput(getTodaysDate());
     };
 
     return (
         <div>
             <label>
-                {'Month: '}
+                {'Date: ' + getDayFromDayIndex(dateInput.getDay()) + ', '}
                 <select value={getMonthByIndex(dateInput.getMonth())} onChange={handleChangeMonth}>
                     {getMonthOptions()}
                 </select>
-            </label>
-            <br />
-            <label>
-                {'Day: '}
                 <select value={dateInput.getDate()} onChange={handleChangeDay}>
                     {getDayOptions(dateInput.getMonth(), dateInput.getFullYear())}
                 </select>
-            </label>
-            <br />
-            <label>
-                {'Year: '}
                 <input type="number" value={dateInput.getFullYear()} onChange={handleChangeYear} />
             </label>
             <br />
@@ -72,7 +73,11 @@ const DateInputCell: React.FC<DateInputCellProps> = ({ state, setState, showRese
 };
 
 const getMonthOptions = () => {
-    return months.map((month) => <option value={month}>{month}</option>);
+    return months.map((month, index) => (
+        <option value={month} key={index}>
+            {month}
+        </option>
+    ));
 };
 
 const getDayOptions = (monthIndex: number, year: number): JSX.Element[] => {

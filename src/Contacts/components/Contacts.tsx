@@ -11,13 +11,33 @@ import Tabs from '../../Common/components/Tabs';
 //EXTENSION: Manually added contacts can have manually added photos; other contacts have photos
 //as defined in profile
 
-const tabNames = ['All', 'Your Apartment', 'Friends', 'Manually Added'] as const;
+const tabNames = ['All', 'Your Apartment', 'Friends', 'Manually Added', 'Add New Contact'] as const;
 type ContactsTabType = typeof tabNames[number];
 
 const Contacts: React.FC = () => {
     const { user, setUser } = useContext(UserContext) as UserContextType;
 
     const [tab, setTab] = useState<ContactsTabType>('All');
+
+    let contacts: Contact[] = [];
+    switch (tab) {
+        case 'All':
+            contacts = getAllContacts(user.apartment);
+            break;
+        case 'Friends':
+            contacts = getFriendsContacts(user.apartment);
+            break;
+        case 'Manually Added':
+            contacts = getManuallyAddedContacts(user.apartment);
+            break;
+        case 'Your Apartment':
+            contacts = getTenantContacts(user.apartment);
+            break;
+        case 'Add New Contact':
+            break;
+        default:
+            assertUnreachable(tab);
+    }
 
     type TenantOrContact = Tenant | Contact;
 
@@ -35,6 +55,7 @@ const Contacts: React.FC = () => {
 
         user.apartment.manuallyAddedContacts.push(newContact);
         setUser({ ...user });
+        setTab('Manually Added');
         //TO DO: Save to Database
     };
 
@@ -49,48 +70,32 @@ const Contacts: React.FC = () => {
     return (
         <div>
             <Tabs<ContactsTabType> currentTab={tab} setTab={setTab} tabNames={tabNames} />
-            {tab === 'Manually Added' || tab === 'All' ? (
+            {tab === 'All' ? <DescriptionCell /> : null}
+            {tab === 'Add New Contact' ? (
                 <AddContact handleNewContact={handleNewContact} />
-            ) : null}
-            <ContactsList tab={tab} handleDelete={handleDeleteContact} />
+            ) : (
+                <ContactsList handleDelete={handleDeleteContact} contacts={contacts} />
+            )}
         </div>
     );
 };
 
+const DescriptionCell: React.FC = () => (
+    <p style={{ fontWeight: 'bold' }}>{'Only manually added contacts can be deleted.'}</p>
+);
+
 interface ContactsListProps {
-    tab: ContactsTabType;
+    contacts: Contact[];
     handleDelete: (c: Contact) => void;
 }
 
-const ContactsList: React.FC<ContactsListProps> = ({ tab, handleDelete }) => {
-    const { user } = useContext(UserContext) as UserContextType;
-    let contacts: Contact[];
-    switch (tab) {
-        case 'All':
-            contacts = getAllContacts(user.apartment);
-            break;
-        case 'Friends':
-            contacts = getFriendsContacts(user.apartment);
-            break;
-        case 'Manually Added':
-            contacts = getManuallyAddedContacts(user.apartment);
-            break;
-        case 'Your Apartment':
-            contacts = getTenantContacts(user.apartment);
-            break;
-        default:
-            assertUnreachable(tab);
-    }
-    return (
-        <>
-            {contacts
-                .sort((a, b) => (a.name.toLocaleLowerCase() > b.name.toLocaleLowerCase() ? 1 : -1))
-                .map((contact) => (
-                    <ContactCell key={contact.id} contact={contact} handleDelete={handleDelete} />
-                ))}
-        </>
-    );
-};
+const ContactsList: React.FC<ContactsListProps> = ({ contacts, handleDelete }) => (
+    <div>
+        {contacts.map((contact) => (
+            <ContactCell key={contact.id} contact={contact} handleDelete={handleDelete} />
+        ))}
+    </div>
+);
 
 interface AddContactState {
     name: string;
@@ -184,7 +189,9 @@ const getTenantContacts = (apartment: Apartment): Contact[] => {
             id: tenant.id,
         });
     });
-    return apartmentContacts;
+    return apartmentContacts.sort((a, b) =>
+        a.name.toLocaleLowerCase() > b.name.toLocaleLowerCase() ? 1 : -1,
+    );
 };
 
 const getFriendsContacts = (apartment: Apartment): Contact[] => {
@@ -193,15 +200,21 @@ const getFriendsContacts = (apartment: Apartment): Contact[] => {
     friends.forEach((apartment) => {
         friendsContacts = friendsContacts.concat(getTenantContacts(apartment));
     });
-    return friendsContacts;
+    return friendsContacts.sort((a, b) =>
+        a.name.toLocaleLowerCase() > b.name.toLocaleLowerCase() ? 1 : -1,
+    );
 };
 
-const getManuallyAddedContacts = (apartment: Apartment) => apartment.manuallyAddedContacts;
+const getManuallyAddedContacts = (apartment: Apartment) =>
+    apartment.manuallyAddedContacts.sort((a, b) =>
+        a.name.toLocaleLowerCase() > b.name.toLocaleLowerCase() ? 1 : -1,
+    );
 
 const getAllContacts = (apartment: Apartment) =>
     getTenantContacts(apartment)
         .concat(getFriendsContacts(apartment))
-        .concat(getManuallyAddedContacts(apartment));
+        .concat(getManuallyAddedContacts(apartment))
+        .sort((a, b) => (a.name.toLocaleLowerCase() > b.name.toLocaleLowerCase() ? 1 : -1));
 
 interface ContactCellProps {
     contact: Contact;
@@ -212,7 +225,7 @@ const ContactCell: React.FC<ContactCellProps> = ({ contact, handleDelete }) => {
     const handleClick = () => handleDelete(contact);
 
     return (
-        <div style={{ border: '1px solid red' }}>
+        <div style={{ borderTop: '1px solid black', marginTop: 5, marginBottom: 5 }}>
             <Initials name={contact.name} />
 
             <p>{'Name: ' + contact.name}</p>

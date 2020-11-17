@@ -19,13 +19,13 @@ export const months = [
 ] as const;
 
 export const weekdays = [
+    'Sunday',
     'Monday',
     'Tuesday',
     'Wednesday',
     'Thursday',
     'Friday',
     'Saturday',
-    'Sunday',
 ] as const;
 
 const today = new Date(Date.now());
@@ -94,9 +94,13 @@ const Crib: Apartment = {
             },
         ],
     },
+    billsInfo: {
+        billGenerators: [],
+        bills: [],
+    },
     name: 'The Three Musketeers',
     location: '487 Atlantic Ave, #3, Brooklyn, NY 11217',
-    quote: "I'll clear the bowl",
+    quote: "You miss 100% of the shots you don't take",
 };
 
 const Jeremy: User = {
@@ -146,6 +150,10 @@ const ImaginaryCrib: Apartment = {
         choreGenerators: [],
         chores: [],
     },
+    billsInfo: {
+        billGenerators: [],
+        bills: [],
+    },
     name: 'TrackSquad',
     location: '172 Delancey St, #6D, New York, NY 10002',
 };
@@ -182,7 +190,7 @@ const events: ApartmentEvent[] = [
         time: new Date('June 6, 2022 11:45:00'),
         invitees: [],
         attendees: [ImaginaryCrib],
-        title: 'Darty',
+        title: 'Party',
     },
     {
         id: '3',
@@ -191,7 +199,7 @@ const events: ApartmentEvent[] = [
         time: new Date('October 26, 2019, 15:41:00'),
         invitees: [],
         attendees: [],
-        title: 'Yo Momma',
+        title: 'Brunch',
     },
 ];
 
@@ -218,7 +226,7 @@ const messages: Message[] = [
         sender: 'Jeremy',
         senderId: '1',
         time: new Date('March 1, 2020 09:30:00'),
-        content: "Hey what's up losers",
+        content: "Hey what's up guys",
     },
     {
         id: '2',
@@ -232,28 +240,28 @@ const messages: Message[] = [
         sender: 'Jeremy',
         senderId: '1',
         time: new Date('March 3, 2020 09:30:00'),
-        content: "Hey what's up losers",
+        content: 'Mark when are you coming home?',
     },
     {
         id: '4',
         sender: 'Reda',
         senderId: '2',
         time: new Date('June 4, 2020 16:20:20'),
-        content: 'Yo who ate my gummy worms?',
+        content: 'Hahahaha',
     },
     {
         id: '5',
         sender: 'Jeremy',
         senderId: '1',
         time: new Date('March 9, 2020 09:30:00'),
-        content: "Hey what's up losers",
+        content: "I'll be home in a half hour does anyone want anything?",
     },
     {
         id: '6',
         sender: 'Reda',
         senderId: '2',
         time: new Date('June 1, 2020 16:20:20'),
-        content: 'Yo who ate my gummy worms?',
+        content: "Yo what's up guys?",
     },
 ].sort((a, b) => b.time.getTime() - a.time.getTime());
 

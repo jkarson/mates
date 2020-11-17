@@ -4,6 +4,8 @@ import { Message } from '../Messages/models/Message';
 import { Chore } from '../Chores/models/Chore';
 import { ApartmentId, TenantId } from './types';
 import { ChoreGenerator } from '../Chores/models/ChoreGenerator';
+import { BillGenerator } from '../Bills/models/BillGenerator';
+import { Bill } from '../Bills/models/Bill';
 
 export interface Apartment {
     readonly id: ApartmentId;
@@ -14,6 +16,7 @@ export interface Apartment {
     messages: Message[];
     manuallyAddedContacts: Contact[];
     choresInfo: ChoresInfo;
+    billsInfo: BillsInfo;
     quote?: string;
     location?: string;
 }
@@ -45,4 +48,9 @@ export interface EventsInfo {
 export interface ChoresInfo {
     choreGenerators: ChoreGenerator[];
     chores: Chore[];
+}
+
+export interface BillsInfo {
+    billGenerators: BillGenerator[];
+    bills: Bill[];
 }

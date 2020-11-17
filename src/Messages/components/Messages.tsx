@@ -30,7 +30,9 @@ const Messages: React.FC = () => {
 
     return (
         <div>
-            <p>{'Messages will be visible to you and your roommates only.'}</p>
+            <p style={{ fontWeight: 'bold' }}>
+                {'Messages will be visible to you and your roommates only.'}
+            </p>
             <CreateMessageCell
                 state={input}
                 setState={setInput}
