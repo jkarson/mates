@@ -1,5 +1,4 @@
 import { TenantId } from '../../Common/types';
-
 import { ChoreGeneratorID } from './ChoreGenerator';
 
 export interface Chore extends ChoreWithoutId {

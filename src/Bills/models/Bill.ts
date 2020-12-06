@@ -1,4 +1,5 @@
 import { TenantId } from '../../Common/types';
+import { AmountOwed } from './AmountOwed';
 import { BillGeneratorID } from './BillGenerator';
 
 export interface Bill extends BillWithoutId {
@@ -10,15 +11,9 @@ export interface BillWithoutId {
     name: string;
     payableTo: string;
     isPrivate: boolean;
-    privateTenant?: TenantId;
+    privateTenantId?: TenantId;
     amountsOwed: AmountOwed[];
     date: Date;
-    paid: boolean;
 }
 
-export interface AmountOwed {
-    tenantId: TenantId;
-    amount: number;
-}
-
-type BillId = string;
+export type BillId = string;

@@ -12,21 +12,23 @@ import { assertUnreachable } from './Common/utilities';
 import { UserContext } from './Common/context';
 import { Users } from './Common/constants';
 
+//PICKUP!
+/*
+    - Events, Bills, and Chores are refactored
+    - Refactor remaining modules
+    - Identify and fix remaining bugs / todos
+    - Incorporate server 
+
+
+
+
+*/
+
 //TO DO: make sure everything is sorted as it should be for display
 
-//TO DO: If I could build forms into a common component... it would be a lot of work to refactor but would make
-//implementation so much cleaner and quicker
+//note to self: perhaps all database updates can come via setUser, reducing a million endpoints to one.
 
-//TO DO: Make sure Contacts, Whiteboard, Friends, Events update 'back-end' data values as needed;
-//implement bills and chores
-//implement back-end
-//implement style
-
-//note to self: probably every time setUser is called, the database needs to be updated.
-//when our front-end data
-//changes, our back end data must change too
-
-//TO DO:
+//TO DO/EXTENSION: Tab notifications. This system may be a bit tricky and will likely involve the server.
 
 const tabNames = [
     'Profile',
@@ -70,10 +72,6 @@ const App: React.FC = () => {
     }
 
     const [user, setUser] = useState(Users.Jeremy);
-
-    //NOTE TO SELF: if we want everything to run through the database, make our setUser
-    //instead include the call to the database, and then set the user to the database's result.
-    //of course, i've put all the logic here in javascript, so idrk
 
     return (
         <UserContext.Provider value={{ user: user, setUser: setUser }}>

@@ -1,4 +1,4 @@
-import { Month, ObjectWithId, TenantId, Weekday } from '../Common/types';
+import { Frequency, Month, ObjectWithId, TenantId, Weekday } from '../Common/types';
 import { months, weekdays } from './constants';
 import { Tenant, User } from './models';
 
@@ -147,74 +147,131 @@ function getDayFromDayIndex(dayIndex: number): Weekday {
     return weekdays[dayIndex];
 }
 
-function getNextMonthDayIndicesMonthly(currentDate: Date): [number, number] {
+function getNextMonthDayIndicesMonthly(currentDate: Date, startingDate: Date): [number, number] {
     const currentMonth = currentDate.getMonth();
-    const currentDay = currentDate.getDate();
+    const originalDay = startingDate.getDate();
     const currentYear = currentDate.getFullYear();
     const nextMonth = currentMonth + 1;
     const nextYear = nextMonth > 11 ? currentYear + 1 : currentYear;
     const daysInNextMonth = getDaysInMonth(getMonthByIndex(nextMonth % 12), nextYear);
-    if (currentDay < daysInNextMonth) {
-        return [nextMonth, currentDay];
+    if (originalDay < daysInNextMonth) {
+        return [nextMonth, originalDay];
     } else {
         return [nextMonth, daysInNextMonth];
     }
 }
 
-function getNextMonthDayIndicesBiMonthly(currentDate: Date): [number, number] {
+function getNextMonthDayIndicesBiMonthly(currentDate: Date, startingDate: Date): [number, number] {
     const currentMonth = currentDate.getMonth();
-    const currentDay = currentDate.getDate();
+    const originalDay = startingDate.getDate();
     const currentYear = currentDate.getFullYear();
     const nextMonth = currentMonth + 2;
     const nextYear = nextMonth > 11 ? currentYear + 1 : currentYear;
     const daysInNextMonth = getDaysInMonth(getMonthByIndex(nextMonth % 12), nextYear);
-    if (currentDay < daysInNextMonth) {
-        return [nextMonth, currentDay];
+    if (originalDay < daysInNextMonth) {
+        return [nextMonth, originalDay];
     } else {
         return [nextMonth, daysInNextMonth];
     }
 }
 
-function getNextMonthDayIndicesQuarterly(currentDate: Date): [number, number] {
+function getNextMonthDayIndicesQuarterly(currentDate: Date, startingDate: Date): [number, number] {
     const currentMonth = currentDate.getMonth();
-    const currentDay = currentDate.getDate();
+    const originalDay = startingDate.getDate();
     const currentYear = currentDate.getFullYear();
     const nextMonth = currentMonth + 3;
     const nextYear = nextMonth > 11 ? currentYear + 1 : currentYear;
     const daysInNextMonth = getDaysInMonth(getMonthByIndex(nextMonth % 12), nextYear);
-    if (currentDay < daysInNextMonth) {
-        return [nextMonth, currentDay];
+    if (originalDay < daysInNextMonth) {
+        return [nextMonth, originalDay];
     } else {
         return [nextMonth, daysInNextMonth];
     }
 }
 
-function getNextMonthDayIndicesTriAnnually(currentDate: Date): [number, number] {
+function getNextMonthDayIndicesTriAnnually(
+    currentDate: Date,
+    startingDate: Date,
+): [number, number] {
     const currentMonth = currentDate.getMonth();
-    const currentDay = currentDate.getDate();
+    const originalDay = startingDate.getDate();
     const currentYear = currentDate.getFullYear();
     const nextMonth = currentMonth + 4;
     const nextYear = nextMonth > 11 ? currentYear + 1 : currentYear;
     const daysInNextMonth = getDaysInMonth(getMonthByIndex(nextMonth % 12), nextYear);
-    if (currentDay < daysInNextMonth) {
-        return [nextMonth, currentDay];
+    if (originalDay < daysInNextMonth) {
+        return [nextMonth, originalDay];
     } else {
         return [nextMonth, daysInNextMonth];
     }
 }
 
-function getNextMonthDayIndicesBiAnnually(currentDate: Date): [number, number] {
+function getNextMonthDayIndicesBiAnnually(currentDate: Date, startingDate: Date): [number, number] {
     const currentMonth = currentDate.getMonth();
-    const currentDay = currentDate.getDate();
+    const originalDay = startingDate.getDate();
     const currentYear = currentDate.getFullYear();
     const nextMonth = currentMonth + 6;
     const nextYear = nextMonth > 11 ? currentYear + 1 : currentYear;
     const daysInNextMonth = getDaysInMonth(getMonthByIndex(nextMonth % 12), nextYear);
-    if (currentDay < daysInNextMonth) {
-        return [nextMonth, currentDay];
+    if (originalDay < daysInNextMonth) {
+        return [nextMonth, originalDay];
     } else {
         return [nextMonth, daysInNextMonth];
     }
+}
+
+function getMaxDate() {
+    const current = getTodaysDate();
+    const currYear = current.getFullYear();
+    current.setFullYear(currYear + 1);
+    current.setDate(current.getDate() + 1);
+    return current;
+}
+
+function generateDates(starting: Date, generationStartDate: Date, frequency: Frequency): Date[] {
+    const dates: Date[] = [];
+    const ending = getMaxDate();
+
+    let dateIterator = new Date(starting.getTime());
+    loop1: while (isPreviousDate(dateIterator, ending)) {
+        if (!isPreviousDate(dateIterator, generationStartDate)) {
+            dates.push(new Date(dateIterator.getTime()));
+        }
+        switch (frequency) {
+            case 'Daily':
+                dateIterator.setDate(dateIterator.getDate() + 1);
+                break;
+            case 'Weekly':
+                dateIterator.setDate(dateIterator.getDate() + 7);
+                break;
+            case 'Monthly':
+                dateIterator.setMonth(...getNextMonthDayIndicesMonthly(dateIterator, starting));
+                break;
+            case 'Every 2 Months':
+                dateIterator.setMonth(...getNextMonthDayIndicesBiMonthly(dateIterator, starting));
+                break;
+            case 'Every 3 Months':
+                dateIterator.setMonth(...getNextMonthDayIndicesQuarterly(dateIterator, starting));
+                break;
+            case 'Quarterly':
+                dateIterator.setMonth(...getNextMonthDayIndicesQuarterly(dateIterator, starting));
+                break;
+            case 'Every 4 Months':
+                dateIterator.setMonth(...getNextMonthDayIndicesTriAnnually(dateIterator, starting));
+                break;
+            case 'Every 6 Months':
+                dateIterator.setMonth(...getNextMonthDayIndicesBiAnnually(dateIterator, starting));
+                break;
+            case 'Yearly':
+                dateIterator.setFullYear(dateIterator.getFullYear() + 1);
+                break;
+            case 'Once':
+                break loop1;
+            default:
+                assertUnreachable(frequency);
+        }
+    }
+    return dates;
 }
 
 function divideMoneyTotal(amount: number, splitNumber: number): number[] {
@@ -248,22 +305,66 @@ function roundToHundredth(num: number) {
     return Math.round(num * 100) / 100;
 }
 
-const handleFocusNumericInput = (input: React.RefObject<HTMLInputElement>) => {
-    if (input.current && input.current.value === '0') {
-        input.current.value = '';
+function handleFocusNumericStringInput(
+    input: React.RefObject<HTMLInputElement>,
+    setAmount: (amount: string) => void,
+) {
+    if (input.current && input.current.value === '0.00') {
+        setAmount('');
     }
     return;
-};
+}
 
-const handleBlurNumericInput = (input: React.RefObject<HTMLInputElement>) => {
-    if (input.current && input.current.value === '') {
-        input.current.value = '0';
+function handleBlurNumericStringInput(
+    input: React.RefObject<HTMLInputElement>,
+    setAmount: (amount: string) => void,
+    decimalPlaces: number,
+) {
+    if (input.current) {
+        if (input.current.value === '') {
+            let zeroString: string = '0.';
+            let i: number = decimalPlaces;
+            for (i; i > 0; i--) {
+                zeroString += '0';
+            }
+            setAmount(zeroString);
+            //input.current.value = '0.00';
+        } else {
+            const inputValue = roundToHundredth(parseFloat(input.current.value));
+            //input.current.value = inputValue.toFixed(decimalPlaces);
+            setAmount(inputValue.toFixed(decimalPlaces));
+        }
     }
     return;
-};
+}
 
-const isNotEmpty = (str: string) => {
-    return
+function verifyAndSetNumericStringInput(
+    event: React.ChangeEvent<HTMLInputElement>,
+    setAmount: (amount: string) => void,
+    decimalPlaces: number,
+) {
+    const input = event.target.value;
+    if (input === '.') {
+        setAmount(input);
+        return;
+    }
+    if (!isNaN(input as any)) {
+        if (input.length === 2 && input.charAt(0) === '0' && input.charAt(1) !== '.') {
+            setAmount(input.charAt(1));
+            return;
+        }
+        if (input.includes('.')) {
+            const decimalPointIndex = input.indexOf('.');
+            const decimalString = input.substring(decimalPointIndex + 1);
+            if (decimalString.length <= decimalPlaces) {
+                setAmount(input);
+                return;
+            }
+        } else {
+            setAmount(input);
+            return;
+        }
+    }
 }
 
 export {
@@ -292,11 +393,14 @@ export {
     getNextMonthDayIndicesQuarterly,
     getNextMonthDayIndicesTriAnnually,
     getNextMonthDayIndicesBiAnnually,
+    getMaxDate,
+    generateDates,
     divideMoneyTotal,
     getPercent,
     getAmountFromPercent,
     roundToTenth,
     roundToHundredth,
-    handleBlurNumericInput,
-    handleFocusNumericInput,
+    handleBlurNumericStringInput,
+    handleFocusNumericStringInput,
+    verifyAndSetNumericStringInput,
 };

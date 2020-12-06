@@ -1,3 +1,5 @@
+import { BillFrequency } from '../Bills/models/BillFrequency';
+import { ChoreFrequency } from '../Chores/models/ChoreFrequency';
 import { months, weekdays } from './constants';
 
 export interface StateProps<T> {
@@ -15,3 +17,5 @@ export type TenantId = string;
 export type Month = typeof months[number];
 export type Weekday = typeof weekdays[number];
 export type AMPM = 'AM' | 'PM';
+
+export type Frequency = BillFrequency | ChoreFrequency;

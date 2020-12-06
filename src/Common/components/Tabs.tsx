@@ -1,4 +1,6 @@
 import React from 'react';
+import '../styles/Tabs.css';
+import NotificationCell from './NotificationCell';
 
 interface TabsProps<T> {
     currentTab: T;
@@ -27,13 +29,39 @@ const Tabs = <T extends string>({ currentTab, setTab, tabNames }: TabsProps<T>) 
 interface TabProps {
     name: string;
     isSelected: boolean;
-    handleClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+    handleClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+    notifications?: number;
 }
 
-const Tab: React.FC<TabProps> = ({ name, isSelected, handleClick }) => (
-    <button onClick={handleClick} style={isSelected ? { color: 'purple' } : { color: 'pink' }}>
-        {name}
-    </button>
+const Tab: React.FC<TabProps> = ({ name, isSelected, handleClick, notifications }) => (
+    <div
+        className="tab"
+        onClick={handleClick}
+        style={isSelected ? { color: 'purple' } : { color: 'pink' }}
+    >
+        <TabBody name={name} notifications={notifications} />
+    </div>
 );
+
+interface TabBodyProps {
+    name: string;
+    notifications: number | undefined;
+}
+
+//to do: reorganize as red circle white letter,
+//elevated off the upper right corner
+
+const TabBody: React.FC<TabBodyProps> = ({ name, notifications }) => {
+    if (notifications && notifications > 0) {
+        return (
+            <div style={{ display: 'flex' }}>
+                <span>{name}</span>
+                <NotificationCell notifications={notifications} />
+            </div>
+        );
+    } else {
+        return <div>{name}</div>;
+    }
+};
 
 export default Tabs;
