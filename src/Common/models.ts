@@ -2,7 +2,6 @@ import { ApartmentEvent } from '../Events/models/ApartmentEvent';
 import { Contact } from '../Contacts/models/Contact';
 import { Message } from '../Messages/models/Message';
 import { Chore } from '../Chores/models/Chore';
-import { ApartmentId, TenantId } from './types';
 import { ChoreGenerator } from '../Chores/models/ChoreGenerator';
 import { BillGenerator } from '../Bills/models/BillGenerator';
 import { Bill } from '../Bills/models/Bill';
@@ -21,6 +20,8 @@ export interface Apartment {
     location?: string;
 }
 
+export type ApartmentId = string;
+
 export interface Tenant {
     readonly id: TenantId;
     name: string;
@@ -28,6 +29,8 @@ export interface Tenant {
     email?: string;
     number?: string;
 }
+
+export type TenantId = string;
 
 export interface User {
     tenantId: TenantId;

@@ -7,15 +7,26 @@ export interface StateProps<T> {
     setState: React.Dispatch<React.SetStateAction<T>> | ((T: T) => void);
 }
 
+//TO DO: pending server interaction, we can
+//type-guard this more strictly.
 export interface ObjectWithId {
     id: string;
 }
 
-export type ApartmentId = string;
-export type TenantId = string;
+export type Frequency = BillFrequency | ChoreFrequency;
 
 export type Month = typeof months[number];
 export type Weekday = typeof weekdays[number];
+
 export type AMPM = 'AM' | 'PM';
 
-export type Frequency = BillFrequency | ChoreFrequency;
+export interface DateTimeInputType {
+    date: Date;
+    time: TimeInputType;
+}
+
+export interface TimeInputType {
+    hour: number;
+    minute: number;
+    ampm: AMPM;
+}

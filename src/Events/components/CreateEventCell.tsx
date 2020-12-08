@@ -1,13 +1,14 @@
 import React, { useContext, useState } from 'react';
-import {
-    DateTimeInputType,
-    getCurrentDateTime,
-    convertToDateWithTime,
-    DateTimeInputCell,
-} from '../../Common/components/DateTimeInputCell';
+import DateTimeInputCell from '../../Common/components/DateTimeInputCell';
 import { UserContext, UserContextType } from '../../Common/context';
 import { Tenant } from '../../Common/models';
-import { getTenant, getNewId } from '../../Common/utilities';
+import { DateTimeInputType } from '../../Common/types';
+import {
+    getTenant,
+    getNewId,
+    convertToDateWithTime,
+    getCurrentDateTime,
+} from '../../Common/utilities';
 import { ApartmentEvent } from '../models/ApartmentEvent';
 import { EventsTabType } from '../models/EventsTabs';
 import { isPastEvent, isPresentEvent } from '../utilities';

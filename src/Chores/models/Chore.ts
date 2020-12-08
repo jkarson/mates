@@ -1,4 +1,4 @@
-import { TenantId } from '../../Common/types';
+import { TenantId } from '../../Common/models';
 import { ChoreGeneratorID } from './ChoreGenerator';
 
 export interface Chore extends ChoreWithoutId {

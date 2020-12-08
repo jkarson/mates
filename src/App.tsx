@@ -10,21 +10,15 @@ import Profile from './Profile/components/Profile';
 import Tabs from './Common/components/Tabs';
 import { assertUnreachable } from './Common/utilities';
 import { UserContext } from './Common/context';
-import { Users } from './Common/constants';
+import { Users } from './Common/mockData';
 
 //PICKUP!
 /*
-    - Events, Bills, and Chores are refactored
-    - Refactor remaining modules
+    - Events, Bills, and Chores are refactored (done)
+    - Refactor Contacts (done), Friends (done), Messages (done), Profile (done), and Common (done)
     - Identify and fix remaining bugs / todos
-    - Incorporate server 
-
-
-
-
+    - Incorporate server
 */
-
-//TO DO: make sure everything is sorted as it should be for display
 
 //note to self: perhaps all database updates can come via setUser, reducing a million endpoints to one.
 

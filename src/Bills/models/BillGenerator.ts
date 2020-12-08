@@ -1,4 +1,4 @@
-import { TenantId } from '../../Common/types';
+import { TenantId } from '../../Common/models';
 import { AmountWithPercentOwed } from './AmountWithPercentOwed';
 import { BillFrequency } from './BillFrequency';
 

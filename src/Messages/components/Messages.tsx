@@ -1,9 +1,10 @@
 import React, { useContext, useState } from 'react';
 import { Message, MessageWithoutId } from '../models/Message';
 import { UserContext, UserContextType } from '../../Common/context';
-import { StateProps, TenantId } from '../../Common/types';
 import { getNewId, getTenant } from '../../Common/utilities';
 import { Tenant } from '../../Common/models';
+import CreateMessageCell from './CreateMessageCell';
+import MessageCell from './MessageCell';
 
 const Messages: React.FC = () => {
     const { user, setUser } = useContext(UserContext) as UserContextType;
@@ -50,69 +51,6 @@ const Messages: React.FC = () => {
                     />
                 ))}
             </div>
-        </div>
-    );
-};
-
-interface CreateMessageCellProps extends StateProps<string> {
-    author: string;
-    authorId: TenantId;
-    handleNewMessage: (message: MessageWithoutId) => void;
-}
-
-const CreateMessageCell: React.FC<CreateMessageCellProps> = ({
-    state,
-    setState,
-    author,
-    authorId,
-    handleNewMessage,
-}) => {
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        const newMessage: MessageWithoutId = {
-            sender: author,
-            senderId: authorId,
-            time: new Date(Date.now()),
-            content: state,
-        };
-        handleNewMessage(newMessage);
-        setState('');
-        event.preventDefault();
-    };
-
-    return (
-        <form onSubmit={handleSubmit}>
-            <label style={{ fontWeight: 'bold' }}>{author + ':'}</label>
-            <div>
-                <textarea
-                    placeholder="Add your message here"
-                    value={state}
-                    onChange={(e) => setState(e.target.value)}
-                    rows={3}
-                    cols={80}
-                />
-            </div>
-            <input type="submit" value="Send" />
-        </form>
-    );
-};
-
-interface MessageCellProps {
-    message: Message;
-    canDelete: boolean;
-    handleDelete: (message: Message) => void;
-}
-
-const MessageCell: React.FC<MessageCellProps> = ({ message, canDelete, handleDelete }) => {
-    return (
-        <div>
-            <p style={{ fontWeight: 'bold' }}>{message.sender}</p>
-            <p style={{ fontWeight: 'bold', fontSize: 'small' }}>
-                {message.time.toLocaleDateString() + ', ' + message.time.toLocaleTimeString()}
-            </p>
-            <p>{message.content}</p>
-            {canDelete ? (
-                <button onClick={() => handleDelete(message)}>{'Delete Message'}</button>
-            ) : null}
         </div>
     );
 };

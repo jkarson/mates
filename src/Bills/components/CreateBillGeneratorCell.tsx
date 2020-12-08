@@ -1,5 +1,4 @@
 import React, { useContext, useState } from 'react';
-import { DateInputCell } from '../../Common/components/DateInputCell';
 import FrequencySelectCell from '../../Common/components/FrequencySelectCell';
 import { UserContext, UserContextType } from '../../Common/context';
 import {
@@ -17,6 +16,7 @@ import { BillGenerator } from '../models/BillGenerator';
 import { BillsTabType } from '../models/BillsTabs';
 import AmountsWithPercentOwedAssignmentCell from './AmountsWithPercentOwedAssignmentCell';
 import { getInitialAmountsWithPercentOwed, getTotalAssignedValue } from '../utilities';
+import DateInputCell from '../../Common/components/DateInputCell';
 
 interface CreateBillGeneratorInput {
     name: string;

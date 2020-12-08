@@ -1,11 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { UserContext, UserContextType } from '../../Common/context';
 import { Apartment } from '../../Common/models';
-import { getFormattedDateTimeString } from '../../Common/utilities';
-import {
-    getFriendSummaryCellString,
-    FriendSummaryCell,
-} from '../../Friends/components/FriendSummaryCell';
+import { getFormattedDateTimeString, getApartmentSummaryString } from '../../Common/utilities';
+import FriendSummaryCell from '../../Friends/components/FriendSummaryCell';
 import { ApartmentEvent } from '../models/ApartmentEvent';
 import { isFutureEvent, isPresentEvent } from '../utilities';
 
@@ -92,7 +89,7 @@ const SendInvitationCell: React.FC<SendInvitationCellProps> = ({ event, handleIn
             ) : (
                 eligibleInvitees.map((apartment, index) => (
                     <div>
-                        <p>{getFriendSummaryCellString(apartment)}</p>
+                        <p>{getApartmentSummaryString(apartment)}</p>
                         <button onClick={() => handleInvite(event, apartment)}>{'Invite'}</button>
                     </div>
                 ))

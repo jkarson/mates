@@ -1,5 +1,4 @@
-import { Apartment } from '../../Common/models';
-import { TenantId } from '../../Common/types';
+import { Apartment, TenantId } from '../../Common/models';
 
 export interface ApartmentEvent {
     id: ApartmentEventId;

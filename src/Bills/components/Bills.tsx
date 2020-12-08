@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import DescriptionCell from '../../Common/components/DescriptionCell';
 import Tabs from '../../Common/components/Tabs';
 import { UserContext, UserContextType } from '../../Common/context';
-import { TenantId } from '../../Common/types';
+import { TenantId } from '../../Common/models';
 import { assertUnreachable, getTodaysDate, isPreviousDate } from '../../Common/utilities';
 import { AmountOwed } from '../models/AmountOwed';
 import { Bill, BillId } from '../models/Bill';

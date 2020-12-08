@@ -45,12 +45,13 @@ const Tab: React.FC<TabProps> = ({ name, isSelected, handleClick, notifications 
 
 interface TabBodyProps {
     name: string;
-    notifications: number | undefined;
+    notifications?: number;
 }
 
-//to do: reorganize as red circle white letter,
-//elevated off the upper right corner
-
+//TO DO: reorganize as red circle white letter,
+// elevated off the upper right corner
+// note: so all we have to do for tabs is pass stateful
+// notification #s (populated live by server?) to each tab
 const TabBody: React.FC<TabBodyProps> = ({ name, notifications }) => {
     if (notifications && notifications > 0) {
         return (

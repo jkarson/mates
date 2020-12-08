@@ -1,16 +1,16 @@
 import React, { useContext, useState } from 'react';
-import { DateInputCell } from '../../Common/components/DateInputCell';
+import DateInputCell from '../../Common/components/DateInputCell';
 import FrequencySelectCell from '../../Common/components/FrequencySelectCell';
 import { UserContext, UserContextType } from '../../Common/context';
-import { Tenant } from '../../Common/models';
-import { StateProps, TenantId } from '../../Common/types';
+import { Tenant, TenantId } from '../../Common/models';
+import { StateProps } from '../../Common/types';
 import {
+    formatNames,
     getNewId,
     getTenantByTenantId,
     getTodaysDate,
     getYesterdaysDateFromDate,
 } from '../../Common/utilities';
-import { formatNames } from '../../Friends/components/FriendSummaryCell';
 import { choreFrequencies, ChoreFrequency } from '../models/ChoreFrequency';
 import { ChoreGenerator } from '../models/ChoreGenerator';
 import { ChoresTabType } from '../models/ChoresTabs';

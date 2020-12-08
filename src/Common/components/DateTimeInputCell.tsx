@@ -1,12 +1,8 @@
 import React from 'react';
-import { StateProps } from '../types';
-import { DateInputCell } from './DateInputCell';
-import { convertToTime, getCurrentTime, TimeInputCell, TimeInputType } from './TimeInputCell';
-
-export interface DateTimeInputType {
-    date: Date;
-    time: TimeInputType;
-}
+import { DateTimeInputType, StateProps, TimeInputType } from '../types';
+import { getCurrentDateTime } from '../utilities';
+import DateInputCell from './DateInputCell';
+import TimeInputCell from './TimeInputCell';
 
 const DateTimeInputCell: React.FC<StateProps<DateTimeInputType>> = ({ state, setState }) => {
     const [dateTimeInput, setDateTimeInput] = [state, setState];
@@ -32,18 +28,4 @@ const DateTimeInputCell: React.FC<StateProps<DateTimeInputType>> = ({ state, set
     );
 };
 
-export const getCurrentDateTime = (): DateTimeInputType => {
-    return {
-        date: new Date(Date.now()),
-        time: getCurrentTime(),
-    };
-};
-
-export const convertToDateWithTime = (input: DateTimeInputType): Date => {
-    const date = input.date;
-    const time = convertToTime(input.time);
-    date.setHours(time.hour, time.minute);
-    return date;
-};
-
-export { DateTimeInputCell };
+export default DateTimeInputCell;

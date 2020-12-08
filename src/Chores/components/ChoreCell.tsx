@@ -1,8 +1,7 @@
 import React, { useContext } from 'react';
 import { UserContext, UserContextType } from '../../Common/context';
 import { Tenant } from '../../Common/models';
-import { getFormattedDateString, getTenantByTenantId } from '../../Common/utilities';
-import { formatNames } from '../../Friends/components/FriendSummaryCell';
+import { formatNames, getFormattedDateString, getTenantByTenantId } from '../../Common/utilities';
 import { Chore } from '../models/Chore';
 import { ChoreGeneratorID } from '../models/ChoreGenerator';
 

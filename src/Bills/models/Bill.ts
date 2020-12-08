@@ -1,4 +1,4 @@
-import { TenantId } from '../../Common/types';
+import { TenantId } from '../../Common/models';
 import { AmountOwed } from './AmountOwed';
 import { BillGeneratorID } from './BillGenerator';
 

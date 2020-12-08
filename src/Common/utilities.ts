@@ -1,6 +1,13 @@
-import { Frequency, Month, ObjectWithId, TenantId, Weekday } from '../Common/types';
+import {
+    DateTimeInputType,
+    Frequency,
+    Month,
+    ObjectWithId,
+    TimeInputType,
+    Weekday,
+} from '../Common/types';
 import { months, weekdays } from './constants';
-import { Tenant, User } from './models';
+import { Apartment, Tenant, TenantId, User } from './models';
 
 function assertUnreachable(x: never): never {
     throw new Error("Didn't expect to get here");
@@ -328,10 +335,8 @@ function handleBlurNumericStringInput(
                 zeroString += '0';
             }
             setAmount(zeroString);
-            //input.current.value = '0.00';
         } else {
             const inputValue = roundToHundredth(parseFloat(input.current.value));
-            //input.current.value = inputValue.toFixed(decimalPlaces);
             setAmount(inputValue.toFixed(decimalPlaces));
         }
     }
@@ -365,6 +370,59 @@ function verifyAndSetNumericStringInput(
             return;
         }
     }
+}
+
+function formatNames(names: string[]) {
+    if (names.length === 0) {
+        return '';
+    } else if (names.length === 1) {
+        return names[0];
+    } else if (names.length === 2) {
+        return names[0] + ' & ' + names[1];
+    } else {
+        return names[0] + ', ' + formatNames(names.slice(1));
+    }
+}
+
+function getApartmentSummaryString(apartment: Apartment) {
+    return apartment.name + ': ' + formatNames(apartment.tenants.map((tenant) => tenant.name));
+}
+
+function getCurrentTime(): TimeInputType {
+    const now = new Date(Date.now());
+    const rawHour = now.getHours();
+    const hour = rawHour % 12 === 0 ? 12 : rawHour % 12;
+    const minute = now.getMinutes();
+    const ampm = rawHour < 12 ? 'AM' : 'PM';
+    return {
+        hour: hour,
+        minute: minute,
+        ampm: ampm,
+    };
+}
+
+function getCurrentDateTime(): DateTimeInputType {
+    return {
+        date: new Date(Date.now()),
+        time: getCurrentTime(),
+    };
+}
+
+function convertToDateWithTime(input: DateTimeInputType): Date {
+    const convertToTime = (input: TimeInputType): [number, number] => {
+        let hour: number;
+        if (input.ampm === 'AM') {
+            hour = input.hour === 12 ? 0 : input.hour;
+        } else {
+            hour = input.hour === 12 ? 12 : input.hour + 12;
+        }
+        const minute = input.minute;
+        return [hour, minute];
+    };
+    const date = input.date;
+    const time = convertToTime(input.time);
+    date.setHours(...time);
+    return date;
 }
 
 export {
@@ -403,4 +461,9 @@ export {
     handleBlurNumericStringInput,
     handleFocusNumericStringInput,
     verifyAndSetNumericStringInput,
+    formatNames,
+    getApartmentSummaryString,
+    getCurrentTime,
+    getCurrentDateTime,
+    convertToDateWithTime,
 };

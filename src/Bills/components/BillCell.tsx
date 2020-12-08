@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
-import { TenantId } from '../../Common/types';
 import { getFormattedDateString, getTenantByTenantId } from '../../Common/utilities';
 import { Bill, BillId } from '../models/Bill';
 import { BillGeneratorID } from '../models/BillGenerator';
 import { getTotalCurrentAssignedValue } from '../utilities';
 import { AmountOwed } from '../models/AmountOwed';
 import { UserContext, UserContextType } from '../../Common/context';
+import { TenantId } from '../../Common/models';
 
 interface BillCellProps {
     bill: Bill;

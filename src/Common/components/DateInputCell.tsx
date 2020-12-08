@@ -54,6 +54,40 @@ const DateInputCell: React.FC<DateInputCellProps> = ({ state, setState, showRese
         setDateInput(getTodaysDate());
     };
 
+    const getDayOptions = (monthIndex: number, year: number): JSX.Element[] => {
+        const month = getMonthByIndex(monthIndex);
+        const days = getDaysInMonth(month, year);
+        const options: JSX.Element[] = [];
+        let i: number;
+        for (i = 1; i <= days; i++) {
+            options.push(<option value={i}>{i}</option>);
+        }
+        return options;
+    };
+
+    const getMonthOptions = () => {
+        return months.map((month, index) => (
+            <option value={month} key={index}>
+                {month}
+            </option>
+        ));
+    };
+
+    const getYearOptions = () => {
+        const options: JSX.Element[] = [];
+        const today = getTodaysDate();
+        const currentYear = today.getFullYear();
+        let optionYear: number = currentYear - 5;
+        for (optionYear; optionYear < currentYear + 15; optionYear++) {
+            options.push(
+                <option value={optionYear} key={optionYear}>
+                    {optionYear}
+                </option>,
+            );
+        }
+        return options;
+    };
+
     return (
         <div>
             <label>
@@ -74,38 +108,4 @@ const DateInputCell: React.FC<DateInputCellProps> = ({ state, setState, showRese
     );
 };
 
-const getDayOptions = (monthIndex: number, year: number): JSX.Element[] => {
-    const month = getMonthByIndex(monthIndex);
-    const days = getDaysInMonth(month, year);
-    const options: JSX.Element[] = [];
-    let i: number;
-    for (i = 1; i <= days; i++) {
-        options.push(<option value={i}>{i}</option>);
-    }
-    return options;
-};
-
-const getMonthOptions = () => {
-    return months.map((month, index) => (
-        <option value={month} key={index}>
-            {month}
-        </option>
-    ));
-};
-
-const getYearOptions = () => {
-    const options: JSX.Element[] = [];
-    const today = getTodaysDate();
-    const currentYear = today.getFullYear();
-    let optionYear: number = currentYear - 5;
-    for (optionYear; optionYear < currentYear + 15; optionYear++) {
-        options.push(
-            <option value={optionYear} key={optionYear}>
-                {optionYear}
-            </option>,
-        );
-    }
-    return options;
-};
-
-export { DateInputCell };
+export default DateInputCell;
