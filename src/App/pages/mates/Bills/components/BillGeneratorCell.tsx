@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { UserContext, UserContextType } from '../../../../common/context';
+import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { getFormattedDateString, getTenantByTenantId } from '../../../../common/utilities';
 import { AmountWithPercentOwed } from '../models/AmountWithPercentOwed';
 import { BillGenerator, BillGeneratorID } from '../models/BillGenerator';
@@ -31,7 +31,7 @@ const BillGeneratorCell: React.FC<BillGeneratorCellProps> = ({
                     amountsWithPercentOwed={billGenerator.amountsWithPercentOwed}
                 />
             </span>
-            <button onClick={() => handleDeleteBillSeries(billGenerator.id)}>
+            <button onClick={() => handleDeleteBillSeries(billGenerator._id)}>
                 {'Delete Bill Series'}
             </button>
         </div>
@@ -45,11 +45,11 @@ interface AmountsWithPercentOwedDisplayCellProps {
 const AmountsWithPercentOwedDisplayCell: React.FC<AmountsWithPercentOwedDisplayCellProps> = ({
     amountsWithPercentOwed,
 }) => {
-    const { user } = useContext(UserContext) as UserContextType;
+    const { matesUser: user } = useContext(MatesUserContext) as MatesUserContextType;
     const content = amountsWithPercentOwed
         .filter((aWPO) => aWPO.percentValue > 0)
         .map((aWPO) => {
-            const tenant = getTenantByTenantId(user, aWPO.tenantId);
+            const tenant = getTenantByTenantId(user, aWPO.userId);
             const tenantName = tenant ? tenant.name : 'Unknown';
             return <p>{tenantName + ': $' + aWPO.amount + ' (' + aWPO.percent + '%)'}</p>;
         });

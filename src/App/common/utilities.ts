@@ -1,6 +1,24 @@
+import { Contact } from '../pages/mates/Contacts/models/Contact';
 import { months, weekdays } from './constants';
-import { Apartment, Tenant, TenantId, User } from './models';
-import { ObjectWithId, Month, Weekday, Frequency, TimeInputType, DateTimeInputType } from './types';
+import {
+    Apartment,
+    ApartmentSummary,
+    FriendProfile,
+    FriendsInfo,
+    MatesUser,
+    Tenant,
+    UserId,
+} from './models';
+import {
+    ObjectWithId,
+    Month,
+    Weekday,
+    Frequency,
+    TimeInputType,
+    DateTimeInputType,
+    ServerClass,
+    ClientClass,
+} from './types';
 
 function assertUnreachable(x: never): never {
     throw new Error("Didn't expect to get here");
@@ -12,37 +30,42 @@ should be coming from the back-end. Determining what and where those endpoints
 are is something you're struggling with right now. I think a good thing to remember is 
 to embrace the struggle. The struggle is the process of you getting smarter and your
 code getting better. The time crunch is imaginary. Do your work and do it with art */
-function getNewId<T extends ObjectWithId>(objects: T[]): string {
-    if (objects.length === 0) {
-        return '1';
-    }
-    const maxId = Math.max(...objects.map((object) => parseInt(object.id, 10)));
-    const newId = maxId + 1;
-    return newId.toString();
-}
 
-function getNewIds<T extends ObjectWithId>(objects: T[], quantity: number): string[] {
-    const newId = getNewId(objects);
-    const newIds: string[] = [];
+//DEPRECATED
+// function getNewId<T extends ObjectWithId>(objects: T[]): string {
+//     if (objects.length === 0) {
+//         return '1';
+//     }
+//     const maxId = Math.max(...objects.map((object) => parseInt(object.id, 10)));
+//     const newId = maxId + 1;
+//     return newId.toString();
+// }
 
-    let ID = parseInt(newId, 10);
-    for (quantity; quantity > 0; quantity--) {
-        newIds.push(ID.toString());
-        ID += 1;
-    }
-    return newIds;
-}
+//DEPRECATED
+// function getNewIds<T extends ObjectWithId>(objects: T[], quantity: number): string[] {
+//     const newId = getNewId(objects);
+//     const newIds: string[] = [];
+
+//     let ID = parseInt(newId, 10);
+//     for (quantity; quantity > 0; quantity--) {
+//         newIds.push(ID.toString());
+//         ID += 1;
+//     }
+//     return newIds;
+// }
 
 function isLetter(c: string): boolean {
     return c.length === 1 && c.toLocaleLowerCase() !== c.toLocaleUpperCase();
 }
 
-function getTenant(user: User): Tenant {
-    return user.apartment.tenants.find((tenant) => tenant.id === user.tenantId) as Tenant;
+function getTenant(matesUser: MatesUser): Tenant {
+    return matesUser.apartment.tenants.find(
+        (tenant) => tenant.userId === matesUser.userId,
+    ) as Tenant;
 }
 
-function getTenantByTenantId(user: User, tenantId: TenantId): Tenant | undefined {
-    return user.apartment.tenants.find((tenant) => tenant.id === tenantId);
+function getTenantByTenantId(matesUser: MatesUser, tenantId: UserId): Tenant | undefined {
+    return matesUser.apartment.tenants.find((tenant) => tenant.userId === tenantId);
 }
 
 function convertDaysToMS(days: number) {
@@ -228,9 +251,15 @@ function getMaxDate() {
     return current;
 }
 
+function getLaterDateToTest() {
+    const maxDate = getMaxDate();
+    maxDate.setFullYear(maxDate.getFullYear() + 1);
+    return maxDate;
+}
+
 function generateDates(starting: Date, generationStartDate: Date, frequency: Frequency): Date[] {
     const dates: Date[] = [];
-    const ending = getMaxDate();
+    const ending = getMaxDate(); //getLaterDateToTest(); //getMaxDate();
 
     let dateIterator = new Date(starting.getTime());
     loop1: while (isPreviousDate(dateIterator, ending)) {
@@ -378,7 +407,15 @@ function formatNames(names: string[]) {
 }
 
 function getApartmentSummaryString(apartment: Apartment) {
-    return apartment.name + ': ' + formatNames(apartment.tenants.map((tenant) => tenant.name));
+    return (
+        apartment.profile.name + ': ' + formatNames(apartment.tenants.map((tenant) => tenant.name))
+    );
+}
+
+function getFriendProfileSummaryString(friendProfile: FriendProfile) {
+    return (
+        friendProfile.name + ': ' + formatNames(friendProfile.tenants.map((tenant) => tenant.name))
+    );
 }
 
 function getCurrentTime(): TimeInputType {
@@ -418,10 +455,83 @@ function convertToDateWithTime(input: DateTimeInputType): Date {
     return date;
 }
 
+function getPostOptions(data: any) {
+    return {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    };
+}
+
+function getPutOptions(data: any) {
+    return {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    };
+}
+
+function getDeleteOptions(data: any) {
+    return {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    };
+}
+
+function initializeDates(uninitializedArray: ServerClass[], parameterName: string): ClientClass[] {
+    const result: unknown = uninitializedArray.map((unintializedObject) => {
+        unintializedObject[parameterName] = new Date(unintializedObject[parameterName]);
+        return unintializedObject;
+    });
+    const clientResult = result as ClientClass[];
+    return clientResult;
+}
+
+function getFriendProfilesFromServerFriends(friends: any[]): FriendProfile[] {
+    return friends.map((friend) => {
+        return {
+            apartmentId: friend._id,
+            code: friend.profile.code,
+            name: friend.profile.name,
+            quote: friend.profile.quote,
+            address: friend.profile.address,
+            tenants: friend.tenants,
+        };
+    });
+}
+
+function getApartmentSummariesFromServerFriendRequests(requests: any[]): ApartmentSummary[] {
+    return requests.map((requestApt) => {
+        return {
+            apartmentId: requestApt._id,
+            name: requestApt.profile.name,
+            tenantNames: requestApt.tenants.map((tenant) => tenant.name),
+        };
+    });
+}
+
+function getFriendProfileFromApartment(apartment: Apartment): FriendProfile {
+    return {
+        apartmentId: apartment._id,
+        code: apartment.profile.code,
+        name: apartment.profile.name,
+        quote: apartment.profile.quote,
+        address: apartment.profile.address,
+        tenants: apartment.tenants,
+    };
+}
+
 export {
     assertUnreachable,
-    getNewId,
-    getNewIds,
+    // getNewId,
+    // getNewIds,
     isLetter,
     getTenant,
     getTenantByTenantId,
@@ -456,7 +566,16 @@ export {
     verifyAndSetNumericStringInput,
     formatNames,
     getApartmentSummaryString,
+    getFriendProfileSummaryString,
     getCurrentTime,
     getCurrentDateTime,
     convertToDateWithTime,
+    getPostOptions,
+    getPutOptions,
+    getDeleteOptions,
+    initializeDates,
+    getFriendProfileFromApartment,
+    getFriendProfilesFromServerFriends,
+    getApartmentSummariesFromServerFriendRequests,
+    getLaterDateToTest, //TEMP
 };

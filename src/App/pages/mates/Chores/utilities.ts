@@ -1,72 +1,102 @@
-import { User } from '../../../common/models';
+import { ChoresInfo, MatesUser } from '../../../common/models';
 import {
     isSameDayMonthYear,
     getMaxDate,
-    getNewIds,
     generateDates,
     isPreviousDate,
     getTodaysDate,
+    initializeDates,
+    getPostOptions,
+    getLaterDateToTest,
+    getDeleteOptions,
 } from '../../../common/utilities';
 import { Chore, ChoreWithoutId } from './models/Chore';
-import { ChoreGenerator } from './models/ChoreGenerator';
+import { ChoreGenerator, ChoreGeneratorWithoutId } from './models/ChoreGenerator';
+import { ServerChoresInfo } from './models/ServerChoresInfo';
 
 export const updateChoresFromChoreGenerators = (
     choreGenerators: ChoreGenerator[],
-    user: User,
-    setUser: React.Dispatch<React.SetStateAction<User>>,
+    matesUser: MatesUser,
+    setMatesUser: React.Dispatch<React.SetStateAction<MatesUser>>,
 ) => {
-    const originalChores = user.apartment.choresInfo.chores;
-    const newChores: Chore[] = [];
+    console.log('hi from updateChores effect');
+    const newChores: ChoreWithoutId[] = [];
 
-    // Only update user if user actually needs to be updated. This protects
-    // against an infinite update loop.
+    // Only proceed if user has chore generators to update
     if (
         choreGenerators.filter((chore) => !isSameDayMonthYear(chore.updatedThrough, getMaxDate()))
             .length === 0
     ) {
-        return;
+        console.log('nothing to update, returning');
+        return false;
     }
 
     choreGenerators.forEach((choreGenerator) => {
-        const { updatedThrough } = choreGenerator;
-        const generationStartDate = new Date(updatedThrough.getTime());
-        generationStartDate.setDate(generationStartDate.getDate() + 1);
-        const generatedChores = getChoresFromChoreGenerator(
-            choreGenerator,
-            originalChores.concat(newChores),
-            generationStartDate,
-        );
+        const generatedChores = getChoresWithoutIdFromChoreGenerator(choreGenerator);
         newChores.push(...generatedChores);
-        choreGenerator.updatedThrough = getMaxDate();
     });
-    user.apartment.choresInfo.chores.push(...newChores);
-    setUser({ ...user });
+
+    const data = {
+        apartmentId: matesUser.apartment._id,
+        updatedThrough: getMaxDate(),
+        newChores: newChores,
+    };
+    console.log(data);
+
+    const options = getPostOptions(data);
+    fetch('/mates/addChoresAndUpdateChoreGenerators', options).then((res) =>
+        res.json().then((json) => {
+            console.log(json);
+            const { authenticated, success } = json;
+            if (!authenticated) {
+                return true;
+            }
+            if (!success) {
+                return false;
+            }
+            const { choresInfo } = json;
+            const formattedChoresInfo = initializeServerChoresInfo(choresInfo);
+            setMatesUser({
+                ...matesUser,
+                apartment: { ...matesUser.apartment, choresInfo: formattedChoresInfo },
+            });
+        }),
+    );
+    // matesUser.apartment.choresInfo.chores.push(...newChores);
+    //setMatesUser({ ...matesUser });
     //TO DO: SAVE NEW CHORES TO DATABASE
 };
 
-const getChoresFromChoreGenerator = (
-    choreGenerator: ChoreGenerator,
-    previousChores: Chore[],
-    generationStartDate: Date,
-): Chore[] => {
-    const choresWithoutId = getChoresWithoutIdFromChoreGenerator(
-        choreGenerator,
-        generationStartDate,
-    );
-    const newIds = getNewIds(previousChores, choresWithoutId.length);
-    const chores: Chore[] = [];
-    choresWithoutId.forEach((chore, index) => chores.push({ ...chore, id: newIds[index] }));
-    return chores;
-};
+// const getChoresFromChoreGenerator = (
+//     choreGenerator: ChoreGenerator,
+//     generationStartDate: Date,
+// ): Chore[] => {
+//     const choresWithoutId = getChoresWithoutIdFromChoreGenerator(
+//         choreGenerator,
+//         generationStartDate,
+//     );
+//     //const newIds = getNewIds(previousChores, choresWithoutId.length);
+//     //const newIds = choresWithoutId.map(() => '-1'); //TO DO: OVERRIDE W ID FROM SERVER
+//     const chores: Chore[] = [];
+//     choresWithoutId.forEach((chore, index) => chores.push({ ...chore, _id: newIds[index] }));
+//     return chores;
+// };
 
-const getChoresWithoutIdFromChoreGenerator = (
-    { id, name, assigneeIds, showUntilCompleted, frequency, starting }: ChoreGenerator,
-    generationStartDate: Date,
-): ChoreWithoutId[] => {
+const getChoresWithoutIdFromChoreGenerator = ({
+    _id: id,
+    name,
+    assigneeIds,
+    showUntilCompleted,
+    frequency,
+    starting,
+    updatedThrough,
+}: ChoreGenerator): ChoreWithoutId[] => {
+    const generationStartDate = new Date(updatedThrough.getTime());
+    generationStartDate.setDate(generationStartDate.getDate() + 1);
     const choreDates = generateDates(starting, generationStartDate, frequency);
     return choreDates.map((date) => {
         return {
-            choreGeneratorID: id,
+            choreGeneratorId: id,
             name: name,
             assigneeIds: [...assigneeIds],
             showUntilCompleted: showUntilCompleted,
@@ -76,29 +106,87 @@ const getChoresWithoutIdFromChoreGenerator = (
     });
 };
 
-export const purgeOldChores = (user: User, setUser: React.Dispatch<React.SetStateAction<User>>) => {
-    const existingChores = user.apartment.choresInfo.chores;
-    const deletionIndices: number[] = [];
+export const getChoresWithoutIdFromChoreGeneratorWithoutId = ({
+    name,
+    assigneeIds,
+    showUntilCompleted,
+    frequency,
+    starting,
+    updatedThrough,
+}: ChoreGeneratorWithoutId): ChoreWithoutId[] => {
+    const generationStartDate = new Date(updatedThrough.getTime());
+    generationStartDate.setDate(generationStartDate.getDate() + 1);
+    const choreDates = generateDates(starting, generationStartDate, frequency);
+    return choreDates.map((date) => {
+        return {
+            choreGeneratorId: 'TBD',
+            name: name,
+            assigneeIds: [...assigneeIds],
+            showUntilCompleted: showUntilCompleted,
+            completed: false,
+            date: date,
+        };
+    });
+};
 
-    existingChores.forEach((chore, index) => {
+export const purgeOldChores = (
+    matesUser: MatesUser,
+    setMatesUser: React.Dispatch<React.SetStateAction<MatesUser>>,
+) => {
+    console.log('hi from purge old chores');
+    const existingChores = matesUser.apartment.choresInfo.chores;
+    const choreDeletionIds: string[] = [];
+
+    existingChores.forEach((chore) => {
         if (
             (isPreviousDate(chore.date, getTodaysDate()) &&
                 !chore.completed &&
                 !chore.showUntilCompleted) ||
             (isPreviousDate(chore.date, getMinDate()) && chore.completed)
         ) {
-            deletionIndices.push(index);
+            choreDeletionIds.push(chore._id);
         }
     });
 
-    deletionIndices.forEach((index) => {
-        existingChores.splice(index, 1);
-    });
-
-    if (deletionIndices.length > 0) {
-        //TO DO: Save deletions to database
-        setUser({ ...user });
+    if (choreDeletionIds.length === 0) {
+        console.log('nothing to delete, returning');
+        return false;
     }
+
+    const data = {
+        apartmentId: matesUser.apartment._id,
+        choreDeletionIds: choreDeletionIds,
+    };
+    const options = getDeleteOptions(data);
+    fetch('/mates/deleteOldChores', options).then((res) =>
+        res.json().then((json) => {
+            console.log('delete old chores response:');
+            console.log(json);
+            const { authenticated, success } = json;
+            if (!authenticated) {
+                return true;
+            }
+            if (!success) {
+                return false;
+            }
+            const { choresInfo } = json;
+            const formattedChoresInfo = initializeServerChoresInfo(choresInfo);
+            setMatesUser({
+                ...matesUser,
+                apartment: { ...matesUser.apartment, choresInfo: formattedChoresInfo },
+            });
+            return false;
+        }),
+    );
+
+    // deletionIndices.forEach((index) => {
+    //     existingChores.splice(index, 1);
+    // });
+
+    // if (deletionIndices.length > 0) {
+    //     //TO DO: Save deletions to database
+    //     setMatesUser({ ...matesUser });
+    // }
 };
 
 // Completed chores will be deleted after they are 1 month old.
@@ -107,4 +195,11 @@ const getMinDate = () => {
     const currentMonth = current.getMonth();
     current.setMonth(currentMonth - 1);
     return current;
+};
+
+export const initializeServerChoresInfo = (choresInfo: ServerChoresInfo) => {
+    initializeDates(choresInfo.choreGenerators, 'starting');
+    initializeDates(choresInfo.choreGenerators, 'updatedThrough');
+    initializeDates(choresInfo.chores, 'date');
+    return (choresInfo as unknown) as ChoresInfo;
 };

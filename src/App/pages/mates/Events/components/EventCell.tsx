@@ -1,11 +1,14 @@
 import React, { useContext, useState } from 'react';
-import { UserContext, UserContextType } from '../../../../common/context';
-import { Apartment } from '../../../../common/models';
+import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
+import { Apartment, ApartmentId, ApartmentSummary, FriendProfile } from '../../../../common/models';
 import {
     getFormattedDateTimeString,
     getApartmentSummaryString,
+    getFriendProfileSummaryString,
 } from '../../../../common/utilities';
-import FriendSummaryCell from '../../Friends/components/FriendSummaryCell';
+import FriendProfileSummaryCell, {
+    ApartmentSummaryCell,
+} from '../../Friends/components/FriendSummaryCell';
 import { ApartmentEvent } from '../models/ApartmentEvent';
 import { isFutureEvent, isPresentEvent } from '../utilities';
 
@@ -13,20 +16,24 @@ interface EventCellProps {
     event: ApartmentEvent;
     hosting: boolean;
     canRemoveEvent: boolean;
+    canRemoveFromEvent: boolean;
     handleRemoveEvent: (event: ApartmentEvent) => void;
-    handleInvite: (event: ApartmentEvent, invitee: Apartment) => void;
-    handleRemoveInvitee: (event: ApartmentEvent, invitee: Apartment) => void;
-    handleRemoveAttendee: (event: ApartmentEvent, attendee: Apartment) => void;
+    handleInvite: (event: ApartmentEvent, invitee: ApartmentId) => void;
+    handleRemoveInvitee: (event: ApartmentEvent, invitee: ApartmentId) => void;
+    handleRemoveAttendee: (event: ApartmentEvent, attendee: ApartmentId) => void;
+    handleLeaveEvent: (event: ApartmentEvent) => void;
 }
 
 const EventCell: React.FC<EventCellProps> = ({
     event,
     hosting,
     canRemoveEvent,
+    canRemoveFromEvent,
     handleRemoveEvent,
     handleInvite,
     handleRemoveInvitee,
     handleRemoveAttendee,
+    handleLeaveEvent,
 }) => {
     const [showInviteCell, setShowInviteCell] = useState(false);
     const presentOrFuture = isFutureEvent(event) || isPresentEvent(event);
@@ -56,19 +63,21 @@ const EventCell: React.FC<EventCellProps> = ({
                 <SendInvitationCell event={event} handleInvite={handleInvite} />
             ) : null}
             <AttendeesInviteesCell
+                canRemoveFromEvent={canRemoveFromEvent}
                 apartments={event.invitees}
                 isInviteesCell={true}
                 handleDelete={handleRemoveInvitee}
                 event={event}
             />
             <AttendeesInviteesCell
+                canRemoveFromEvent={canRemoveFromEvent}
                 apartments={event.attendees}
                 isInviteesCell={false}
                 handleDelete={handleRemoveAttendee}
                 event={event}
             />
             {!hosting ? (
-                <button onClick={() => handleRemoveEvent(event)}>{'Leave Event'}</button>
+                <button onClick={() => handleLeaveEvent(event)}>{'Leave Event'}</button>
             ) : null}
         </div>
     );
@@ -76,15 +85,18 @@ const EventCell: React.FC<EventCellProps> = ({
 
 interface SendInvitationCellProps {
     event: ApartmentEvent;
-    handleInvite: (event: ApartmentEvent, invitee: Apartment) => void;
+    handleInvite: (event: ApartmentEvent, invitee: ApartmentId) => void;
 }
 
 const SendInvitationCell: React.FC<SendInvitationCellProps> = ({ event, handleInvite }) => {
-    const { user } = useContext(UserContext) as UserContextType;
-    const friends = user.apartment.friendsInfo.friends;
-    const eligibleInvitees = friends.filter(
-        (apartment) => !event.attendees.includes(apartment) && !event.invitees.includes(apartment),
-    );
+    const { matesUser } = useContext(MatesUserContext) as MatesUserContextType;
+    const friends = matesUser.apartment.friendsInfo.friends;
+    const eligibleInvitees = friends.filter((apartment) => {
+        const apartmentId = apartment.apartmentId;
+        const attendeeIds = event.attendees.map((attendee) => attendee.apartmentId);
+        const inviteeIds = event.invitees.map((invitee) => invitee.apartmentId);
+        return !attendeeIds.includes(apartmentId) && !inviteeIds.includes(apartmentId);
+    });
     return (
         <div>
             {eligibleInvitees.length === 0 ? (
@@ -92,8 +104,10 @@ const SendInvitationCell: React.FC<SendInvitationCellProps> = ({ event, handleIn
             ) : (
                 eligibleInvitees.map((apartment, index) => (
                     <div>
-                        <p>{getApartmentSummaryString(apartment)}</p>
-                        <button onClick={() => handleInvite(event, apartment)}>{'Invite'}</button>
+                        <p>{getFriendProfileSummaryString(apartment)}</p>
+                        <button onClick={() => handleInvite(event, apartment.apartmentId)}>
+                            {'Invite'}
+                        </button>
                     </div>
                 ))
             )}
@@ -102,10 +116,11 @@ const SendInvitationCell: React.FC<SendInvitationCellProps> = ({ event, handleIn
 };
 
 interface AttendeesInviteesCellProps {
+    canRemoveFromEvent: boolean;
     event: ApartmentEvent;
-    apartments: Apartment[];
+    apartments: ApartmentSummary[];
     isInviteesCell: boolean;
-    handleDelete: (event: ApartmentEvent, apartment: Apartment) => void;
+    handleDelete: (event: ApartmentEvent, apartmentId: ApartmentId) => void;
 }
 
 const AttendeesInviteesCell: React.FC<AttendeesInviteesCellProps> = ({
@@ -113,6 +128,7 @@ const AttendeesInviteesCell: React.FC<AttendeesInviteesCellProps> = ({
     apartments,
     isInviteesCell,
     handleDelete,
+    canRemoveFromEvent,
 }) => {
     return (
         <div>
@@ -127,10 +143,12 @@ const AttendeesInviteesCell: React.FC<AttendeesInviteesCellProps> = ({
                     <p>{isInviteesCell ? 'Invited: ' : 'Attending: '}</p>
                     {apartments.map((apartment) => (
                         <div>
-                            <FriendSummaryCell friend={apartment} />
-                            <button onClick={() => handleDelete(event, apartment)}>
-                                {'Remove from event'}
-                            </button>
+                            <ApartmentSummaryCell friend={apartment} />
+                            {!canRemoveFromEvent ? null : (
+                                <button onClick={() => handleDelete(event, apartment.apartmentId)}>
+                                    {'Remove from event'}
+                                </button>
+                            )}
                         </div>
                     ))}
                 </div>

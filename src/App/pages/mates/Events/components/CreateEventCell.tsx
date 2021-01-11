@@ -1,17 +1,18 @@
 import React, { useContext, useState } from 'react';
+import { Redirect } from 'react-router-dom';
 import DateTimeInputCell from '../../../../common/components/DateTimeInputCell';
-import { UserContext, UserContextType } from '../../../../common/context';
+import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { Tenant } from '../../../../common/models';
 import { DateTimeInputType } from '../../../../common/types';
 import {
     getCurrentDateTime,
     getTenant,
-    getNewId,
     convertToDateWithTime,
+    getPostOptions,
 } from '../../../../common/utilities';
-import { ApartmentEvent } from '../models/ApartmentEvent';
+import { ApartmentEvent, ApartmentEventWithoutId } from '../models/ApartmentEvent';
 import { EventsTabType } from '../models/EventsTabs';
-import { isPastEvent, isPresentEvent } from '../utilities';
+import { initializeServerEventsInfo, isPastEvent, isPresentEvent } from '../utilities';
 
 interface CreateEventInputType {
     title: string;
@@ -24,7 +25,9 @@ interface CreateEventCellProps {
 }
 
 const CreateEventCell: React.FC<CreateEventCellProps> = ({ setTab }) => {
-    const { user, setUser } = useContext(UserContext) as UserContextType;
+    const { matesUser: user, setMatesUser: setUser } = useContext(
+        MatesUserContext,
+    ) as MatesUserContextType;
 
     const initialInput: CreateEventInputType = {
         title: '',
@@ -32,6 +35,8 @@ const CreateEventCell: React.FC<CreateEventCellProps> = ({ setTab }) => {
         time: getCurrentDateTime(),
     };
     const [input, setInput] = useState<CreateEventInputType>(initialInput);
+    const [redirect, setRedirect] = useState(false);
+    const [error, setError] = useState('');
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const name = event.target.name;
@@ -48,41 +53,73 @@ const CreateEventCell: React.FC<CreateEventCellProps> = ({ setTab }) => {
 
             //TO DO: This isn't a sufficiently large IDPool, if IDs need to be universally unique.
             //This will require a server to be remedied.
-            const IDPool = [
-                ...user.apartment.eventsInfo.events,
-                ...user.apartment.eventsInfo.invitations,
-            ];
+            // const IDPool = [
+            //     ...user.apartment.eventsInfo.events,
+            //     ...user.apartment.eventsInfo.invitations,
+            // ];
 
-            const newId = getNewId(IDPool);
-            const newEvent: ApartmentEvent = {
-                id: newId,
-                creator: tenant.name + ' (' + user.apartment.name + ')',
-                creatorId: tenant.id,
+            //const newId = getNewId(IDPool);
+            const newEvent: ApartmentEventWithoutId = {
+                //id: '-1', //to do: override w id from server
+                creator: tenant.name + ' (' + user.apartment.profile.name + ')',
+                creatorId: tenant.userId,
                 time: convertToDateWithTime(input.time),
+                hostApartmentId: user.apartment._id,
                 invitees: [],
                 attendees: [],
                 title: input.title,
                 description: input.description,
             };
-            user.apartment.eventsInfo.events.push(newEvent);
-            setInput(initialInput);
 
-            let newTab: EventsTabType;
-            if (isPastEvent(newEvent)) {
-                newTab = 'Past';
-            } else if (isPresentEvent(newEvent)) {
-                newTab = 'Present';
-            } else {
-                newTab = 'Future';
-            }
-            setTab(newTab);
-            setUser({ ...user });
-            //TO DO: Save to database.
+            const data = {
+                apartmentId: user.apartment._id,
+                newEvent: newEvent,
+            };
+            const options = getPostOptions(data);
+            fetch('/mates/createEvent', options)
+                .then((res) => res.json())
+                .then((json) => {
+                    console.log(json);
+                    const { authenticated, success } = json;
+                    if (!authenticated) {
+                        setRedirect(true);
+                        return;
+                    }
+                    if (!success) {
+                        setError('Sorry, the event could not be created at this time');
+                        return;
+                    }
+                    const { eventsInfo } = json;
+                    const formattedEventsInfo = initializeServerEventsInfo(eventsInfo);
+                    const formattedNewEvent =
+                        formattedEventsInfo.events[formattedEventsInfo.events.length - 1];
+                    setUser({
+                        ...user,
+                        apartment: { ...user.apartment, eventsInfo: formattedEventsInfo },
+                    });
+                    setError('');
+                    setInput(initialInput);
+
+                    let newTab: EventsTabType;
+                    if (isPastEvent(formattedNewEvent)) {
+                        newTab = 'Past';
+                    } else if (isPresentEvent(formattedNewEvent)) {
+                        newTab = 'Present';
+                    } else {
+                        newTab = 'Future';
+                    }
+                    setTab(newTab);
+                });
         }
     };
 
+    if (redirect) {
+        return <Redirect to="/" />;
+    }
+
     return (
         <div>
+            {error.length === 0 ? null : <p style={{ color: 'red' }}>{error}</p>}
             <label>
                 {'Event Title: '}
                 <input

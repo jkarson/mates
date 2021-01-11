@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import './Mates.css';
 import Bills from './Bills/components/Bills';
 import Chores from './Chores/components/Chores';
@@ -8,11 +8,23 @@ import Contacts from './Contacts/components/Contacts';
 import Messages from './Messages/components/Messages';
 import Profile from './Profile/components/Profile';
 import Tabs from '../../common/components/Tabs';
-import { UserContext } from '../../common/context';
-import { Users } from '../../common/mockData';
-import { assertUnreachable } from '../../common/utilities';
+import { MatesUserContext } from '../../common/context';
+import {
+    assertUnreachable,
+    //formatFriendsInfo,
+    initializeDates,
+    //markManuallyAddedContacts,
+} from '../../common/utilities';
 import PageCell from '../../common/components/PageCell';
 import { matesTabNames, MatesTabType } from './MatesTabs';
+import { Apartment, MatesUser } from '../../common/models';
+import { Redirect } from 'react-router-dom';
+import { initializeServerMessages } from './Messages/utilities';
+import { initializeServerBillsInfo } from './Bills/utilities';
+import { initializeServerContacts } from './Contacts/utilities';
+import { initializeServerFriendsInfo } from './Friends/utilities';
+import { initializeServerChoresInfo } from './Chores/utilities';
+import { initializeServerEventsInfo } from './Events/utilities';
 
 //PICKUP!
 /*
@@ -27,19 +39,32 @@ import { matesTabNames, MatesTabType } from './MatesTabs';
 //TO DO/EXTENSION: Tab notifications. This system may be a bit tricky and will likely involve the server.
 
 const Mates: React.FC = () => {
-    /*const [users, setUsers] = useState<any>(null);
-    useLayoutEffect(() => {
-        fetch('/api')
-            .then((res) => res.json())
-            .then((json) => {
-                setUsers(json);
-                console.log(json);
-            });
-        //.then((val) => console.log(val));
-        // .then((users) => console.log(users));
-    }, []);*/
-
     const [tab, setTab] = useState<MatesTabType>('Profile');
+    const [matesUser, setMatesUser] = useState<MatesUser | null>(null);
+    const [redirect, setRedirect] = useState(false);
+    const [accountRedirect, setAccountRedirect] = useState(false);
+
+    useLayoutEffect(() => {
+        fetch('/mates')
+            .then((response) => response.json())
+            .then((json) => {
+                console.log(json);
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setAccountRedirect(true);
+                    return;
+                }
+                const { userId, apartment } = json;
+                const formattedApartment = initialize(apartment);
+                console.log('setting mates user...');
+                console.log(json);
+                setMatesUser({ userId: userId, apartment: apartment });
+            });
+    }, []);
 
     let currentComponent: JSX.Element | undefined;
     switch (tab) {
@@ -68,16 +93,42 @@ const Mates: React.FC = () => {
             assertUnreachable(tab);
     }
 
-    const [user, setUser] = useState(Users.Jeremy);
+    if (redirect) {
+        return <Redirect to="/" />;
+    }
+    if (accountRedirect) {
+        return <Redirect to="/account" />;
+    }
+    if (!matesUser) {
+        return null;
+    }
 
     return (
-        <UserContext.Provider value={{ user: user, setUser: setUser }}>
+        <MatesUserContext.Provider
+            value={{
+                matesUser: matesUser,
+                setMatesUser: setMatesUser as React.Dispatch<React.SetStateAction<MatesUser>>,
+            }}
+        >
             <PageCell
                 tabs={<Tabs currentTab={tab} setTab={setTab} tabNames={matesTabNames} />}
                 content={currentComponent}
             />
-        </UserContext.Provider>
+        </MatesUserContext.Provider>
     );
+};
+
+//TO DO: this will expand in scope... maybe we can opt out of types for it,
+// or put them in later. it's the type of helper method we want to avoid,
+//but for expediency we're using it rather brashly for now
+const initialize = (apartment: any): void => {
+    initializeServerMessages(apartment.messages);
+    initializeServerBillsInfo(apartment.billsInfo);
+    initializeServerChoresInfo(apartment.choresInfo);
+    initializeServerContacts(apartment.manuallyAddedContacts);
+    initializeServerFriendsInfo(apartment.friendsInfo);
+    initializeServerEventsInfo(apartment.eventsInfo);
+    return;
 };
 
 export default Mates;

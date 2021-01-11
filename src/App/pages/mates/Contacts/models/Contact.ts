@@ -1,5 +1,5 @@
 export interface Contact extends ContactWithoutId {
-    readonly id: ContactId;
+    readonly _id: ContactId;
 }
 
 export interface ContactWithoutId {

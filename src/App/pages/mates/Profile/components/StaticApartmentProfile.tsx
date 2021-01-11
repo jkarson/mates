@@ -1,10 +1,10 @@
 import React from 'react';
-import { Apartment } from '../../../../common/models';
+import { Apartment, FriendProfile } from '../../../../common/models';
 import { TenantsProfileCell } from '../components/Profile';
 import ApartmentProfileCellBody from './ApartmentProfileCellBody';
 
 interface StaticApartmentProfileProps {
-    apartment: Apartment;
+    apartment: FriendProfile;
 }
 
 const StaticApartmentProfile: React.FC<StaticApartmentProfileProps> = ({ apartment }) => (

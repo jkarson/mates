@@ -1,7 +1,7 @@
-import { TenantId } from '../../../../common/models';
+import { UserId } from '../../../../common/models';
 
 export interface AmountWithPercentOwed {
-    tenantId: TenantId;
+    userId: UserId;
     amount: string;
     amountValue: number;
     percent: string;

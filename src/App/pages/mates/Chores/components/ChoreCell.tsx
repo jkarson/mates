@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { UserContext, UserContextType } from '../../../../common/context';
+import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { Tenant } from '../../../../common/models';
 import {
     getTenantByTenantId,
@@ -24,12 +24,12 @@ const ChoreCell: React.FC<ChoreCellProps> = ({
     handleDeleteChore,
     handleDeleteSeries,
 }) => {
-    const { user } = useContext(UserContext) as UserContextType;
+    const { matesUser } = useContext(MatesUserContext) as MatesUserContextType;
     const tenantAssignees = chore.assigneeIds
-        .map((assignee) => getTenantByTenantId(user, assignee))
+        .map((assignee) => getTenantByTenantId(matesUser, assignee))
         .filter((assignee) => assignee !== undefined) as Tenant[];
     const completedBy: Tenant | undefined = chore.completedBy
-        ? getTenantByTenantId(user, chore.completedBy)
+        ? getTenantByTenantId(matesUser, chore.completedBy)
         : undefined;
     return (
         <div style={{ borderTop: '1px solid black' }}>
@@ -47,7 +47,7 @@ const ChoreCell: React.FC<ChoreCellProps> = ({
                 {chore.completed ? 'Mark chore as uncompleted' : 'Mark chore as completed'}
             </button>
             <button onClick={() => handleDeleteChore(chore)}>{'Delete Chore'}</button>
-            <button onClick={() => handleDeleteSeries(chore.choreGeneratorID)}>
+            <button onClick={() => handleDeleteSeries(chore.choreGeneratorId)}>
                 {'Delete all chores in series'}
             </button>
         </div>

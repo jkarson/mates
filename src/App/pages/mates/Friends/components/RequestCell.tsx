@@ -1,14 +1,15 @@
 import React from 'react';
-import { Apartment } from '../../../../common/models';
-import FriendSummaryCell from './FriendSummaryCell';
+import { Apartment, ApartmentSummary } from '../../../../common/models';
+import FriendProfileSummaryCell, { ApartmentSummaryCell } from './FriendSummaryCell';
 
 interface RequestCellProps {
-    request: Apartment;
+    request: ApartmentSummary;
     incoming: boolean;
-    handleAdd: (apartment: Apartment) => void;
-    handleDelete: (apartment: Apartment) => void;
+    handleAdd: (apartment: ApartmentSummary) => void;
+    handleDelete: (apartment: ApartmentSummary) => void;
 }
 
+//to do: fix type below
 const RequestCell: React.FC<RequestCellProps> = ({
     request,
     incoming,
@@ -16,9 +17,15 @@ const RequestCell: React.FC<RequestCellProps> = ({
     handleDelete,
 }) => (
     <div>
-        <FriendSummaryCell friend={request} />
-        {incoming ? <button onClick={() => handleAdd(request)}>{'Add Friend'}</button> : null}
-        <button onClick={() => handleDelete(request)}>{'Delete Request'}</button>
+        <ApartmentSummaryCell friend={request} />
+        {incoming ? (
+            <button onClick={() => handleAdd((request as unknown) as ApartmentSummary)}>
+                {'Add Friend'}
+            </button>
+        ) : null}
+        <button onClick={() => handleDelete((request as unknown) as ApartmentSummary)}>
+            {'Delete Request'}
+        </button>
     </div>
 );
 

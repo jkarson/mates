@@ -3,9 +3,9 @@ import { Bill, BillId } from '../models/Bill';
 import { BillGeneratorID } from '../models/BillGenerator';
 import { getTotalCurrentAssignedValue } from '../utilities';
 import { AmountOwed } from '../models/AmountOwed';
-import { UserContext, UserContextType } from '../../../../common/context';
-import { TenantId } from '../../../../common/models';
+import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { getFormattedDateString, getTenantByTenantId } from '../../../../common/utilities';
+import { UserId } from '../../../../common/models';
 
 interface BillCellProps {
     bill: Bill;
@@ -16,7 +16,7 @@ interface BillCellProps {
     handleDeleteBillSeries: (bgId: BillGeneratorID) => void;
     handleResolveBill: (billId: BillId) => void;
     handlePayPortionToPayable: (billId: BillId) => void;
-    handlePayPortionToTenant: (billId: BillId, payeeId: TenantId) => void;
+    handlePayPortionToTenant: (billId: BillId, payeeId: UserId) => void;
     handlePayBalance: (billId: BillId) => void;
     handleResetBill: (billId: BillId) => void;
 }
@@ -34,13 +34,13 @@ const BillCell: React.FC<BillCellProps> = ({
     handlePayBalance,
     handleResetBill,
 }) => {
-    const handlePayPortionToTenantBound = handlePayPortionToTenant.bind(null, bill.id);
+    const handlePayPortionToTenantBound = handlePayPortionToTenant.bind(null, bill._id);
     return (
         <div style={{ borderBottom: '1px solid black' }}>
             <span style={bill.isPrivate ? { color: 'red' } : {}}>
                 <p style={{ fontWeight: 'bold' }}>{bill.name}</p>
                 <PayableToDisplayCell
-                    billId={bill.id}
+                    billId={bill._id}
                     payableTo={bill.payableTo}
                     isPaid={isPaid}
                     isPrivate={isPrivate}
@@ -58,10 +58,10 @@ const BillCell: React.FC<BillCellProps> = ({
                 />
             </span>
             {isPrivate ? null : (
-                <button onClick={() => handleResolveBill(bill.id)}>{'Resolve all debts.'}</button>
+                <button onClick={() => handleResolveBill(bill._id)}>{'Resolve all debts.'}</button>
             )}
-            <button onClick={() => handleResetBill(bill.id)}>{'Reset'}</button>
-            <button onClick={() => handleDeleteBill(bill.id)}>{'Delete Bill'}</button>
+            <button onClick={() => handleResetBill(bill._id)}>{'Reset'}</button>
+            <button onClick={() => handleDeleteBill(bill._id)}>{'Delete Bill'}</button>
             <button onClick={() => handleDeleteBillSeries(bill.billGeneratorId)}>
                 {'Delete Bill Series'}
             </button>
@@ -73,7 +73,7 @@ interface AmountsOwedDisplayCellProps {
     amountsOwed: AmountOwed[];
     userPortionIsPaid: boolean;
     isPrivate: boolean;
-    handlePayPortionToTenant: (payeeId: TenantId) => void;
+    handlePayPortionToTenant: (payeeId: UserId) => void;
 }
 
 //TO DO: make sure it's protected from 2 users paying the bill at the same time.
@@ -84,13 +84,13 @@ const AmountsOwedDisplayCell: React.FC<AmountsOwedDisplayCellProps> = ({
     isPrivate,
     handlePayPortionToTenant,
 }) => {
-    const { user } = useContext(UserContext) as UserContextType;
+    const { matesUser: user } = useContext(MatesUserContext) as MatesUserContextType;
     const content = amountsOwed.map((amountOwed) => {
-        const { tenantId, currentAmount, initialAmount } = amountOwed;
+        const { userId: tenantId, currentAmount, initialAmount } = amountOwed;
         const tenant = getTenantByTenantId(user, tenantId);
-        if (tenant === undefined || (isPrivate && tenant.id !== user.tenantId)) {
+        if (tenant === undefined || (isPrivate && tenant.userId !== user.userId)) {
             return null;
-        } else if (amountOwed.tenantId === user.tenantId) {
+        } else if (amountOwed.userId === user.userId) {
             return (
                 <AmountOwedDisplayCell
                     name={tenant.name}
@@ -107,7 +107,7 @@ const AmountsOwedDisplayCell: React.FC<AmountsOwedDisplayCellProps> = ({
                         initialAmount={initialAmount}
                     />
                     {userPortionIsPaid ? null : (
-                        <button onClick={() => handlePayPortionToTenant(tenant.id)}>
+                        <button onClick={() => handlePayPortionToTenant(tenant.userId)}>
                             {'Pay Portion'}
                         </button>
                     )}

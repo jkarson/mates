@@ -1,23 +1,27 @@
 import React from 'react';
-import { User } from '../../../common/models';
+import { BillsInfo, MatesUser } from '../../../common/models';
 import {
     roundToHundredth,
     isSameDayMonthYear,
     getMaxDate,
-    getNewIds,
     generateDates,
     isPreviousDate,
     getTodaysDate,
+    getPostOptions,
+    initializeDates,
+    getDeleteOptions,
+    //getLaterDateToTest,
 } from '../../../common/utilities';
 import { AmountOwed } from './models/AmountOwed';
 import { AmountWithPercentOwed } from './models/AmountWithPercentOwed';
-import { Bill } from './models/Bill';
-import { BillGenerator } from './models/BillGenerator';
+import { Bill, BillWithoutId } from './models/Bill';
+import { BillGenerator, BillGeneratorWithoutId } from './models/BillGenerator';
+import { ServerBillsInfo } from './models/ServerBillsInfo';
 
-export const getInitialAmountsWithPercentOwed = (user: User): AmountWithPercentOwed[] => {
-    const tenants = user.apartment.tenants;
+export const getInitialAmountsWithPercentOwed = (matesUser: MatesUser): AmountWithPercentOwed[] => {
+    const tenants = matesUser.apartment.tenants;
     const amountsOwed = tenants.map((tenant) => ({
-        tenantId: tenant.id,
+        userId: tenant.userId,
         amount: '0.00',
         amountValue: 0,
         percent: '0.0',
@@ -50,74 +54,87 @@ export const getTotalCurrentAssignedValue = (amountsOwed: AmountOwed[]) => {
 
 export const updateBillsFromBillGenerators = (
     billGenerators: BillGenerator[],
-    user: User,
-    setUser: React.Dispatch<React.SetStateAction<User>>,
+    matesUser: MatesUser,
+    setMatesUser: React.Dispatch<React.SetStateAction<MatesUser>>,
 ) => {
-    const originalBills = user.apartment.billsInfo.bills;
-    const newBills: Bill[] = [];
+    const newBills: BillWithoutId[] = [];
 
-    // Only update user if user actually needs to be updated. This protects
-    // against an infinite update loop.
+    // Only proceed if there are bills that actually need to be updated.
     if (
         billGenerators.filter(
-            (billGenerator) => !isSameDayMonthYear(billGenerator.updatedThrough, getMaxDate()),
+            (billGenerator) => !isSameDayMonthYear(billGenerator.updatedThrough, getMaxDate()), //getLaterDateToTest()), //getMaxDate()), //,
         ).length === 0
     ) {
-        return;
+        return false;
     }
 
     billGenerators.forEach((billGenerator) => {
-        const { updatedThrough } = billGenerator;
-        const generationStartDate = new Date(updatedThrough.getTime());
-        generationStartDate.setDate(generationStartDate.getDate() + 1);
-        const generatedBills = getBillsFromBillGenerator(
-            billGenerator,
-            originalBills.concat(newBills),
-            generationStartDate,
-        );
+        const generatedBills = getBillsWithoutIdFromBillGenerator(billGenerator);
         newBills.push(...generatedBills);
-        billGenerator.updatedThrough = getMaxDate();
     });
-    user.apartment.billsInfo.bills.push(...newBills);
-    setUser({ ...user });
-    //TO DO: SAVE NEW BILLS TO DATABASE
+    const updatedThrough = getMaxDate(); //getLaterDateToTest();
+    const data = {
+        updatedThrough: updatedThrough,
+        newBills: newBills,
+        apartmentId: matesUser.apartment._id,
+    };
+    const options = getPostOptions(data);
+    fetch('/mates/addBillsAndUpdateBillGenerators', options)
+        .then((res) => res.json())
+        .then((json) => {
+            console.log(json);
+            const { authenticated, success } = json;
+            if (!authenticated) {
+                return true;
+            }
+            if (!success) {
+                return false; //note: ideally, this should never occur;
+                //if it does, I don't see a reason for the user to be notified
+            }
+            const { billsInfo } = json;
+            initializeServerBillsInfo(billsInfo);
+            setMatesUser({
+                ...matesUser,
+                apartment: { ...matesUser.apartment, billsInfo: billsInfo },
+            });
+        });
 };
 
-const getBillsFromBillGenerator = (
-    billGenerator: BillGenerator,
-    previousBills: Bill[],
-    generationStartDate: Date,
-): Bill[] => {
-    const billsWithoutId = getBillsWithoutIdFromBillGenerator(billGenerator, generationStartDate);
-    const newIds = getNewIds(previousBills, billsWithoutId.length);
-    const bills: Bill[] = [];
-    billsWithoutId.forEach((bill, index) => bills.push({ ...bill, id: newIds[index] }));
-    return bills;
-};
+// const getBillsFromBillGenerator = (
+//     billGenerator: BillGenerator,
+//     generationStartDate: Date,
+// ): BillWithoutId[] => {
+//     const billsWithoutId = getBillsWithoutIdFromBillGenerator(billGenerator, generationStartDate);
+//     // const newIds = getNewIds(previousBills, billsWithoutId.length);
+//     // const newIds = billsWithoutId.map(() => '-1'); //TO DO: override w retrieving id from server
+//     const bills: Bill[] = [];
+//     billsWithoutId.forEach((bill, index) => bills.push({ ...bill, id: newIds[index] }));
+//     return bills;
+// };
 
-const getBillsWithoutIdFromBillGenerator = (
-    {
-        id,
-        name,
-        payableTo,
-        isPrivate,
-        privateTenantId,
-        frequency,
-        amountsWithPercentOwed,
-        starting,
-    }: BillGenerator,
-    generationStartDate: Date,
-) => {
+export const getBillsWithoutIdFromBillGeneratorWithoutId = ({
+    //_id: id,
+    name,
+    payableTo,
+    isPrivate,
+    privateTenantId,
+    frequency,
+    amountsWithPercentOwed,
+    starting,
+    updatedThrough,
+}: BillGeneratorWithoutId) => {
+    const generationStartDate = new Date(updatedThrough.getTime());
+    generationStartDate.setDate(generationStartDate.getDate() + 1);
     const billDates = generateDates(starting, generationStartDate, frequency);
     return billDates.map((date) => {
         const amountsOwed = amountsWithPercentOwed.map((aWPO) => ({
-            tenantId: aWPO.tenantId,
+            userId: aWPO.userId,
             initialAmount: aWPO.amountValue,
             currentAmount: aWPO.amountValue,
         }));
 
         return {
-            billGeneratorId: id,
+            billGeneratorId: 'TBD',
             name: name,
             payableTo: payableTo,
             isPrivate: isPrivate,
@@ -128,26 +145,90 @@ const getBillsWithoutIdFromBillGenerator = (
     });
 };
 
-export const purgeOldBills = (user: User, setUser: React.Dispatch<React.SetStateAction<User>>) => {
-    const bills = user.apartment.billsInfo.bills;
-    const deletionIndices: number[] = [];
+export const getBillsWithoutIdFromBillGenerator = ({
+    _id,
+    name,
+    payableTo,
+    isPrivate,
+    privateTenantId,
+    frequency,
+    amountsWithPercentOwed,
+    starting,
+    updatedThrough,
+}: BillGenerator) => {
+    const generationStartDate = new Date(updatedThrough.getTime());
+    generationStartDate.setDate(generationStartDate.getDate() + 1);
+    const billDates = generateDates(starting, generationStartDate, frequency);
+    return billDates.map((date) => {
+        const amountsOwed = amountsWithPercentOwed.map((aWPO) => ({
+            userId: aWPO.userId,
+            initialAmount: aWPO.amountValue,
+            currentAmount: aWPO.amountValue,
+        }));
 
-    bills.forEach((bill, index) => {
+        return {
+            billGeneratorId: _id,
+            name: name,
+            payableTo: payableTo,
+            isPrivate: isPrivate,
+            privateTenantId: privateTenantId,
+            amountsOwed: amountsOwed,
+            date: date,
+        };
+    });
+};
+
+export const purgeOldBills = (
+    matesUser: MatesUser,
+    setMatesUser: React.Dispatch<React.SetStateAction<MatesUser>>,
+) => {
+    console.log('hi from purge on client');
+    const bills = matesUser.apartment.billsInfo.bills;
+    const billDeletionIds: string[] = [];
+
+    bills.forEach((bill) => {
         if (
             bill.amountsOwed.every((amountOwned) => amountOwned.currentAmount === 0) &&
             isPreviousDate(bill.date, getMinDate())
         ) {
-            deletionIndices.push(index);
+            billDeletionIds.push(bill._id);
         }
     });
 
-    deletionIndices.forEach((index) => {
-        bills.splice(index, 1);
-    });
-
-    if (deletionIndices.length > 0) {
-        setUser({ ...user });
+    if (billDeletionIds.length === 0) {
+        console.log('no bills to purge');
+        return false;
     }
+
+    const data = {
+        apartmentId: matesUser.apartment._id,
+        billDeletionIds: billDeletionIds,
+    };
+    const options = getDeleteOptions(data);
+    fetch('/mates/deleteOldBills', options)
+        .then((res) => res.json())
+        .then((json) => {
+            console.log(json);
+            const { authenticated, success } = json;
+            if (!authenticated) {
+                return true;
+            }
+            if (!success) {
+                return false; //note: ideally, this should never occur;
+                //if it does, I don't see a reason for the user to be notified
+            }
+            const { billsInfo } = json;
+            initializeServerBillsInfo(billsInfo);
+
+            setMatesUser({
+                ...matesUser,
+                apartment: { ...matesUser.apartment, billsInfo: billsInfo },
+            });
+            return false;
+        });
+
+    //setMatesUser({ ...matesUser });
+    //}
 };
 
 // Resolved bills will be deleted after they are 3 month old.
@@ -156,4 +237,11 @@ const getMinDate = () => {
     const currentMonth = current.getMonth();
     current.setMonth(currentMonth - 3);
     return current;
+};
+
+export const initializeServerBillsInfo = (billsInfo: ServerBillsInfo) => {
+    initializeDates(billsInfo.billGenerators, 'starting');
+    initializeDates(billsInfo.billGenerators, 'updatedThrough');
+    initializeDates(billsInfo.bills, 'date');
+    return (billsInfo as unknown) as BillsInfo;
 };

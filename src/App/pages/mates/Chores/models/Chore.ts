@@ -1,17 +1,28 @@
-import { TenantId } from '../../../../common/models';
+import { UserId } from '../../../../common/models';
 import { ChoreGeneratorID } from './ChoreGenerator';
 
 export interface Chore extends ChoreWithoutId {
-    readonly id: ChoreID;
+    readonly _id: ChoreID;
 }
 
 export interface ChoreWithoutId {
-    readonly choreGeneratorID: ChoreGeneratorID;
+    readonly choreGeneratorId: ChoreGeneratorID;
     name: string;
-    assigneeIds: TenantId[];
+    assigneeIds: UserId[];
     date: Date;
     completed: boolean;
-    completedBy?: TenantId;
+    completedBy?: UserId;
+    showUntilCompleted: boolean;
+}
+
+export interface ServerChore {
+    readonly _id: ChoreID;
+    readonly choreGeneratorID: ChoreGeneratorID;
+    name: string;
+    assigneeIds: UserId[];
+    date: string;
+    completed: boolean;
+    completedBy?: UserId;
     showUntilCompleted: boolean;
 }
 

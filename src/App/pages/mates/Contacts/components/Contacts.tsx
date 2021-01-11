@@ -1,13 +1,15 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Contact, ContactWithoutId } from '../models/Contact';
 import { contactsTabNames, ContactsTabType } from '../models/ContactsTabs';
 import ContactCell from './ContactCell';
 import AddContactCell from './AddContactCell';
-import { UserContext, UserContextType } from '../../../../common/context';
+import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import DescriptionCell from '../../../../common/components/DescriptionCell';
 import Tabs from '../../../../common/components/Tabs';
-import { Apartment, Tenant } from '../../../../common/models';
-import { assertUnreachable, getNewId } from '../../../../common/utilities';
+import { Apartment, FriendProfile, Tenant } from '../../../../common/models';
+import { assertUnreachable, getDeleteOptions, getPostOptions } from '../../../../common/utilities';
+import { Redirect } from 'react-router-dom';
+import { initializeServerContacts } from '../utilities';
 
 //EXTENSION: each Contact / tab could be color coded by type of contact
 
@@ -15,11 +17,19 @@ import { assertUnreachable, getNewId } from '../../../../common/utilities';
 //as defined in profile
 
 const Contacts: React.FC = () => {
-    const { user, setUser } = useContext(UserContext) as UserContextType;
+    const { matesUser: user, setMatesUser: setUser } = useContext(
+        MatesUserContext,
+    ) as MatesUserContextType;
 
     const [tab, setTab] = useState<ContactsTabType>('All');
+    const [redirect, setRedirect] = useState(false);
+    const [message, setMessage] = useState('');
 
-    const getTenantContacts = (apartment: Apartment): Contact[] => {
+    useEffect(() => {
+        setMessage('');
+    }, [tab]);
+
+    const getTenantContacts = (apartment: Apartment | FriendProfile): Contact[] => {
         const tenants = apartment.tenants;
         const apartmentContacts: Contact[] = [];
         tenants.forEach((tenant) => {
@@ -28,7 +38,7 @@ const Contacts: React.FC = () => {
                 email: tenant.email,
                 number: tenant.number,
                 manuallyAdded: false,
-                id: tenant.id,
+                _id: tenant.userId,
             });
         });
         return apartmentContacts.sort((a, b) =>
@@ -78,37 +88,70 @@ const Contacts: React.FC = () => {
             assertUnreachable(tab);
     }
 
-    type TenantOrContact = Tenant | Contact;
-
     const handleNewContact = (c: ContactWithoutId) => {
-        const manuallyAddedContacts: TenantOrContact[] = user.apartment.manuallyAddedContacts;
-        const tenants: TenantOrContact[] = user.apartment.tenants;
-        const friends = user.apartment.friendsInfo.friends;
-        let friendTenants: TenantOrContact[] = [];
-        friends.forEach((friend) => friendTenants.concat(friend.tenants));
-        const IdPool: TenantOrContact[] = manuallyAddedContacts
-            .concat(tenants)
-            .concat(friendTenants);
-        const newId = getNewId(IdPool);
-        const newContact: Contact = { ...c, id: newId };
-
-        user.apartment.manuallyAddedContacts.push(newContact);
-        setUser({ ...user });
-        setTab('Manually Added');
-        //TO DO: Save to Database
+        const data = {
+            apartmentId: user.apartment._id,
+            contact: c,
+        };
+        const options = getPostOptions(data);
+        fetch('/mates/addNewContact', options)
+            .then((response) => response.json())
+            .then((json) => {
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, the contact could not be saved');
+                    return;
+                }
+                const { manuallyAddedContacts } = json;
+                const markedContacts = initializeServerContacts(manuallyAddedContacts);
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, manuallyAddedContacts: markedContacts },
+                });
+                setTab('Manually Added');
+            });
     };
 
     const handleDeleteContact = (c: Contact) => {
-        const manuallyAddedContacts = user.apartment.manuallyAddedContacts;
-        const cIndex = manuallyAddedContacts.indexOf(c);
-        manuallyAddedContacts.splice(cIndex, 1);
-        setUser({ ...user });
-        //TO DO: Save to Dtabase
+        const data = { apartmentId: user.apartment._id, contactId: c._id };
+        const options = getDeleteOptions(data);
+        fetch('/mates/deleteContact', options)
+            .then((response) => response.json())
+            .then((json) => {
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, the contact could not be deleted');
+                    return;
+                }
+                const { remainingManuallyAddedContacts } = json;
+                const markedContacts = initializeServerContacts(remainingManuallyAddedContacts);
+                setUser({
+                    ...user,
+                    apartment: {
+                        ...user.apartment,
+                        manuallyAddedContacts: markedContacts,
+                    },
+                });
+                setMessage('Contact deleted');
+            });
     };
+
+    if (redirect) {
+        return <Redirect to="/" />;
+    }
 
     return (
         <div>
             <Tabs<ContactsTabType> currentTab={tab} setTab={setTab} tabNames={contactsTabNames} />
+            {message.length === 0 ? null : <p style={{ color: 'red' }}>{message}</p>}
             {tab === 'All' ? <ContactsDescriptionCell /> : null}
             {tab === 'Add New Contact' ? (
                 <AddContactCell handleNewContact={handleNewContact} />
@@ -131,7 +174,7 @@ interface ContactsListProps {
 const ContactsList: React.FC<ContactsListProps> = ({ contacts, handleDelete }) => (
     <div>
         {contacts.map((contact) => (
-            <ContactCell key={contact.id} contact={contact} handleDelete={handleDelete} />
+            <ContactCell key={contact._id} contact={contact} handleDelete={handleDelete} />
         ))}
     </div>
 );

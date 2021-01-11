@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Apartment } from '../../../../common/models';
+import { Apartment, ApartmentSummary, FriendProfile } from '../../../../common/models';
 import StaticApartmentProfile from '../../Profile/components/StaticApartmentProfile';
-import FriendSummaryCell from './FriendSummaryCell';
+import FriendProfileSummaryCell from './FriendSummaryCell';
 
 interface FriendCellProps {
-    friend: Apartment;
-    handleDelete: (apartment: Apartment) => void;
+    friend: FriendProfile;
+    handleDelete: (apartment: FriendProfile) => void;
 }
 
 const FriendCell: React.FC<FriendCellProps> = ({ friend, handleDelete }) => {
@@ -14,10 +14,10 @@ const FriendCell: React.FC<FriendCellProps> = ({ friend, handleDelete }) => {
         const curr = showProfile;
         setShowProfile(!curr);
     };
-
+    //TO DO: fix unknown type below
     return (
         <div>
-            <FriendSummaryCell friend={friend} />
+            <FriendProfileSummaryCell friend={friend} />
             <button onClick={handleClick}>{showProfile ? 'Minimize' : 'Expand'}</button>
             <button onClick={() => handleDelete(friend)}>{'Delete Friend'}</button>
             {showProfile ? <StaticApartmentProfile apartment={friend} /> : null}

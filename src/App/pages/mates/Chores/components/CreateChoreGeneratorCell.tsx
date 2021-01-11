@@ -1,24 +1,31 @@
 import React, { useContext, useState } from 'react';
+import { Redirect } from 'react-router-dom';
 import DateInputCell from '../../../../common/components/DateInputCell';
 import FrequencySelectCell from '../../../../common/components/FrequencySelectCell';
-import { UserContext, UserContextType } from '../../../../common/context';
-import { TenantId, Tenant } from '../../../../common/models';
+import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
+import { Tenant, UserId } from '../../../../common/models';
 import { StateProps } from '../../../../common/types';
 import {
     getTodaysDate,
-    getNewId,
     getYesterdaysDateFromDate,
     getTenantByTenantId,
     formatNames,
+    getMaxDate,
+    getPostOptions,
 } from '../../../../common/utilities';
+import { Chore, ChoreWithoutId } from '../models/Chore';
 
 import { choreFrequencies, ChoreFrequency } from '../models/ChoreFrequency';
-import { ChoreGenerator } from '../models/ChoreGenerator';
+import { ChoreGenerator, ChoreGeneratorWithoutId } from '../models/ChoreGenerator';
 import { ChoresTabType } from '../models/ChoresTabs';
+import {
+    getChoresWithoutIdFromChoreGeneratorWithoutId,
+    initializeServerChoresInfo,
+} from '../utilities';
 
 interface CreateChoreGeneratorInput {
     name: string;
-    assigneeIds: TenantId[];
+    assigneeIds: UserId[];
     frequency: ChoreFrequency;
     starting: Date;
     showUntilCompleted: boolean;
@@ -29,7 +36,12 @@ interface CreateChoreGeneratorCellProps {
 }
 
 const CreateChoreGeneratorCell: React.FC<CreateChoreGeneratorCellProps> = ({ setTab }) => {
-    const { user, setUser } = useContext(UserContext) as UserContextType;
+    const { matesUser: user, setMatesUser: setUser } = useContext(
+        MatesUserContext,
+    ) as MatesUserContextType;
+
+    const [redirect, setRedirect] = useState(false);
+    const [error, setError] = useState('');
 
     const initialCreateChoreGeneratorInput: CreateChoreGeneratorInput = {
         name: '',
@@ -41,7 +53,7 @@ const CreateChoreGeneratorCell: React.FC<CreateChoreGeneratorCellProps> = ({ set
 
     const [input, setInput] = useState<CreateChoreGeneratorInput>(initialCreateChoreGeneratorInput);
 
-    const handleSetAssigneeIds = (assigneeIds: TenantId[]) => {
+    const handleSetAssigneeIds = (assigneeIds: UserId[]) => {
         setInput({ ...input, assigneeIds: [...assigneeIds] });
     };
 
@@ -67,13 +79,14 @@ const CreateChoreGeneratorCell: React.FC<CreateChoreGeneratorCellProps> = ({ set
         if (!input.name) {
             return;
         }
-        const assigneeIds: TenantId[] =
+        const assigneeIds: UserId[] =
             input.assigneeIds.length > 0
                 ? input.assigneeIds
-                : user.apartment.tenants.map((tenant) => tenant.id);
+                : user.apartment.tenants.map((tenant) => tenant.userId);
         const starting = new Date(input.starting.getTime());
-        const newChoreGenerator: ChoreGenerator = {
-            id: getNewId(user.apartment.choresInfo.choreGenerators),
+        const newChoreGenerator: ChoreGeneratorWithoutId = {
+            //id: getNewId(user.apartment.choresInfo.choreGenerators),
+            //id: '-1', //TO DO: OVERRIDE W ID FROM SERVER
             name: input.name,
             assigneeIds: [...assigneeIds],
             frequency: input.frequency,
@@ -81,20 +94,55 @@ const CreateChoreGeneratorCell: React.FC<CreateChoreGeneratorCellProps> = ({ set
             showUntilCompleted: input.showUntilCompleted,
             updatedThrough: getYesterdaysDateFromDate(starting),
         };
-        user.apartment.choresInfo.choreGenerators.push(newChoreGenerator);
-        setUser({ ...user });
-        setInput({
-            name: '',
-            assigneeIds: [],
-            frequency: 'Daily',
-            starting: getTodaysDate(),
-            showUntilCompleted: true,
-        });
-        setTab('Summary');
+        const generatedChores: ChoreWithoutId[] = getChoresWithoutIdFromChoreGeneratorWithoutId(
+            newChoreGenerator,
+        );
+        newChoreGenerator.updatedThrough = getMaxDate();
+        const data = {
+            apartmentId: user.apartment._id,
+            newChoreGenerator: newChoreGenerator,
+            generatedChores: generatedChores,
+        };
+        const options = getPostOptions(data);
+        fetch('/mates/createChoreGenerator', options)
+            .then((response) => response.json())
+            .then((json) => {
+                console.log(json);
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setError('Sorry, the chore series could not be created');
+                    return;
+                }
+
+                const { choresInfo } = json;
+                const formattedChoresInfo = initializeServerChoresInfo(choresInfo);
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, choresInfo: formattedChoresInfo },
+                });
+                setInput({
+                    name: '',
+                    assigneeIds: [],
+                    frequency: 'Daily',
+                    starting: getTodaysDate(),
+                    showUntilCompleted: true,
+                });
+                setError('');
+                setTab('Summary');
+            });
     };
+
+    if (redirect) {
+        return <Redirect to="/" />;
+    }
 
     return (
         <div>
+            {error.length === 0 ? null : <p style={{ color: 'red' }}>{error}</p>}
             <label>
                 {'Chore Title: '}
                 <input
@@ -133,11 +181,8 @@ const CreateChoreGeneratorCell: React.FC<CreateChoreGeneratorCellProps> = ({ set
     );
 };
 
-const ChoreGeneratorAssignmentCell: React.FC<StateProps<Array<TenantId>>> = ({
-    state,
-    setState,
-}) => {
-    const { user } = useContext(UserContext) as UserContextType;
+const ChoreGeneratorAssignmentCell: React.FC<StateProps<Array<UserId>>> = ({ state, setState }) => {
+    const { matesUser: user } = useContext(MatesUserContext) as MatesUserContextType;
     const assignees = state
         .map((tenantId) => getTenantByTenantId(user, tenantId))
         .filter((tenant) => tenant) as Tenant[];
@@ -146,7 +191,7 @@ const ChoreGeneratorAssignmentCell: React.FC<StateProps<Array<TenantId>>> = ({
 
     const tenants = user.apartment.tenants;
 
-    const toggleAssign = (tenantId: TenantId) => {
+    const toggleAssign = (tenantId: UserId) => {
         if (state.includes(tenantId)) {
             const tenantIdIndex = state.indexOf(tenantId);
             state.splice(tenantIdIndex, 1);
@@ -159,7 +204,7 @@ const ChoreGeneratorAssignmentCell: React.FC<StateProps<Array<TenantId>>> = ({
 
     const tenantAssignmentCells = tenants.map((tenant) => (
         <TenantAssignmentCell
-            key={tenant.id}
+            key={tenant.userId}
             tenant={tenant}
             assigned={assignees.includes(tenant)}
             toggleAssign={toggleAssign}
@@ -184,7 +229,7 @@ const ChoreGeneratorAssignmentCell: React.FC<StateProps<Array<TenantId>>> = ({
 interface TenantAssignmentCellProps {
     tenant: Tenant;
     assigned: boolean;
-    toggleAssign: (tenantId: TenantId) => void;
+    toggleAssign: (tenantId: UserId) => void;
 }
 
 const TenantAssignmentCell: React.FC<TenantAssignmentCellProps> = ({
@@ -195,7 +240,7 @@ const TenantAssignmentCell: React.FC<TenantAssignmentCellProps> = ({
     return (
         <div style={{ paddingLeft: 20, paddingRight: 20 }}>
             <h3>{tenant.name}</h3>
-            <button onClick={() => toggleAssign(tenant.id)}>
+            <button onClick={() => toggleAssign(tenant.userId)}>
                 {assigned ? 'Unassign' : 'Assign'}
             </button>
         </div>

@@ -1,15 +1,25 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ApartmentEvent } from '../models/ApartmentEvent';
 import { eventsTabNames, EventsTabType } from '../models/EventsTabs';
 import CreateEventCell from './CreateEventCell';
-import { isFutureEvent, isPastEvent, isPresentEvent } from '../utilities';
+import {
+    initializeServerEventsInfo,
+    isFutureEvent,
+    isPastEvent,
+    isPresentEvent,
+} from '../utilities';
 import EventCell from './EventCell';
 import InvitationCell from './InvitationCell';
 import DescriptionCell from '../../../../common/components/DescriptionCell';
 import Tabs from '../../../../common/components/Tabs';
-import { UserContext, UserContextType } from '../../../../common/context';
-import { Apartment } from '../../../../common/models';
-import { assertUnreachable } from '../../../../common/utilities';
+import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
+import { Apartment, ApartmentId, FriendProfile } from '../../../../common/models';
+import { assertUnreachable, getDeleteOptions, getPutOptions } from '../../../../common/utilities';
+import { Redirect } from 'react-router-dom';
+
+//TO DO: since users can be in more than one apartment, determining if an apartment is hosting is insufficient
+//using this method. we need to add a host apartment id on the server and client. attendees and invitees,
+//then, can remain limited to non-host apartments.
 
 //EXTENSION: Guarantee that events move from past to present and to future
 //in real time at the 24 hour mark
@@ -17,7 +27,7 @@ import { assertUnreachable } from '../../../../common/utilities';
 const Events: React.FC = () => {
     const [tab, setTab] = useState<EventsTabType>('Present');
 
-    const { user } = useContext(UserContext) as UserContextType;
+    const { matesUser: user } = useContext(MatesUserContext) as MatesUserContextType;
     const events = user.apartment.eventsInfo.events;
 
     const getFutureEvents = () =>
@@ -41,13 +51,13 @@ const Events: React.FC = () => {
             content = <CreateEventCell setTab={setTab} />;
             break;
         case 'Past':
-            content = <EventsComponent displayEvents={getPastEvents()} />;
+            content = <EventsComponent displayEvents={getPastEvents()} tab={tab} />;
             break;
         case 'Present':
-            content = <EventsComponent displayEvents={getPresentEvents()} />;
+            content = <EventsComponent displayEvents={getPresentEvents()} tab={tab} />;
             break;
         case 'Future':
-            content = <EventsComponent displayEvents={getFutureEvents()} />;
+            content = <EventsComponent displayEvents={getFutureEvents()} tab={tab} />;
             break;
         case 'Event Invitations':
             content = <IncomingInvitationsCell setTab={setTab} />;
@@ -101,32 +111,84 @@ interface IncomingInvitationsCellProps {
 }
 
 const IncomingInvitationsCell: React.FC<IncomingInvitationsCellProps> = ({ setTab }) => {
-    const { user, setUser } = useContext(UserContext) as UserContextType;
+    const { matesUser: user, setMatesUser: setUser } = useContext(
+        MatesUserContext,
+    ) as MatesUserContextType;
+
+    const [redirect, setRedirect] = useState(false);
+    const [message, setMessage] = useState('');
+
     const invitations = user.apartment.eventsInfo.invitations;
 
     const handleAcceptInvitation = (invitation: ApartmentEvent) => {
-        handleDeleteInvitation(invitation);
-        user.apartment.eventsInfo.events.push(invitation);
-        setUser({ ...user });
-        if (isPastEvent(invitation)) {
-            setTab('Past');
-        } else if (isPresentEvent(invitation)) {
-            setTab('Present');
-        } else {
-            setTab('Future');
-        }
-        //TO DO: update back end.
+        const data = { apartmentId: user.apartment._id, eventId: invitation._id };
+        const options = getPutOptions(data);
+        fetch('/mates/acceptEventInvitation', options).then((res) =>
+            res.json().then((json) => {
+                console.log(json);
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, the invitation can not be accepted at this time');
+                    return;
+                }
+                const { eventsInfo } = json;
+                const formattedEventsInfo = initializeServerEventsInfo(eventsInfo);
+                const newEvent = formattedEventsInfo.events[formattedEventsInfo.events.length - 1];
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, eventsInfo: formattedEventsInfo },
+                });
+                if (isPastEvent(newEvent)) {
+                    setTab('Past');
+                } else if (isPresentEvent(newEvent)) {
+                    setTab('Present');
+                } else {
+                    setTab('Future');
+                }
+            }),
+        );
     };
 
-    const handleDeleteInvitation = (invitation: ApartmentEvent) => {
-        const invitationIndex = invitations.indexOf(invitation);
-        invitations.splice(invitationIndex, 1);
-        setUser({ ...user });
-        //TO DO: update back end.
+    const handleRejectInvitation = (invitation: ApartmentEvent) => {
+        const data = {
+            apartmentId: user.apartment._id,
+            eventId: invitation._id,
+        };
+        const options = getPutOptions(data);
+        fetch('/mates/rejectEventInvitation', options)
+            .then((res) => res.json())
+            .then((json) => {
+                console.log(json);
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, the event invitation could not be rejected at this time');
+                    return;
+                }
+                const { eventsInfo } = json;
+                const formattedEventsInfo = initializeServerEventsInfo(eventsInfo);
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, eventsInfo: formattedEventsInfo },
+                });
+                setMessage('Event invitation rejected');
+            });
     };
+
+    if (redirect) {
+        return <Redirect to="/" />;
+    }
 
     return (
         <div>
+            {message.length === 0 ? null : <p style={{ color: 'red' }}>{message}</p>}
             {invitations.length === 0 ? (
                 <p style={{ fontWeight: 'bold' }}>{'You have not been invited to any events.'}</p>
             ) : (
@@ -135,7 +197,7 @@ const IncomingInvitationsCell: React.FC<IncomingInvitationsCellProps> = ({ setTa
                         <InvitationCell
                             invitation={invitation}
                             handleAccept={handleAcceptInvitation}
-                            handleDelete={handleDeleteInvitation}
+                            handleDelete={handleRejectInvitation}
                         />
                     ))}
                 </div>
@@ -146,57 +208,184 @@ const IncomingInvitationsCell: React.FC<IncomingInvitationsCellProps> = ({ setTa
 
 interface EventsComponentProps {
     displayEvents: ApartmentEvent[];
+    tab: EventsTabType;
 }
 
-const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents }) => {
-    const { user, setUser } = useContext(UserContext) as UserContextType;
-    const allEvents = user.apartment.eventsInfo.events;
+const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents, tab }) => {
+    const { matesUser: user, setMatesUser: setUser } = useContext(
+        MatesUserContext,
+    ) as MatesUserContextType;
+    //const allEvents = user.apartment.eventsInfo.events;
 
-    const handleInvite = (event: ApartmentEvent, invitee: Apartment) => {
-        event.invitees.push(invitee);
-        setUser({ ...user });
-        //TO DO: Save to database, and handle invitation on the back end.
+    const [redirect, setRedirect] = useState(false);
+    const [message, setMessage] = useState('');
+
+    useEffect(() => {
+        setMessage('');
+    }, [tab]);
+
+    const handleInvite = (event: ApartmentEvent, inviteeId: ApartmentId) => {
+        const data = {
+            apartmentId: user.apartment._id,
+            eventId: event._id,
+            inviteeId: inviteeId,
+        };
+        const options = getPutOptions(data);
+        fetch('/mates/inviteFriendToEvent', options)
+            .then((res) => res.json())
+            .then((json) => {
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, your friend could not be invited to the event at this time');
+                    return;
+                }
+                const { eventsInfo } = json;
+                const formattedEventsInfo = initializeServerEventsInfo(eventsInfo);
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, eventsInfo: formattedEventsInfo },
+                });
+                setMessage('Invitation Sent');
+            });
     };
 
-    const handleRemoveInvitee = (event: ApartmentEvent, invitee: Apartment) => {
-        const inviteeIndex = event.invitees.indexOf(invitee);
-        event.invitees.splice(inviteeIndex, 1);
-        setUser({ ...user });
-        //TO DO: Save to database, and handle invitation removal on the back end.
+    const handleRemoveInvitee = (event: ApartmentEvent, inviteeId: ApartmentId) => {
+        const data = { apartmentId: user.apartment._id, eventId: event._id, inviteeId: inviteeId };
+        const options = getPutOptions(data);
+        fetch('/mates/removeEventInvitation', options)
+            .then((res) => res.json())
+            .then((json) => {
+                console.log(json);
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, your invitation could not be removed at this time');
+                    return;
+                }
+                const { eventsInfo } = json;
+                const formattedEventsInfo = initializeServerEventsInfo(eventsInfo);
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, eventsInfo: formattedEventsInfo },
+                });
+                setMessage('Invitation removed');
+            });
     };
 
-    const handleRemoveAttendee = (event: ApartmentEvent, attendee: Apartment) => {
-        const attendeeIndex = event.attendees.indexOf(attendee);
-        event.attendees.splice(attendeeIndex, 1);
-        setUser({ ...user });
-        //TO DO: Save to database, and handle attendee removal on the back end.
+    const handleRemoveAttendee = (event: ApartmentEvent, attendeeId: ApartmentId) => {
+        const data = {
+            apartmentId: user.apartment._id,
+            eventId: event._id,
+            attendeeId: attendeeId,
+        };
+        const options = getPutOptions(data);
+        fetch('/mates/removeEventAttendee', options)
+            .then((res) => res.json())
+            .then((json) => {
+                console.log(json);
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, your invitation could not be removed at this time');
+                    return;
+                }
+                const { eventsInfo } = json;
+                const formattedEventsInfo = initializeServerEventsInfo(eventsInfo);
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, eventsInfo: formattedEventsInfo },
+                });
+                setMessage('Attendee removed from event');
+            });
     };
 
-    const handleRemoveEvent = (event: ApartmentEvent) => {
-        const eventIndex = allEvents.indexOf(event);
-        allEvents.splice(eventIndex, 1);
-        setUser({ ...user });
-        //TO DO: Save to database, and handle event removal on the back end.
-        //Note that this gets called both when a creator deletes their own event, and
-        //when a tenant elects to leave another apartment's event. The logic can be split if
-        //necessary, although this seems like an easy thing to intuit on the spot on the back-end
-        //or in this method
+    const handleLeaveEvent = (event: ApartmentEvent) => {
+        const data = {
+            apartmentId: user.apartment._id,
+            eventId: event._id,
+        };
+        const options = getPutOptions(data);
+        fetch('/mates/leaveEvent', options)
+            .then((res) => res.json())
+            .then((json) => {
+                console.log(json);
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, you are unable to leave this event at this time');
+                    return;
+                }
+                const { eventsInfo } = json;
+                const formattedEventsInfo = initializeServerEventsInfo(eventsInfo);
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, eventsInfo: formattedEventsInfo },
+                });
+                setMessage('You have left the event');
+            });
     };
+
+    const handleDeleteEvent = (event: ApartmentEvent) => {
+        const data = { apartmentId: user.apartment._id, eventId: event._id };
+        const options = getDeleteOptions(data);
+        fetch('mates/deleteEvent', options)
+            .then((res) => res.json())
+            .then((json) => {
+                console.log(json);
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, the event could not be deleted at this time');
+                    return;
+                }
+                const { eventsInfo } = json;
+                const formattedEventsInfo = initializeServerEventsInfo(eventsInfo);
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, eventsInfo: formattedEventsInfo },
+                });
+                setMessage('Event Deleted');
+            });
+    };
+
+    if (redirect) {
+        return <Redirect to="/" />;
+    }
 
     return (
         <div>
+            {message.length === 0 ? null : <p style={{ color: 'red' }}>{message}</p>}
             <h3>{'Scheduled Events:'}</h3>
             {displayEvents.map((event) => (
                 <EventCell
                     event={event}
-                    hosting={user.apartment.tenants
-                        .map((tenant) => tenant.id)
-                        .includes(event.creatorId)}
-                    canRemoveEvent={event.creatorId === user.tenantId}
-                    handleRemoveEvent={handleRemoveEvent}
+                    hosting={event.hostApartmentId === user.apartment._id}
+                    canRemoveEvent={
+                        event.hostApartmentId === user.apartment._id &&
+                        event.creatorId === user.userId
+                    }
+                    canRemoveFromEvent={event.hostApartmentId === user.apartment._id}
+                    handleRemoveEvent={handleDeleteEvent}
                     handleInvite={handleInvite}
                     handleRemoveAttendee={handleRemoveAttendee}
                     handleRemoveInvitee={handleRemoveInvitee}
+                    handleLeaveEvent={handleLeaveEvent}
                 />
             ))}
         </div>

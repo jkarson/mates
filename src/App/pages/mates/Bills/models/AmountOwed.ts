@@ -1,7 +1,7 @@
-import { TenantId } from '../../../../common/models';
+import { UserId } from '../../../../common/models';
 
 export interface AmountOwed {
-    tenantId: TenantId;
+    userId: UserId;
     initialAmount: number;
     currentAmount: number;
 }

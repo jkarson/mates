@@ -1,9 +1,16 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { Redirect } from 'react-router-dom';
 import DescriptionCell from '../../../../common/components/DescriptionCell';
 import Tabs from '../../../../common/components/Tabs';
-import { UserContext, UserContextType } from '../../../../common/context';
-import { TenantId } from '../../../../common/models';
-import { getTodaysDate, isPreviousDate, assertUnreachable } from '../../../../common/utilities';
+import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
+import { BillsInfo, UserId } from '../../../../common/models';
+import {
+    getTodaysDate,
+    isPreviousDate,
+    assertUnreachable,
+    getPutOptions,
+    getDeleteOptions,
+} from '../../../../common/utilities';
 import { AmountOwed } from '../models/AmountOwed';
 import { Bill, BillId } from '../models/Bill';
 import { BillGenerator, BillGeneratorID } from '../models/BillGenerator';
@@ -12,10 +19,15 @@ import {
     purgeOldBills,
     updateBillsFromBillGenerators,
     getTotalCurrentAssignedValue,
+    initializeServerBillsInfo,
 } from '../utilities';
 import BillCell from './BillCell';
 import BillGeneratorCell from './BillGeneratorCell';
 import CreateBillGeneratorCell from './CreateBillGeneratorCell';
+
+//PICK UP: Bills server is all working I believe. Chores next
+
+//BUG: says owed amount is 2.5, not 2.50
 
 //EXTENSION: make bills editable
 
@@ -23,101 +35,281 @@ import CreateBillGeneratorCell from './CreateBillGeneratorCell';
 
 //EXTENSION: bills summary should have some analytics about your spending, how much you owe/owed, etc
 
+//TO DO: wrap content in a scroll view or equivalent so that the tabs/description/
+//message are stuck on the top
+
 const Bills: React.FC = () => {
-    const { user, setUser } = useContext(UserContext) as UserContextType;
+    const { matesUser: user, setMatesUser: setUser } = useContext(
+        MatesUserContext,
+    ) as MatesUserContextType;
 
     const [tab, setTab] = useState<BillsTabType>('Overdue');
+    const [redirect, setRedirect] = useState(false);
+    const [message, setMessage] = useState('');
 
     const billGenerators = user.apartment.billsInfo.billGenerators;
     const visibleBillGenerators = billGenerators.filter(
         (billGenerator) =>
-            !billGenerator.isPrivate || billGenerator.privateTenantId === user.tenantId,
+            !billGenerator.isPrivate || billGenerator.privateTenantId === user.userId,
     );
 
     const bills = user.apartment.billsInfo.bills;
     const visibleBills = bills.filter(
-        (bill) => !bill.isPrivate || bill.privateTenantId === user.tenantId,
+        (bill) => !bill.isPrivate || bill.privateTenantId === user.userId,
     );
 
     useEffect(() => {
-        updateBillsFromBillGenerators(billGenerators, user, setUser);
-    });
+        setMessage('');
+    }, [tab]);
 
     useEffect(() => {
-        purgeOldBills(user, setUser);
-    });
+        const unauthenticated = updateBillsFromBillGenerators(billGenerators, user, setUser);
+        if (unauthenticated) {
+            setRedirect(true);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        //TO DO: make purge call server
+        const unauthenticated = purgeOldBills(user, setUser);
+        if (unauthenticated) {
+            setRedirect(true);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleDeleteBill = (billId: BillId) => {
-        const billIndex = bills.findIndex((bill) => bill.id === billId);
-        bills.splice(billIndex, 1);
-        setUser({ ...user });
-        //TO DO: Save to database
+        const data = {
+            apartmentId: user.apartment._id,
+            billId: billId,
+        };
+        const options = getDeleteOptions(data);
+        fetch('/mates/deleteBill', options)
+            .then((response) => response.json())
+            .then((json) => {
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, the bill could not be deleted at this time');
+                    return;
+                }
+                const { billsInfo } = json;
+                const formattedBillsInfo = initializeServerBillsInfo(billsInfo);
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, billsInfo: formattedBillsInfo },
+                });
+                setMessage('Bill deleted.');
+            });
     };
 
     const handleDeleteBillSeries = (bgId: BillGeneratorID) => {
-        const billsInSeries = bills.filter((bill) => bill.billGeneratorId === bgId);
-        billsInSeries.forEach((bill) => bills.splice(bills.indexOf(bill), 1));
-        const bgIndex = billGenerators.findIndex((bg) => bg.id === bgId);
-        billGenerators.splice(bgIndex, 1);
-        setUser({ ...user });
-        //TO DO: Save to database
+        const data = {
+            apartmentId: user.apartment._id,
+            billGeneratorId: bgId,
+        };
+        const options = getDeleteOptions(data);
+        fetch('mates/deleteBillSeries', options)
+            .then((response) => response.json())
+            .then((json) => {
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, the bill series could not be deleted at this time');
+                    return;
+                }
+                const { billsInfo } = json;
+                const formattedBillsInfo = initializeServerBillsInfo(billsInfo);
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, billsInfo: formattedBillsInfo },
+                });
+                setMessage('Bill series deleted.');
+            });
     };
 
     const handleResolveBill = (billId: BillId) => {
-        const bill = bills.find((bill) => bill.id === billId) as Bill;
+        const bill = bills.find((bill) => bill._id === billId) as Bill;
         bill.amountsOwed.forEach((amountOwed) => {
             amountOwed.currentAmount = 0;
         });
-        setUser({ ...user });
-        //TO DO: Save to database
+        const data = {
+            apartmentId: user.apartment._id,
+            billId: billId,
+            amountsOwed: bill.amountsOwed,
+        };
+        const options = getPutOptions(data);
+        fetch('/mates/updateAmountsOwed', options)
+            .then((res) => res.json())
+            .then((json) => {
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, your payment action could not be completed at this time.');
+                    return;
+                }
+                const { billsInfo } = json;
+                const formattedBillsInfo = initializeServerBillsInfo(billsInfo);
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, billsInfo: formattedBillsInfo },
+                });
+                setMessage('Bill resolved.');
+            });
     };
 
     const handlePayPortionToPayable = (billId: BillId) => {
-        const bill = bills.find((bill) => bill.id === billId) as Bill;
+        const bill = bills.find((bill) => bill._id === billId) as Bill;
         const userAmountOwed = bill.amountsOwed.find(
-            (amountOwed) => amountOwed.tenantId === user.tenantId,
+            (amountOwed) => amountOwed.userId === user.userId,
         ) as AmountOwed;
         userAmountOwed.currentAmount = 0;
-        setUser({ ...user });
-        //TO DO: Save to database
+        const data = {
+            apartmentId: user.apartment._id,
+            billId: billId,
+            amountsOwed: bill.amountsOwed,
+        };
+        const options = getPutOptions(data);
+        fetch('/mates/updateAmountsOwed', options)
+            .then((res) => res.json())
+            .then((json) => {
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, your payment action could not be completed at this time.');
+                    return;
+                }
+                const { billsInfo } = json;
+                const formattedBillsInfo = initializeServerBillsInfo(billsInfo);
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, billsInfo: formattedBillsInfo },
+                });
+                setMessage('Portion Paid To Vendor');
+            });
     };
 
-    const handlePayPortionToTenant = (billId: BillId, payeeId: TenantId) => {
-        const bill = bills.find((bill) => bill.id === billId) as Bill;
+    const handlePayPortionToTenant = (billId: BillId, payeeId: UserId) => {
+        const bill = bills.find((bill) => bill._id === billId) as Bill;
         const userAmountOwed = bill.amountsOwed.find(
-            (amountOwed) => amountOwed.tenantId === user.tenantId,
+            (amountOwed) => amountOwed.userId === user.userId,
         ) as AmountOwed;
         const tenantAmountOwed = bill.amountsOwed.find(
-            (amountOwed) => amountOwed.tenantId === payeeId,
+            (amountOwed) => amountOwed.userId === payeeId,
         ) as AmountOwed;
         tenantAmountOwed.currentAmount += userAmountOwed.currentAmount;
         userAmountOwed.currentAmount = 0;
-        setUser({ ...user });
-        //TO DO: Save to database
+        const data = {
+            apartmentId: user.apartment._id,
+            billId: billId,
+            amountsOwed: bill.amountsOwed,
+        };
+        const options = getPutOptions(data);
+        fetch('/mates/updateAmountsOwed', options)
+            .then((res) => res.json())
+            .then((json) => {
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, your payment action could not be completed at this time.');
+                    return;
+                }
+                const { billsInfo } = json;
+                const formattedBillsInfo = initializeServerBillsInfo(billsInfo);
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, billsInfo: formattedBillsInfo },
+                });
+                setMessage('Portion Paid To Tenant');
+            });
     };
 
     const handlePayBalance = (billId: BillId) => {
-        const bill = bills.find((bill) => bill.id === billId) as Bill;
+        const bill = bills.find((bill) => bill._id === billId) as Bill;
         const userAmountOwed = bill.amountsOwed.find(
-            (amountOwed) => amountOwed.tenantId === user.tenantId,
+            (amountOwed) => amountOwed.userId === user.userId,
         ) as AmountOwed;
         userAmountOwed.currentAmount = 0;
         bill.amountsOwed.forEach((amountOwed) => {
-            if (amountOwed.tenantId !== user.tenantId) {
+            if (amountOwed.userId !== user.userId) {
                 userAmountOwed.currentAmount -= amountOwed.currentAmount;
             }
         });
-        setUser({ ...user });
-        //TO DO: Save to database
+        const data = {
+            apartmentId: user.apartment._id,
+            billId: billId,
+            amountsOwed: bill.amountsOwed,
+        };
+        const options = getPutOptions(data);
+        fetch('/mates/updateAmountsOwed', options)
+            .then((res) => res.json())
+            .then((json) => {
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, your payment action could not be completed at this time.');
+                    return;
+                }
+                const { billsInfo } = json;
+                const formattedBillsInfo = initializeServerBillsInfo(billsInfo);
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, billsInfo: formattedBillsInfo },
+                });
+                setMessage('Balance Paid To Vendor');
+            });
     };
 
     const handleResetBill = (billId: BillId) => {
-        const bill = bills.find((bill) => bill.id === billId) as Bill;
+        const bill = bills.find((bill) => bill._id === billId) as Bill;
         bill.amountsOwed.forEach((amountOwed) => {
             amountOwed.currentAmount = amountOwed.initialAmount;
         });
-        setUser({ ...user });
-        //TO DO: Save to database
+        const data = {
+            apartmentId: user.apartment._id,
+            billId: billId,
+            amountsOwed: bill.amountsOwed,
+        };
+        const options = getPutOptions(data);
+        fetch('/mates/updateAmountsOwed', options)
+            .then((res) => res.json())
+            .then((json) => {
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, your payment action could not be completed at this time.');
+                    return;
+                }
+                const { billsInfo } = json;
+                const formattedBillsInfo = initializeServerBillsInfo(billsInfo);
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, billsInfo: formattedBillsInfo },
+                });
+                setMessage('Bill Reset');
+            });
     };
 
     const upcomingDateLimit = getTodaysDate();
@@ -132,7 +324,7 @@ const Bills: React.FC = () => {
 
     const userPortionIsPaid = (bill: Bill) => {
         const userAmountOwed = bill.amountsOwed.find(
-            (amountOwed) => amountOwed.tenantId === user.tenantId,
+            (amountOwed) => amountOwed.userId === user.userId,
         ) as AmountOwed;
         return userAmountOwed.currentAmount <= 0;
     };
@@ -217,10 +409,15 @@ const Bills: React.FC = () => {
             assertUnreachable(tab);
     }
 
+    if (redirect) {
+        return <Redirect to="/" />;
+    }
+
     return (
         <div>
             <Tabs currentTab={tab} setTab={setTab} tabNames={billsTabNames} />
             <BillsDescriptionCell tab={tab} />
+            {message.length === 0 ? null : <p style={{ color: 'red' }}>{message}</p>}
             <div>{content}</div>
         </div>
     );

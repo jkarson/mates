@@ -10,57 +10,75 @@ import { Message } from '../pages/mates/Messages/models/Message';
 // need to reorg the structure without breaking client code. can i use careful renames?
 //
 // to do: move context provider up the tree so i can play w it here
-//
-/*
-User
-    id
-    username
-    apartments
-    selectedApartment
 
-Apartment
+// note / to do: as far as i can tell, i dont need any ids on the front end except for the apartment
+//id so that i can display it. i guess i'll need tenant ids in mates probably. but at the "User" layer, what
+//do i need an id for?
 
+export interface User {
+    //readonly id: UserId;
+    username: string;
+    apartments: ApartmentSummary[];
+    requestedApartments: ApartmentSummary[];
+}
 
+export interface ApartmentSummary {
+    apartmentId: ApartmentId;
+    name: string;
+    tenantNames: string[];
+}
 
-
-
-*/
+export interface MatesUser {
+    userId: UserId;
+    apartment: Apartment;
+}
 
 export interface Apartment {
-    readonly id: ApartmentId;
+    readonly _id: ApartmentId;
     tenants: Tenant[];
+    profile: ProfileInfo;
     friendsInfo: FriendsInfo;
     eventsInfo: EventsInfo;
-    name: string;
     messages: Message[];
     manuallyAddedContacts: Contact[];
     choresInfo: ChoresInfo;
     billsInfo: BillsInfo;
-    quote?: string;
-    location?: string;
 }
 
-export type ApartmentId = string;
-
 export interface Tenant {
-    readonly id: TenantId;
+    userId: UserId;
     name: string;
     age?: number;
     email?: string;
     number?: string;
 }
 
-export type TenantId = string;
+export interface ProfileInfo {
+    code: string;
+    name: string;
+    quote?: string;
+    address?: string;
+    requests: JoinRequest[];
+}
 
-export interface User {
-    tenantId: TenantId;
-    apartment: Apartment;
+export interface JoinRequest {
+    _id: UserId;
+    username: string;
 }
 
 export interface FriendsInfo {
-    friends: Apartment[];
-    outgoingRequests: Apartment[];
-    incomingRequests: Apartment[];
+    friends: FriendProfile[];
+    outgoingRequests: ApartmentSummary[];
+    incomingRequests: ApartmentSummary[];
+}
+
+export interface FriendProfile {
+    apartmentId: ApartmentId;
+    code: string;
+    name: string;
+    quote?: string;
+    address?: string;
+    tenants: Tenant[];
 }
 
 export interface EventsInfo {
@@ -77,3 +95,6 @@ export interface BillsInfo {
     billGenerators: BillGenerator[];
     bills: Bill[];
 }
+
+export type UserId = string;
+export type ApartmentId = string;

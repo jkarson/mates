@@ -1,5 +1,5 @@
 import React, { useContext, useRef } from 'react';
-import { UserContext, UserContextType } from '../../../../common/context';
+import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import {
     verifyAndSetNumericStringInput,
     divideMoneyTotal,
@@ -31,11 +31,11 @@ const AmountsWithPercentOwedAssignmentCell: React.FC<AmountsWithPercentOwedAssig
     setTotal,
     isPrivate,
 }) => {
-    const { user } = useContext(UserContext) as UserContextType;
+    const { matesUser } = useContext(MatesUserContext) as MatesUserContextType;
 
     const handleSetAmountWithPercentOwed = (amountWithPercentOwed: AmountWithPercentOwed) => {
-        const id = amountWithPercentOwed.tenantId;
-        const index = amountsWithPercentOwed.findIndex((aWPO) => aWPO.tenantId === id);
+        const id = amountWithPercentOwed.userId;
+        const index = amountsWithPercentOwed.findIndex((aWPO) => aWPO.userId === id);
         amountsWithPercentOwed.splice(index, 1, amountWithPercentOwed);
         setAmountsWithPercentOwed(amountsWithPercentOwed);
     };
@@ -49,7 +49,7 @@ const AmountsWithPercentOwedAssignmentCell: React.FC<AmountsWithPercentOwedAssig
         const values = divideMoneyTotal(totalValue, numTenants);
         const newAmountsWithPercentOwed: AmountWithPercentOwed[] = amountsWithPercentOwed.map(
             (amountOwed, index) => ({
-                tenantId: amountOwed.tenantId,
+                userId: amountOwed.userId,
                 amount: values[index].toFixed(2),
                 amountValue: values[index],
                 percent: roundToTenth(getPercent(values[index], totalValue)).toFixed(1),
@@ -60,7 +60,7 @@ const AmountsWithPercentOwedAssignmentCell: React.FC<AmountsWithPercentOwedAssig
     };
 
     const tenantAssignmentCells = amountsWithPercentOwed.map((aWPO) => {
-        const tenant = getTenantByTenantId(user, aWPO.tenantId);
+        const tenant = getTenantByTenantId(matesUser, aWPO.userId);
         const tenantName = tenant ? tenant.name : 'UNKNOWN';
 
         const setAmount = (amount: string) => {
@@ -71,7 +71,7 @@ const AmountsWithPercentOwedAssignmentCell: React.FC<AmountsWithPercentOwedAssig
                 const newPercentValue = roundToTenth(getPercent(newAmountValue, totalValue));
                 const newPercent = newPercentValue.toFixed(1);
                 const newAmountWithPercentOwed: AmountWithPercentOwed = {
-                    tenantId: aWPO.tenantId,
+                    userId: aWPO.userId,
                     amount: amount,
                     amountValue: newAmountValue,
                     percent: newPercent,
@@ -92,7 +92,7 @@ const AmountsWithPercentOwedAssignmentCell: React.FC<AmountsWithPercentOwedAssig
                 );
                 const newAmount = newAmountValue.toFixed(2);
                 const newAmountWithPercentOwed: AmountWithPercentOwed = {
-                    tenantId: aWPO.tenantId,
+                    userId: aWPO.userId,
                     amount: newAmount,
                     amountValue: newAmountValue,
                     percent: newPercent,

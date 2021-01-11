@@ -1,11 +1,14 @@
 import React from 'react';
-import { Apartment } from '../../../../common/models';
+import { ProfileInfo } from '../../../../common/models';
 import { StateProps } from '../../../../common/types';
 
 // EXTENSION: Add autocomplete and/or verification for address input, perhaps using Google Places API
 // https://developers.google.com/maps/documentation/javascript/places-autocomplete
 
-const ApartmentProfileModificationCell: React.FC<StateProps<Apartment>> = ({ state, setState }) => {
+const ApartmentProfileModificationCell: React.FC<StateProps<ProfileInfo>> = ({
+    state,
+    setState,
+}) => {
     const handleChange = (
         event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>,
     ) => {
@@ -25,12 +28,12 @@ const ApartmentProfileModificationCell: React.FC<StateProps<Apartment>> = ({ sta
             />
             <br />
             <label>
-                {'Location: '}
+                {'Address: '}
                 <input
-                    name="location"
+                    name="address"
                     type="text"
                     onChange={handleChange}
-                    value={state.location}
+                    value={state.address}
                     style={{ width: 300 }}
                 />
             </label>

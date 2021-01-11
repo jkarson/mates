@@ -1,21 +1,34 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { Redirect } from 'react-router-dom';
 import DescriptionCell from '../../../../common/components/DescriptionCell';
 import Tabs from '../../../../common/components/Tabs';
-import { UserContext, UserContextType } from '../../../../common/context';
+import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import {
     getTodaysDate,
     isSameDayMonthYear,
     isPreviousDate,
     isFutureDate,
     assertUnreachable,
+    getPutOptions,
+    getDeleteOptions,
 } from '../../../../common/utilities';
 import { Chore } from '../models/Chore';
 import { ChoreGeneratorID } from '../models/ChoreGenerator';
 import { ChoresTabType, choresTabNames } from '../models/ChoresTabs';
-import { updateChoresFromChoreGenerators, purgeOldChores } from '../utilities';
+import {
+    updateChoresFromChoreGenerators,
+    purgeOldChores,
+    initializeServerChoresInfo,
+} from '../utilities';
 import ChoreCell from './ChoreCell';
 import ChoreGeneratorCell from './ChoreGeneratorCell';
 import CreateChoreGeneratorCell from './CreateChoreGeneratorCell';
+
+//PICKUP: These little TODOS fall under next week's tasks. Chores server is DONE. Onto Events!
+
+//TO DO: user should know that "old, uncompleted" chores will be swiftly deletedx
+
+//TO DO: reverse sorting on 'today' tab is confusing/bad UI... re-name tab and reconsider sort order
 
 //EXTENSION: Optimize useEffect calls w/ dependency arrays
 
@@ -24,45 +37,159 @@ import CreateChoreGeneratorCell from './CreateChoreGeneratorCell';
 //EXTENSION: consider adding a "Your Chores" section or other analytics to the Summary tab
 
 const Chores: React.FC = () => {
-    const { user, setUser } = useContext(UserContext) as UserContextType;
+    const { matesUser: user, setMatesUser: setUser } = useContext(
+        MatesUserContext,
+    ) as MatesUserContextType;
     const [tab, setTab] = useState<ChoresTabType>('Today');
+    const [redirect, setRedirect] = useState(false);
+    const [message, setMessage] = useState('');
 
     const choreGenerators = user.apartment.choresInfo.choreGenerators;
     const chores = user.apartment.choresInfo.chores;
 
     useEffect(() => {
-        updateChoresFromChoreGenerators(choreGenerators, user, setUser);
-    });
+        setMessage('');
+    }, [tab]);
 
     useEffect(() => {
-        purgeOldChores(user, setUser);
-    });
+        const unauthenticated = updateChoresFromChoreGenerators(choreGenerators, user, setUser);
+        if (unauthenticated) {
+            setRedirect(true);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        //TO DO: add server call
+        const unauthenticated = purgeOldChores(user, setUser);
+        if (unauthenticated) {
+            setRedirect(true);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const toggleCompleted = (chore: Chore) => {
         if (!chore.completed) {
-            chore.completed = true;
-            chore.completedBy = user.tenantId;
+            markChoreCompleted(chore);
         } else {
-            chore.completed = false;
-            chore.completedBy = undefined;
+            markChoreUncompleted(chore);
         }
-        setUser({ ...user });
-        //TO DO: Save to database
+    };
+
+    const markChoreCompleted = (chore: Chore) => {
+        const data = {
+            userId: user.userId,
+            apartmentId: user.apartment._id,
+            choreId: chore._id,
+        };
+        const options = getPutOptions(data);
+        fetch('mates/markChoreCompleted', options).then((res) =>
+            res.json().then((json) => {
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, the chore could not be marked completed at this time');
+                    return;
+                }
+                const { choresInfo } = json;
+                const formattedChoresInfo = initializeServerChoresInfo(choresInfo);
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, choresInfo: formattedChoresInfo },
+                });
+                setMessage('Chore Marked Completed');
+            }),
+        );
+    };
+
+    const markChoreUncompleted = (chore: Chore) => {
+        const data = {
+            apartmentId: user.apartment._id,
+            choreId: chore._id,
+        };
+        const options = getPutOptions(data);
+        fetch('/mates/markChoreUncompleted', options)
+            .then((res) => res.json())
+            .then((json) => {
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, the chore could not be marked uncompleted at this time');
+                    return;
+                }
+                const { choresInfo } = json;
+                const formattedChoresInfo = initializeServerChoresInfo(choresInfo);
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, choresInfo: formattedChoresInfo },
+                });
+                setMessage('Chore Marked Uncompleted');
+            });
     };
 
     const handleDeleteChore = (chore: Chore) => {
-        const choreIndex = chores.indexOf(chore);
-        chores.splice(choreIndex, 1);
-        setUser({ ...user });
-        //TO DO: Save to database
+        const data = {
+            apartmentId: user.apartment._id,
+            choreId: chore._id,
+        };
+        const options = getDeleteOptions(data);
+        fetch('/mates/deleteChore', options)
+            .then((res) => res.json())
+            .then((json) => {
+                console.log(json);
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, the chore could not be deleted at this time.');
+                    return;
+                }
+                const { choresInfo } = json;
+                const formattedChoresInfo = initializeServerChoresInfo(choresInfo);
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, choresInfo: formattedChoresInfo },
+                });
+                setMessage('Chore Deleted');
+            });
     };
 
     const handleDeleteChoreSeries = (cgId: ChoreGeneratorID) => {
-        const choresInSeries = chores.filter((chore) => chore.choreGeneratorID === cgId);
-        choresInSeries.forEach((chore) => chores.splice(chores.indexOf(chore), 1));
-        const cgIndex = choreGenerators.findIndex((cg) => cg.id === cgId);
-        choreGenerators.splice(cgIndex, 1);
-        setUser({ ...user });
+        const data = {
+            apartmentId: user.apartment._id,
+            choreGeneratorId: cgId,
+        };
+        console.log('hi from handle delete chore series. data:');
+        console.log(data);
+        const options = getDeleteOptions(data);
+        fetch('/mates/deleteChoreSeries', options).then((res) =>
+            res.json().then((json) => {
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setMessage('Sorry, the chore series could not be deleted at this time');
+                    return;
+                }
+                const { choresInfo } = json;
+                const formattedChoresInfo = initializeServerChoresInfo(choresInfo);
+                setUser({
+                    ...user,
+                    apartment: { ...user.apartment, choresInfo: formattedChoresInfo },
+                });
+                setMessage('Chore Series Deleted');
+            }),
+        );
     };
 
     const upcomingDateLimit = getTodaysDate();
@@ -95,18 +222,18 @@ const Chores: React.FC = () => {
             .sort((a, b) => a.starting.getTime() - b.starting.getTime())
             .map((cg) => (
                 <ChoreGeneratorCell
-                    key={cg.id}
+                    key={cg._id}
                     choreGenerator={cg}
                     handleDeleteSeries={handleDeleteChoreSeries}
-                    assignedToUser={cg.assigneeIds.includes(user.tenantId)}
+                    assignedToUser={cg.assigneeIds.includes(user.userId)}
                 />
             ));
 
     const getChoreCell = (chore: Chore) => (
         <ChoreCell
-            key={chore.id}
+            key={chore._id}
             chore={chore}
-            assignedToUser={chore.assigneeIds.includes(user.tenantId)}
+            assignedToUser={chore.assigneeIds.includes(user.userId)}
             toggleCompleted={toggleCompleted}
             handleDeleteChore={handleDeleteChore}
             handleDeleteSeries={handleDeleteChoreSeries}
@@ -137,10 +264,15 @@ const Chores: React.FC = () => {
             assertUnreachable(tab);
     }
 
+    if (redirect) {
+        return <Redirect to="/" />;
+    }
+
     return (
         <div>
             <Tabs currentTab={tab} setTab={setTab} tabNames={choresTabNames} />
             <ChoresDescriptionCell tab={tab} />
+            {message.length === 0 ? null : <p style={{ color: 'red' }}>{message}</p>}
             <div>{content}</div>
         </div>
     );

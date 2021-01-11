@@ -14,7 +14,7 @@ class App extends Component {
                     <Route exact path="/" render={(props) => <LogIn {...props} />} />
                     <Route exact path="/signup" component={SignUp} />
                     <Route exact path="/mates" component={Mates} />
-                    <Route exact path="/account" component={Account} />
+                    <Route exact path="/account" render={(props) => <Account {...props} />} />
                 </Switch>
             </div>
         );

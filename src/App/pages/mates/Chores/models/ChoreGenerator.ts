@@ -1,14 +1,27 @@
-import { TenantId } from '../../../../common/models';
+import { UserId } from '../../../../common/models';
 import { ChoreFrequency } from './ChoreFrequency';
 
-export interface ChoreGenerator {
-    readonly id: ChoreGeneratorID;
+export interface ChoreGenerator extends ChoreGeneratorWithoutId {
+    readonly _id: ChoreGeneratorID;
+}
+
+export interface ChoreGeneratorWithoutId {
     name: string;
-    assigneeIds: TenantId[];
+    assigneeIds: UserId[];
     frequency: ChoreFrequency;
     starting: Date;
-    showUntilCompleted: boolean;
     updatedThrough: Date;
+    showUntilCompleted: boolean;
+}
+
+export interface ServerChoreGenerator {
+    readonly _id: ChoreGeneratorID;
+    name: string;
+    assigneeIds: UserId[];
+    frequency: ChoreFrequency;
+    starting: string;
+    updatedThrough: string;
+    showUntilCompleted: boolean;
 }
 
 export type ChoreGeneratorID = string;

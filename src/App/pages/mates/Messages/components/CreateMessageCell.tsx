@@ -1,11 +1,11 @@
 import React from 'react';
-import { TenantId } from '../../../../common/models';
+import { UserId } from '../../../../common/models';
 import { StateProps } from '../../../../common/types';
 import { MessageWithoutId } from '../models/Message';
 
 interface CreateMessageCellProps extends StateProps<string> {
     author: string;
-    authorId: TenantId;
+    authorId: UserId;
     handleNewMessage: (message: MessageWithoutId) => void;
 }
 
@@ -16,7 +16,10 @@ const CreateMessageCell: React.FC<CreateMessageCellProps> = ({
     authorId,
     handleNewMessage,
 }) => {
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = () => {
+        if (state.length === 0) {
+            return;
+        }
         const newMessage: MessageWithoutId = {
             sender: author,
             senderId: authorId,
@@ -25,11 +28,11 @@ const CreateMessageCell: React.FC<CreateMessageCellProps> = ({
         };
         handleNewMessage(newMessage);
         setState('');
-        event.preventDefault();
+        //event.preventDefault();
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <div>
             <label style={{ fontWeight: 'bold' }}>{author + ':'}</label>
             <div>
                 <textarea
@@ -40,8 +43,8 @@ const CreateMessageCell: React.FC<CreateMessageCellProps> = ({
                     cols={80}
                 />
             </div>
-            <input type="submit" value="Send" />
-        </form>
+            <button onClick={handleSubmit}>{'Send'}</button>
+        </div>
     );
 };
 

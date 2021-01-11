@@ -1,22 +1,37 @@
 import React, { useContext, useState } from 'react';
 import { AmountWithPercentOwed } from '../models/AmountWithPercentOwed';
 import { billFrequencies, BillFrequency } from '../models/BillFrequency';
-import { BillGenerator } from '../models/BillGenerator';
+import {
+    BillGenerator,
+    BillGeneratorWithoutId,
+    ServerBillGenerator,
+} from '../models/BillGenerator';
 import { BillsTabType } from '../models/BillsTabs';
 import AmountsWithPercentOwedAssignmentCell from './AmountsWithPercentOwedAssignmentCell';
-import { getInitialAmountsWithPercentOwed, getTotalAssignedValue } from '../utilities';
+import {
+    getBillsWithoutIdFromBillGeneratorWithoutId,
+    getInitialAmountsWithPercentOwed,
+    getTotalAssignedValue,
+    initializeServerBillsInfo,
+} from '../utilities';
 import DateInputCell from '../../../../common/components/DateInputCell';
 import FrequencySelectCell from '../../../../common/components/FrequencySelectCell';
-import { UserContext, UserContextType } from '../../../../common/context';
+import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import {
     getTodaysDate,
     roundToHundredth,
     getAmountFromPercent,
     roundToTenth,
     getPercent,
-    getNewId,
     getYesterdaysDateFromDate,
+    getPutOptions,
+    initializeDates,
+    getPostOptions,
+    getMaxDate,
 } from '../../../../common/utilities';
+import { Redirect } from 'react-router-dom';
+import { ServerClass } from '../../../../common/types';
+import { Bill, BillWithoutId, ServerBill } from '../models/Bill';
 
 interface CreateBillGeneratorInput {
     name: string;
@@ -33,7 +48,9 @@ interface CreateBillGeneratorCellProps {
 }
 
 const CreateBillGeneratorCell: React.FC<CreateBillGeneratorCellProps> = ({ setTab }) => {
-    const { user, setUser } = useContext(UserContext) as UserContextType;
+    const { matesUser: user, setMatesUser: setUser } = useContext(
+        MatesUserContext,
+    ) as MatesUserContextType;
     const initialCreateBillGeneratorInput: CreateBillGeneratorInput = {
         name: '',
         payableTo: '',
@@ -43,6 +60,9 @@ const CreateBillGeneratorCell: React.FC<CreateBillGeneratorCellProps> = ({ setTa
         frequency: 'Monthly',
         starting: getTodaysDate(),
     };
+
+    const [redirect, setRedirect] = useState(false);
+    const [error, setError] = useState('');
 
     const [input, setInput] = useState<CreateBillGeneratorInput>(initialCreateBillGeneratorInput);
     const totalValue = isNaN(parseFloat(input.total))
@@ -114,18 +134,19 @@ const CreateBillGeneratorCell: React.FC<CreateBillGeneratorCellProps> = ({ setTa
     };
 
     const handleCreate = () => {
-        const newBillGenerator: BillGenerator = {
-            id: getNewId(user.apartment.billsInfo.billGenerators),
+        const newBillGenerator: BillGeneratorWithoutId = {
+            //id: getNewId(user.apartment.billsInfo.billGenerators),
+            // _id: '-1', //TO DO: override w id from server
             name: input.name,
             payableTo: input.payableTo,
             isPrivate: input.isPrivate,
-            privateTenantId: input.isPrivate ? user.tenantId : undefined,
+            privateTenantId: input.isPrivate ? user.userId : undefined,
             frequency: input.frequency,
             amountsWithPercentOwed: input.isPrivate
                 ? getInitialAmountsWithPercentOwed(user).map((aWPO) => {
-                      if (user.tenantId === aWPO.tenantId) {
+                      if (user.userId === aWPO.userId) {
                           return {
-                              tenantId: aWPO.tenantId,
+                              userId: aWPO.userId,
                               amount: totalValue.toFixed(2),
                               amountValue: totalValue,
                               percentValue: 100,
@@ -139,11 +160,53 @@ const CreateBillGeneratorCell: React.FC<CreateBillGeneratorCellProps> = ({ setTa
             starting: new Date(input.starting.getTime()),
             updatedThrough: getYesterdaysDateFromDate(input.starting),
         };
-        user.apartment.billsInfo.billGenerators.push(newBillGenerator);
-        setUser(user);
-        setInput(initialCreateBillGeneratorInput);
-        setTab('Summary');
+        const generatedBills: BillWithoutId[] = getBillsWithoutIdFromBillGeneratorWithoutId(
+            newBillGenerator,
+        );
+        newBillGenerator.updatedThrough = getMaxDate();
+        const data = {
+            apartmentId: user.apartment._id,
+            newBillGenerator: newBillGenerator,
+            generatedBills: generatedBills,
+        };
+        const options = getPostOptions(data);
+        fetch('/mates/createBillGenerator', options)
+            .then((response) => response.json())
+            .then((json) => {
+                const { authenticated, success } = json;
+                if (!authenticated) {
+                    setRedirect(true);
+                    return;
+                }
+                if (!success) {
+                    setError('Sorry, the bill series could not be created');
+                    return;
+                }
+                console.log('success!');
+                console.log('json response:');
+                console.log(json);
+
+                const { billsInfo } = json;
+                initializeServerBillsInfo(billsInfo);
+                setUser({
+                    ...user,
+                    apartment: {
+                        ...user.apartment,
+                        billsInfo: {
+                            bills: billsInfo.bills as Bill[],
+                            billGenerators: billsInfo.billGenerators as BillGenerator[],
+                        },
+                    },
+                });
+                setError('');
+                setInput(initialCreateBillGeneratorInput);
+                setTab('Summary');
+            });
     };
+
+    if (redirect) {
+        return <Redirect to="/" />;
+    }
 
     return (
         <div>
@@ -202,6 +265,7 @@ const CreateBillGeneratorCell: React.FC<CreateBillGeneratorCellProps> = ({ setTa
             <div style={{ padding: 30 }}>
                 {canCreate() ? <button onClick={handleCreate}>{'Create Bill'}</button> : null}
             </div>
+            {error.length === 0 ? null : <p style={{ color: 'red' }}>{error}</p>}
         </div>
     );
 };

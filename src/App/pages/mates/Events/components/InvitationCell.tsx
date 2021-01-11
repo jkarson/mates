@@ -19,7 +19,7 @@ const InvitationCell: React.FC<InvitationCellProps> = ({
             <h5>{getFormattedDateTimeString(invitation.time)}</h5>
             <p>{'Created by ' + invitation.creator}</p>
             <button onClick={() => handleAccept(invitation)}>{'Accept Invitation'}</button>
-            <button onClick={() => handleDelete(invitation)}>{'Delete Invitation'}</button>
+            <button onClick={() => handleDelete(invitation)}>{'Reject Invitation'}</button>
         </div>
     );
 };

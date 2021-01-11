@@ -1,9 +1,16 @@
 import { createContext } from 'react';
-import { User } from './models';
+import { MatesUser, User } from './models';
 
-export const UserContext = createContext<UserContextType | null>(null);
+export const MatesUserContext = createContext<MatesUserContextType | null>(null);
 
-export interface UserContextType {
+export interface MatesUserContextType {
+    matesUser: MatesUser;
+    setMatesUser: React.Dispatch<React.SetStateAction<MatesUser>>;
+}
+
+export const AccountContext = createContext<AccountContextType | null>(null);
+
+export interface AccountContextType {
     user: User;
     setUser: React.Dispatch<React.SetStateAction<User>>;
 }
