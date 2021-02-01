@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useLayoutEffect, useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import DescriptionCell from '../../../../common/components/DescriptionCell';
 import Tabs from '../../../../common/components/Tabs';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
-import { BillsInfo, UserId } from '../../../../common/models';
+import { UserId } from '../../../../common/models';
 import {
     getTodaysDate,
     isPreviousDate,
@@ -12,8 +12,7 @@ import {
     getDeleteOptions,
 } from '../../../../common/utilities';
 import { AmountOwed } from '../models/AmountOwed';
-import { Bill, BillId } from '../models/Bill';
-import { BillGenerator, BillGeneratorID } from '../models/BillGenerator';
+import { BillId, BillGeneratorID, Bill, BillGenerator } from '../models/BillsInfo';
 import { billsTabNames, BillsTabType } from '../models/BillsTabs';
 import {
     purgeOldBills,
@@ -25,18 +24,11 @@ import BillCell from './BillCell';
 import BillGeneratorCell from './BillGeneratorCell';
 import CreateBillGeneratorCell from './CreateBillGeneratorCell';
 
-//PICK UP: Bills server is all working I believe. Chores next
-
-//BUG: says owed amount is 2.5, not 2.50
-
 //EXTENSION: make bills editable
 
 //EXTENSION: Optimize useEffect calls w/ dependency arrays
 
 //EXTENSION: bills summary should have some analytics about your spending, how much you owe/owed, etc
-
-//TO DO: wrap content in a scroll view or equivalent so that the tabs/description/
-//message are stuck on the top
 
 const Bills: React.FC = () => {
     const { matesUser: user, setMatesUser: setUser } = useContext(
@@ -58,6 +50,26 @@ const Bills: React.FC = () => {
         (bill) => !bill.isPrivate || bill.privateTenantId === user.userId,
     );
 
+    useLayoutEffect(() => {
+        if (getOverdueBills().length > 0) {
+            setTab('Overdue');
+            return;
+        }
+        if (getUnresolvedBills().length > 0) {
+            setTab('Unresolved');
+            return;
+        }
+        if (getUpcomingBills().length > 0) {
+            setTab('Upcoming');
+            return;
+        }
+        if (getFutureBills().length > 0) {
+            setTab('Future');
+            return;
+        }
+        setTab('Create New');
+    }, []);
+
     useEffect(() => {
         setMessage('');
     }, [tab]);
@@ -71,7 +83,6 @@ const Bills: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        //TO DO: make purge call server
         const unauthenticated = purgeOldBills(user, setUser);
         if (unauthenticated) {
             setRedirect(true);
@@ -366,6 +377,7 @@ const Bills: React.FC = () => {
             bill={bill}
             isPaid={isPaid(bill)}
             isPrivate={bill.isPrivate}
+            isResolved={isResolved(bill)}
             userPortionIsPaid={userPortionIsPaid(bill)}
             handleDeleteBill={handleDeleteBill}
             handleDeleteBillSeries={handleDeleteBillSeries}

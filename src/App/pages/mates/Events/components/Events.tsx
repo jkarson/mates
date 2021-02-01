@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { ApartmentEvent } from '../models/ApartmentEvent';
+import React, { useContext, useEffect, useLayoutEffect, useState } from 'react';
 import { eventsTabNames, EventsTabType } from '../models/EventsTabs';
 import CreateEventCell from './CreateEventCell';
 import {
@@ -13,13 +12,10 @@ import InvitationCell from './InvitationCell';
 import DescriptionCell from '../../../../common/components/DescriptionCell';
 import Tabs from '../../../../common/components/Tabs';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
-import { Apartment, ApartmentId, FriendProfile } from '../../../../common/models';
+import { ApartmentId } from '../../../../common/models';
 import { assertUnreachable, getDeleteOptions, getPutOptions } from '../../../../common/utilities';
 import { Redirect } from 'react-router-dom';
-
-//TO DO: since users can be in more than one apartment, determining if an apartment is hosting is insufficient
-//using this method. we need to add a host apartment id on the server and client. attendees and invitees,
-//then, can remain limited to non-host apartments.
+import { ApartmentEvent } from '../models/EventsInfo';
 
 //EXTENSION: Guarantee that events move from past to present and to future
 //in real time at the 24 hour mark
@@ -29,6 +25,22 @@ const Events: React.FC = () => {
 
     const { matesUser: user } = useContext(MatesUserContext) as MatesUserContextType;
     const events = user.apartment.eventsInfo.events;
+
+    useLayoutEffect(() => {
+        if (user.apartment.eventsInfo.invitations.length > 0) {
+            setTab('Event Invitations');
+            return;
+        }
+        if (getPresentEvents().length > 0) {
+            setTab('Present');
+            return;
+        }
+        if (getFutureEvents().length > 0) {
+            setTab('Future');
+            return;
+        }
+        setTab('Create New Event');
+    }, []);
 
     const getFutureEvents = () =>
         events
@@ -137,6 +149,8 @@ const IncomingInvitationsCell: React.FC<IncomingInvitationsCellProps> = ({ setTa
                 }
                 const { eventsInfo } = json;
                 const formattedEventsInfo = initializeServerEventsInfo(eventsInfo);
+                //TO DO: This doesn't seem like the best way to do this, the server should explicitly
+                //return the new event.
                 const newEvent = formattedEventsInfo.events[formattedEventsInfo.events.length - 1];
                 setUser({
                     ...user,

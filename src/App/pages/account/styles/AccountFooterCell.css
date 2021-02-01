@@ -1,0 +1,25 @@
+.permanent-delete-modal {
+    height: 100%;
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    grid-template-areas:
+        'message'
+        'buttons';
+}
+
+.permanent-delete-modal > *:nth-child(1) {
+    grid-area: message;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0% 2vw;
+}
+
+.permanent-delete-modal-buttons {
+    grid-area: buttons;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}

@@ -1,0 +1,22 @@
+.simple-button {
+    background-color: dodgerblue;
+    color: white;
+    border-radius: 20px;
+    border: 0px;
+    font-size: medium;
+    padding: 5px 10px;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+.simple-button:hover {
+    box-shadow: 2px 2px 1px black;
+}
+
+.simple-button:focus {
+    outline: none;
+}
+
+.simple-button:active {
+    background-color: white;
+    color: dodgerblue;
+}

@@ -1,0 +1,12 @@
+.verification-cell-green > span {
+    color: green;
+}
+
+.verification-cell-red > span {
+    color: red;
+}
+
+.verification-cell-green,
+.verification-cell-red {
+    font-size: 2rem;
+}

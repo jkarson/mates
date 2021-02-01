@@ -1,11 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { AmountWithPercentOwed } from '../models/AmountWithPercentOwed';
 import { billFrequencies, BillFrequency } from '../models/BillFrequency';
-import {
-    BillGenerator,
-    BillGeneratorWithoutId,
-    ServerBillGenerator,
-} from '../models/BillGenerator';
 import { BillsTabType } from '../models/BillsTabs';
 import AmountsWithPercentOwedAssignmentCell from './AmountsWithPercentOwedAssignmentCell';
 import {
@@ -30,8 +25,7 @@ import {
     getMaxDate,
 } from '../../../../common/utilities';
 import { Redirect } from 'react-router-dom';
-import { ServerClass } from '../../../../common/types';
-import { Bill, BillWithoutId, ServerBill } from '../models/Bill';
+import { BillGeneratorWithoutId, BillWithoutId, Bill, BillGenerator } from '../models/BillsInfo';
 
 interface CreateBillGeneratorInput {
     name: string;
@@ -89,7 +83,6 @@ const CreateBillGeneratorCell: React.FC<CreateBillGeneratorCellProps> = ({ setTa
         setInput({ ...input, starting: starting });
     };
 
-    //BUG: THIS IS CAUSING TOTAL to go from 7.00 to 7, i.e. from total to totalValue
     const handleSetAmountsWithPercentOwed = (amountsWithPercentOwed: AmountWithPercentOwed[]) => {
         setInput({ ...input, amountsWithPercentOwed: amountsWithPercentOwed });
     };
@@ -135,8 +128,6 @@ const CreateBillGeneratorCell: React.FC<CreateBillGeneratorCellProps> = ({ setTa
 
     const handleCreate = () => {
         const newBillGenerator: BillGeneratorWithoutId = {
-            //id: getNewId(user.apartment.billsInfo.billGenerators),
-            // _id: '-1', //TO DO: override w id from server
             name: input.name,
             payableTo: input.payableTo,
             isPrivate: input.isPrivate,

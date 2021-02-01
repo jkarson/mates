@@ -1,6 +1,6 @@
 import React from 'react';
 import { getFormattedDateTimeString } from '../../../../common/utilities';
-import { ApartmentEvent } from '../models/ApartmentEvent';
+import { ApartmentEvent } from '../models/EventsInfo';
 
 interface InvitationCellProps {
     invitation: ApartmentEvent;

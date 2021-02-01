@@ -1,0 +1,8 @@
+.red-message {
+    font-family: Georgia, Cambria, Cochin, Times, 'Times New Roman', serif;
+    color: rgb(238, 83, 83);
+    font-size: 1rem;
+    line-height: 1.2em;
+    font-weight: 800;
+    margin: 0px;
+}

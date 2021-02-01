@@ -1,0 +1,138 @@
+.signup-container {
+    height: 100%;
+    display: grid;
+    padding: 0 2vw;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 3fr 1fr 1fr 4fr;
+    grid-template-areas:
+        'username-text password-text'
+        'username-input password-input'
+        'availability-cell password-confirm'
+        'button button';
+}
+
+.signup-container > *:nth-child(1) {
+    grid-area: username-text;
+    margin: 5rem 0 0 0;
+    padding-left: 6vw;
+    padding-right: 6vw;
+    line-height: 2rem;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.signup-container > *:nth-child(2) {
+    grid-area: password-text;
+    margin: 5rem 0 0 0;
+    padding-left: 6vw;
+    padding-right: 6vw;
+    line-height: 2rem;
+    text-align: center;
+}
+
+.signup-container > *:nth-child(2) > * {
+    margin: 0px;
+    font-size: 1rem;
+}
+
+.signup-container > *:nth-child(3) {
+    grid-area: username-input;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.signup-container > *:nth-child(3) > * {
+    width: calc(5rem + 20vw);
+}
+
+.signup-container > *:nth-child(4) {
+    grid-area: password-input;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.signup-container > *:nth-child(4) > input {
+    width: calc(5rem + 20vw);
+}
+
+.signup-container > *:nth-child(5) {
+    grid-area: availability-cell;
+    height: 15vh;
+    flex: 0 0 auto;
+}
+
+.signup-container > *:nth-child(6) {
+    grid-area: password-confirm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.signup-container > *:nth-child(6) > input {
+    width: calc(5rem + 20vw);
+}
+
+.signup-container > *:nth-child(7) {
+    grid-area: button;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-and-verification {
+    display: flex;
+    align-items: center;
+}
+
+.password-and-verification > *:last-child {
+    margin-left: calc(-1rem - 1vw);
+}
+
+.availability-cell-container {
+    height: 100%;
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    grid-template-areas:
+        'button'
+        'message';
+}
+
+.availability-cell-button-div {
+    grid-area: button;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.availability-cell-message-div {
+    grid-area: message;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: center;
+}
+
+.create-error {
+    position: absolute;
+    bottom: calc(3rem + 2vw);
+    text-align: center;
+    left: 0;
+    right: 0;
+}
+
+.create-account-faux-button-container button {
+    background-color: rgba(128, 128, 128, 0.7);
+}
+
+.create-account-faux-button-container button:hover {
+    box-shadow: none;
+}
+
+.create-account-faux-button-container button:active {
+    background-color: rgba(128, 128, 128, 0.7);
+    color: white;
+}

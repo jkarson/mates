@@ -1,0 +1,72 @@
+.contact-cell-container {
+    border-left: 1px dashed purple;
+    border-bottom: 1px dashed purple;
+    border-right: 1px dashed purple;
+    display: flex;
+    flex-direction: row;
+    padding: 1rem;
+}
+
+.contact-cell-container:first-child {
+    border-top: 1px dashed purple;
+}
+
+.contact-cell-initials-container {
+    /* background-color: green; */
+}
+
+.contact-cell-content-container {
+    flex: 1;
+    /* height: 100%; */
+    margin-left: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    /* background-color: red; */
+}
+
+.contact-cell-content-container span {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1.1rem;
+}
+
+.contact-cell-content-container span:nth-child(1) {
+    font-weight: bold;
+}
+
+.contact-cell-delete-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.contact-cell-delete-button-container > span {
+    font-size: 2rem;
+    color: red;
+}
+
+/* MODAL STYLES */
+.contact-cell-modal-container button {
+    font-size: 1.5rem;
+}
+
+.contact-cell-modal-container span {
+    font-size: 1.5rem;
+}
+
+/* INITIALS STYLES */
+
+.contact-cell-initials-circle {
+    border-radius: 50%;
+    border: 2px solid black;
+    width: 5rem;
+    height: 5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.contact-cell-initials-content {
+    font-size: 2rem;
+    color: rgb(6, 114, 223);
+}

@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { getFormattedDateString, getTenantByTenantId } from '../../../../common/utilities';
 import { AmountWithPercentOwed } from '../models/AmountWithPercentOwed';
-import { BillGenerator, BillGeneratorID } from '../models/BillGenerator';
+import { BillGenerator, BillGeneratorID } from '../models/BillsInfo';
 import { getTotalAssignedValue } from '../utilities';
 
 interface BillGeneratorCellProps {

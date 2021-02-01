@@ -1,0 +1,18 @@
+.profile-link-container {
+    position: absolute;
+    right: 5vw;
+    top: 2vh;
+    padding: 0.5vh 1vw;
+    color: dodgerblue;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 20px;
+}
+
+.profile-link-container:hover {
+    background-color: rgba(128, 128, 128, 0.3);
+}
+
+.profile-link-container:active {
+    color: purple;
+}

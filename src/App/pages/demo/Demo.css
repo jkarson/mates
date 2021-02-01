@@ -1,0 +1,66 @@
+.demo-about-container {
+    height: 100%;
+    display: grid;
+    grid-template-rows: 3fr 1fr;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+        'first second'
+        'button button';
+}
+
+.demo-about-text-container-one {
+    grid-area: first;
+    padding: 0 0.5rem 0 1rem;
+}
+
+.demo-about-text-container-two {
+    grid-area: second;
+    padding: 0 1rem 0 0.5rem;
+}
+
+.demo-about-text-container-one,
+.demo-about-text-container-two {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.demo-about-view-button-container {
+    grid-area: button;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.demo-about-view-button-container > * {
+    color: dodgerblue;
+    font-size: 2rem;
+    padding: 2rem;
+}
+
+.demo-about-text-inner-container {
+    background-color: rgba(100, 100, 100, 0.1);
+    padding: 0 1rem;
+    border-radius: 50px;
+    height: calc(36rem - 20vw);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: center;
+    line-height: 2rem;
+}
+
+.demo-about-text-inner-container span {
+    font-size: 1rem;
+}
+
+@media only screen and (max-width: 600px) {
+    .demo-about-text-inner-container span {
+        font-size: 0.9rem;
+    }
+
+    .demo-about-text-inner-container h1 {
+        font-size: 1.6rem;
+    }
+}

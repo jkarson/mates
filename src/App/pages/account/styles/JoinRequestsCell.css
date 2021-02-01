@@ -1,0 +1,20 @@
+.join-requests-cell-container {
+    height: 100%;
+    flex-direction: column;
+    display: flex;
+    overflow-y: scroll;
+}
+
+.join-requests-cell-header-container {
+    flex: 0 0 auto;
+    padding: 1rem 1rem 0;
+}
+
+.join-requests-cell-content-container {
+    flex: 1;
+    overflow-y: scroll;
+}
+
+.join-requests-cell-message-container {
+    margin: 0.5rem 0;
+}

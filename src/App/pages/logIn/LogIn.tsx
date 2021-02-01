@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import { Redirect, RouteComponentProps } from 'react-router-dom';
+import BiggerSimpleButton from '../../common/components/BiggerSimpleButton';
+import BiggerStyledInput from '../../common/components/BiggerStyledInput';
+import FooterButton from '../../common/components/FooterButton';
+import FooterComponent from '../../common/components/FooterComponent';
 import PageCell from '../../common/components/PageCell';
-
-// to do: error cell can be extracted out too for maintainability
+import RedMessageCell from '../../common/components/RedMessageCell';
+import StyledInput from '../../common/components/StyledInput';
+import { getPostOptions } from '../../common/utilities';
+import './LogIn.css';
 
 const LogIn: React.FC<RouteComponentProps> = (props) => {
     const [usernameInput, setUsernameInput] = useState('');
@@ -24,13 +30,7 @@ const LogIn: React.FC<RouteComponentProps> = (props) => {
             username: usernameInput,
             password: passwordInput,
         };
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        };
+        const options = getPostOptions(data);
         fetch('/login', options)
             .then((response) => response.json())
             .then((json) => {
@@ -49,31 +49,39 @@ const LogIn: React.FC<RouteComponentProps> = (props) => {
         props.history.push('/signup');
     };
 
+    const handleClickGoToDemo = () => {
+        props.history.push('/demo');
+    };
+
     return (
         <PageCell
+            onHeaderClick={() => props.history.go(0)}
             content={
-                <div>
-                    <label>
-                        {'Username: '}
-                        <input type="text" value={usernameInput} onChange={handleChangeUsername} />
-                    </label>
-                    <br />
-                    <label>
-                        {'Password: '}
-                        <input
+                <div className="login-content-container">
+                    <div className="login-content-login-container">
+                        <StyledInput
+                            type="text"
+                            value={usernameInput}
+                            onChange={handleChangeUsername}
+                            placeholder={'Username'}
+                        />
+                        <StyledInput
                             type="password"
                             value={passwordInput}
                             onChange={handleChangePassword}
+                            placeholder={'Password'}
                         />
-                    </label>
-                    <br />
-                    <button onClick={handleLogIn}>{'Log In'}</button>
-                    <br />
-                    <ErrorMessage error={error} />
-                    <br />
-                    <br />
-                    <br />
-                    <button onClick={handleClickSignUp}>{'Or, Sign Up'}</button>
+                        <div className="login-content-login-button-div">
+                            <BiggerSimpleButton onClick={handleLogIn} text={'Log In'} />
+                        </div>
+                        <div className="login-content-login-error-div">
+                            <ErrorMessage error={error} />
+                        </div>
+                    </div>
+                    <div className="login-content-buttons-container">
+                        <BiggerSimpleButton onClick={handleClickSignUp} text="Sign Up" />
+                        <BiggerSimpleButton onClick={handleClickGoToDemo} text="Go To Demo" />
+                    </div>
                 </div>
             }
         />
@@ -86,10 +94,20 @@ interface ErrorMessageProps {
 
 const ErrorMessage: React.FC<ErrorMessageProps> = ({ error }) => {
     if (error.length > 0) {
-        return <p style={{ color: 'red' }}>{error}</p>;
+        return <RedMessageCell message={error} />;
     } else {
         return null;
     }
 };
+
+/*
+
+[
+                //<FooterButton onClick={handleClickSignUp} text="Or, Sign Up" />,
+                <FooterButton onClick={() => setShowModal(true)} text="Or, Sign Up" />,
+                <FooterButton onClick={() => setGoToDemo(true)} text="Go To Demo Page" />,
+            ]
+
+*/
 
 export default LogIn;

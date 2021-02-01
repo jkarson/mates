@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { Redirect } from 'react-router-dom';
+import { Redirect, RouteComponentProps } from 'react-router-dom';
+import BiggerSimpleButton from '../../common/components/BiggerSimpleButton';
+import GreenMessageCell from '../../common/components/GreenMessageCell';
 import PageCell from '../../common/components/PageCell';
+import RedMessageCell from '../../common/components/RedMessageCell';
+import SimpleButton from '../../common/components/SimpleButton';
+import StandardStyledText from '../../common/components/StandardStyledText';
+import StyledInput from '../../common/components/StyledInput';
 import VerificationCell from '../../common/components/VerificationCell';
 import { getPostOptions, isLetter } from '../../common/utilities';
 
-// to do: we should switch from rendering client side
-// to server side eventually, but since it requires fully
-// built react pages, let's render react-side for development
+import './SignUp.css';
 
-const SignUp: React.FC = () => {
+const SignUp: React.FC<RouteComponentProps> = (props) => {
     const [usernameInput, setUsernameInput] = useState('');
     const [passwordInput, setPasswordInput] = useState('');
     const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
     const [redirect, setRedirect] = useState(false);
     const [error, setError] = useState<string>('');
-
     const handleChangeUsername = (event: React.ChangeEvent<HTMLInputElement>) => {
         setUsernameInput(event.target.value);
         setError('');
@@ -22,10 +25,12 @@ const SignUp: React.FC = () => {
 
     const handleChangePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
         setPasswordInput(event.target.value);
+        setError('');
     };
 
     const handleChangePasswordInput = (event: React.ChangeEvent<HTMLInputElement>) => {
         setConfirmPasswordInput(event.target.value);
+        setError('');
     };
 
     const isValidPasswordInput = () => {
@@ -50,6 +55,7 @@ const SignUp: React.FC = () => {
         fetch('/signup', options)
             .then((response) => response.json())
             .then((json) => {
+                console.log(json);
                 const created = json.created;
                 if (created) {
                     setUsernameInput('');
@@ -67,52 +73,73 @@ const SignUp: React.FC = () => {
         return;
     };
 
+    if (redirect) {
+        return <Redirect to="/" />;
+    }
+
     return (
         <PageCell
+            onHeaderClick={() => props.history.goBack()}
             content={
-                <div>
-                    <p>
-                        {
+                <div className="signup-container">
+                    <StandardStyledText
+                        text={
                             'Your username can be anything you like, as long as it is not already taken.'
                         }
-                    </p>
-                    <label>
-                        {'Username: '}
-                        <input type="text" value={usernameInput} onChange={handleChangeUsername} />
-                    </label>
-                    <AvailabilityCell usernameInput={usernameInput} />
-                    <br />
-                    <p>
-                        <span>{'Your password must contain'}</span>
-                        <br />
-                        <span>{'* at least 6 characters '}</span>
-                        <br />
-                        <span>{'* at least one number or special character'}</span>
-                    </p>
-                    <label>
-                        {'Password: '}
-                        <input
+                    />
+                    <div>
+                        <StandardStyledText text="Your password must contain" />
+                        <StandardStyledText text="• at least 6 characters" />
+                        <StandardStyledText text="• at least one number or special character" />
+                    </div>
+                    <div>
+                        <StyledInput
+                            type="text"
+                            value={usernameInput}
+                            onChange={handleChangeUsername}
+                            placeholder={'Username'}
+                        />
+                    </div>
+                    <div className="password-and-verification">
+                        <StyledInput
                             type="password"
                             value={passwordInput}
                             onChange={handleChangePassword}
+                            placeholder={'Password'}
                         />
-                    </label>
-                    <VerificationCell isVerified={isValidPasswordInput()} />
-                    <br />
-                    <label>
-                        {'Confirm Password: '}
-                        <input
+
+                        <VerificationCell isVerified={isValidPasswordInput()} />
+                    </div>
+                    <AvailabilityCell usernameInput={usernameInput} />
+                    <div className="password-and-verification">
+                        <StyledInput
                             type="password"
                             value={confirmPasswordInput}
                             onChange={handleChangePasswordInput}
+                            placeholder={'Confirm Password'}
                         />
-                    </label>
-                    <VerificationCell isVerified={isValidConfirmPasswordInput()} />
-                    {canCreate() ? (
-                        <button onClick={handleCreateAccount}>{'Create Account'}</button>
-                    ) : null}
-                    <ErrorMessage error={error} />
-                    {!redirect ? null : <Redirect to="/" />}
+                        <VerificationCell isVerified={isValidConfirmPasswordInput()} />
+                    </div>
+                    <div className="button-container">
+                        <div className="create-button">
+                            {canCreate() ? (
+                                <BiggerSimpleButton
+                                    onClick={handleCreateAccount}
+                                    text="Create Account"
+                                />
+                            ) : (
+                                <div className="create-account-faux-button-container">
+                                    <BiggerSimpleButton
+                                        onClick={() => null}
+                                        text="Create Account"
+                                    />
+                                </div>
+                            )}
+                        </div>
+                        <div className="create-error">
+                            <ErrorMessage error={error} />
+                        </div>
+                    </div>
                 </div>
             }
         />
@@ -125,7 +152,7 @@ interface ErrorMessageProps {
 
 const ErrorMessage: React.FC<ErrorMessageProps> = ({ error }) => {
     if (error.length > 0) {
-        return <p style={{ color: 'red' }}>{error}</p>;
+        return <RedMessageCell message={error} />;
     } else {
         return null;
     }
@@ -172,17 +199,21 @@ const AvailabilityCell: React.FC<AvailabilityCellProps> = ({ usernameInput }) =>
     };
 
     return (
-        <div>
+        <div className="availability-cell-container">
             {showButton ? (
                 <div>
-                    <button onClick={checkAvailability}>{'Check Availability'}</button>
-                    {showMessage ? (
-                        isAvailable ? (
-                            <p style={{ color: 'green' }}>{'This username is available.'}</p>
-                        ) : (
-                            <p style={{ color: 'red' }}>{'Sorry, this username is taken.'}</p>
-                        )
-                    ) : null}
+                    <div className="availability-cell-button-div">
+                        <SimpleButton onClick={checkAvailability} text={'Check Availability'} />
+                    </div>
+                    <div className="availability-cell-message-div">
+                        {showMessage ? (
+                            isAvailable ? (
+                                <GreenMessageCell message="This username is available" />
+                            ) : (
+                                <RedMessageCell message="Sorry, this username is taken" />
+                            )
+                        ) : null}
+                    </div>
                 </div>
             ) : null}
         </div>

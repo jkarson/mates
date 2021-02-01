@@ -3,15 +3,18 @@ import Header from './Header';
 import '../styles/PageCell.css';
 
 interface PageCellProps {
+    onHeaderClick?: () => void;
     tabs?: JSX.Element;
     content: JSX.Element;
 }
 
-const PageCell: React.FC<PageCellProps> = ({ tabs, content }) => (
-    <div className="container">
-        <Header />
-        {tabs ? tabs : null}
-        <div className="content">{content}</div>
+const PageCell: React.FC<PageCellProps> = ({ tabs, content, onHeaderClick }) => (
+    <div className="page-cell-container">
+        <div className="page-cell-header-block">
+            <Header onClick={onHeaderClick} />
+            {tabs ? tabs : null}
+        </div>
+        <div className="page-cell-content-block">{content}</div>
     </div>
 );
 

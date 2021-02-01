@@ -1,6 +1,7 @@
 import React from 'react';
-import '../styles/Tabs.css';
 import NotificationCell from './NotificationCell';
+
+import '../styles/Tabs.css';
 
 interface TabsProps<T> {
     currentTab: T;
@@ -12,18 +13,7 @@ const Tabs = <T extends string>({ currentTab, setTab, tabNames }: TabsProps<T>) 
     const tabs = tabNames.map((s) => (
         <Tab key={s} name={s} isSelected={s === currentTab} handleClick={() => setTab(s)} /> //assumes name is a good key?
     ));
-    return (
-        <div
-            style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 10,
-            }}
-        >
-            {tabs}
-        </div>
-    );
+    return <div className="tab-container">{tabs}</div>;
 };
 
 interface TabProps {
@@ -37,7 +27,7 @@ const Tab: React.FC<TabProps> = ({ name, isSelected, handleClick, notifications 
     <div
         className="tab"
         onClick={handleClick}
-        style={isSelected ? { color: 'purple' } : { color: 'pink' }}
+        style={isSelected ? { color: 'rgb(75,0,130)' } : undefined}
     >
         <TabBody name={name} notifications={notifications} />
     </div>
@@ -48,9 +38,9 @@ interface TabBodyProps {
     notifications?: number;
 }
 
-//TO DO: reorganize as red circle white letter,
+// EXTENSION: reorganize as red circle white letter,
 // elevated off the upper right corner
-// note: so all we have to do for tabs is pass stateful
+// note: so all we must do for tabs is pass stateful
 // notification #s (populated live by server?) to each tab
 const TabBody: React.FC<TabBodyProps> = ({ name, notifications }) => {
     if (notifications && notifications > 0) {

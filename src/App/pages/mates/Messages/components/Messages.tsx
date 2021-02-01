@@ -1,21 +1,20 @@
-import { MongoServerSelectionError } from 'mongodb';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useLayoutEffect, useRef, useState } from 'react';
 import { Redirect } from 'react-router-dom';
+import RedMessageCell from '../../../../common/components/RedMessageCell';
+import StandardStyledText from '../../../../common/components/StandardStyledText';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { Tenant } from '../../../../common/models';
 import {
     getDeleteOptions,
     getPostOptions,
-    getPutOptions,
     getTenant,
     initializeDates,
 } from '../../../../common/utilities';
 import { Message, MessageWithoutId, ServerMessage } from '../models/Message';
 import CreateMessageCell from './CreateMessageCell';
-import MessageCell from './MessageCell';
+import MessageCell, { UserMessageCell } from './MessageCell';
 
-//to do / extension: maybe make a "sent"/"delivered"/"✓" or something so people
-// know their message reached the server
+import '../styles/Messages.css';
 
 const Messages: React.FC = () => {
     const { matesUser: user, setMatesUser: setUser } = useContext(
@@ -24,13 +23,23 @@ const Messages: React.FC = () => {
 
     const [redirect, setRedirect] = useState(false);
     const [error, setError] = useState('');
+    const [input, setInput] = useState('');
+
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
 
     const messages = user.apartment.messages;
     const tenant = getTenant(user) as Tenant;
     const author = tenant.name;
 
+    useLayoutEffect(() => {
+        if (messagesContainerRef.current) {
+            const scrollView = messagesContainerRef.current;
+            scrollView.scrollTop = scrollView.scrollHeight - scrollView.clientHeight;
+        }
+    }, []);
+
     const handleNewMessage = (message: MessageWithoutId) => {
-        //const newMessage: MessageWithoutId = { ...message };
+        setError('sending...');
         const data = { ...message, time: message.time, apartmentId: user.apartment._id };
         const options = getPostOptions(data);
         fetch('/mates/postNewMessage', options)
@@ -42,7 +51,7 @@ const Messages: React.FC = () => {
                     return;
                 }
                 if (!success) {
-                    setError('Sorry, your message could not be saved');
+                    setError('Sorry, your message could not be sent');
                     return;
                 }
                 const { savedMessages } = json;
@@ -52,6 +61,11 @@ const Messages: React.FC = () => {
                     ...user,
                     apartment: { ...user.apartment, messages: formattedMessages as Message[] },
                 });
+                setError('');
+                if (messagesContainerRef.current) {
+                    const scrollView = messagesContainerRef.current;
+                    scrollView.scrollTop = scrollView.scrollHeight - scrollView.clientHeight;
+                }
             });
     };
 
@@ -75,41 +89,60 @@ const Messages: React.FC = () => {
                     ...user,
                     apartment: { ...user.apartment, messages: formattedMessages as Message[] },
                 });
+                setError('Your message was deleted.');
             });
-        // const index = messages.indexOf(message);
-        // messages.splice(index, 1);
-        // //TO DO: SAVE TO DATABASE!
-        // setUser({ ...user });
     };
-
-    const [input, setInput] = useState('');
 
     if (redirect) {
         return <Redirect to="/" />;
     }
 
+    const messagesContent = messages.map((message, index) => {
+        let duplicateSender = false;
+        if (index > 0 && messages[index - 1].senderId === message.senderId) {
+            duplicateSender = true;
+        }
+        if (message.senderId === user.userId) {
+            return (
+                <UserMessageCell
+                    key={message._id}
+                    message={message}
+                    handleDelete={handleDelete}
+                    duplicateSender={duplicateSender}
+                />
+            );
+        } else {
+            return (
+                <MessageCell
+                    key={message._id}
+                    message={message}
+                    duplicateSender={duplicateSender}
+                />
+            );
+        }
+    });
+
     return (
-        <div>
-            <p style={{ fontWeight: 'bold' }}>
-                {'Messages will be visible to you and your roommates only.'}
-            </p>
-            <CreateMessageCell
-                state={input}
-                setState={setInput}
-                author={author}
-                authorId={user.userId}
-                handleNewMessage={handleNewMessage}
-            />
-            {error.length === 0 ? null : <p style={{ color: 'red' }}>{error}</p>}
-            <div style={{ padding: 30 }}>
-                {messages.map((message) => (
-                    <MessageCell
-                        message={message}
-                        key={message._id}
-                        handleDelete={handleDelete}
-                        canDelete={message.senderId === user.userId}
-                    />
-                ))}
+        <div className="messages-container">
+            <div className="messages-header-container">
+                <StandardStyledText
+                    text={'Messages will be visible to you and your roommates only.'}
+                />
+            </div>
+            <div className="messages-messages-container" ref={messagesContainerRef}>
+                {messagesContent}
+            </div>
+            <div className="messages-create-message-container">
+                <CreateMessageCell
+                    state={input}
+                    setState={setInput}
+                    author={author}
+                    authorId={user.userId}
+                    handleNewMessage={handleNewMessage}
+                />
+                <div className="messages-create-message-error">
+                    {error.length === 0 ? null : <RedMessageCell message={error} />}
+                </div>
             </div>
         </div>
     );

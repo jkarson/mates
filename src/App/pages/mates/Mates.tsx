@@ -9,40 +9,48 @@ import Messages from './Messages/components/Messages';
 import Profile from './Profile/components/Profile';
 import Tabs from '../../common/components/Tabs';
 import { MatesUserContext } from '../../common/context';
-import {
-    assertUnreachable,
-    //formatFriendsInfo,
-    initializeDates,
-    //markManuallyAddedContacts,
-} from '../../common/utilities';
+import { assertUnreachable } from '../../common/utilities';
 import PageCell from '../../common/components/PageCell';
 import { matesTabNames, MatesTabType } from './MatesTabs';
 import { Apartment, MatesUser } from '../../common/models';
-import { Redirect } from 'react-router-dom';
+import { Redirect, RouteComponentProps } from 'react-router-dom';
 import { initializeServerMessages } from './Messages/utilities';
 import { initializeServerBillsInfo } from './Bills/utilities';
 import { initializeServerContacts } from './Contacts/utilities';
 import { initializeServerFriendsInfo } from './Friends/utilities';
 import { initializeServerChoresInfo } from './Chores/utilities';
 import { initializeServerEventsInfo } from './Events/utilities';
+import { ServerApartment } from '../../common/serverModels';
+import { ServerContact } from './Contacts/models/ServerContact';
+import ProfileLink from '../../common/components/ProfileLink';
+import ApartmentLink from '../../common/components/ApartmentLink';
 
-//PICKUP!
-/*
-    - Events, Bills, and Chores are refactored (done)
-    - Refactor Contacts (done), Friends (done), Messages (done), Profile (done), and Common (done)
-    - Identify and fix remaining bugs / todos
-    - Incorporate server
-*/
+//EXTENSION: Tab notifications. This system may be a bit tricky and will likely involve the server.
 
-//note to self: perhaps all database updates can come via setUser, reducing a million endpoints to one.
+//TO DO (After MVP): Make transactions more safe by verifying on the server that things haven't changed
+//since the client request... if they have, we would ideally send a message telling the user to reload their page
+//especially bills
 
-//TO DO/EXTENSION: Tab notifications. This system may be a bit tricky and will likely involve the server.
+//to do: profile pics
 
-const Mates: React.FC = () => {
+//TO DO: Full code sweep! Delete unused imports, old comments / debug statements...
+//prepare code for production environment.
+
+//to do: make sure every list item has a key!
+
+// to do: we should switch from rendering client side
+// to server side eventually, but since it requires fully
+// built react pages, let's render react-side for development
+
+//TO DO: wrap content in a scroll view or equivalent so that the tabs/description/
+//message are stuck on the top --> see Page Cell
+
+const Mates: React.FC<RouteComponentProps> = (props) => {
     const [tab, setTab] = useState<MatesTabType>('Profile');
     const [matesUser, setMatesUser] = useState<MatesUser | null>(null);
     const [redirect, setRedirect] = useState(false);
     const [accountRedirect, setAccountRedirect] = useState(false);
+    const [message, setMessage] = useState('');
 
     useLayoutEffect(() => {
         fetch('/mates')
@@ -58,11 +66,11 @@ const Mates: React.FC = () => {
                     setAccountRedirect(true);
                     return;
                 }
-                const { userId, apartment } = json;
-                const formattedApartment = initialize(apartment);
+                const { userId, apartment, username } = json;
+                const formattedApartment = initializeServerApartment(apartment);
                 console.log('setting mates user...');
                 console.log(json);
-                setMatesUser({ userId: userId, apartment: apartment });
+                setMatesUser({ userId: userId, apartment: formattedApartment, username: username });
             });
     }, []);
 
@@ -103,6 +111,14 @@ const Mates: React.FC = () => {
         return null;
     }
 
+    const handleProfileLinkClick = () => {
+        props.history.push('account-settings');
+    };
+
+    const handleApartmentLinkClick = () => {
+        props.history.go(0);
+    };
+
     return (
         <MatesUserContext.Provider
             value={{
@@ -111,24 +127,76 @@ const Mates: React.FC = () => {
             }}
         >
             <PageCell
+                onHeaderClick={() => props.history.push('/account')}
                 tabs={<Tabs currentTab={tab} setTab={setTab} tabNames={matesTabNames} />}
-                content={currentComponent}
+                content={
+                    <div className="mates-content-container">
+                        <ProfileLink
+                            accountName={matesUser.username}
+                            onClick={handleProfileLinkClick}
+                        />
+                        <ApartmentLink
+                            apartmentName={matesUser.apartment.profile.name}
+                            onClick={handleApartmentLinkClick}
+                        />
+                        {currentComponent}
+                    </div>
+                }
+                // footer={
+                //     <MatesFooterComponent
+                //         logOutOfApartment={logOutOfApartment}
+                //         leaveApartment={leaveApartment}
+                //         message={message}
+                //     />
+                // }
             />
         </MatesUserContext.Provider>
     );
 };
 
-//TO DO: this will expand in scope... maybe we can opt out of types for it,
-// or put them in later. it's the type of helper method we want to avoid,
-//but for expediency we're using it rather brashly for now
-const initialize = (apartment: any): void => {
+interface MatesFooterComponentProps {
+    logOutOfApartment: () => void;
+    leaveApartment: () => void;
+    message: string;
+}
+
+const MatesFooterComponent: React.FC<MatesFooterComponentProps> = ({
+    logOutOfApartment,
+    leaveApartment,
+    message,
+}) => {
+    const [leaveApartmentPressed, setLeaveApartmentPressed] = useState(false);
+    return (
+        <div>
+            <button onClick={logOutOfApartment}>{'Return To Account Page'}</button>
+            <button onClick={() => setLeaveApartmentPressed(true)}>{'Leave Apartment'}</button>
+            {!leaveApartmentPressed ? null : (
+                <div>
+                    <p>
+                        {
+                            'Are you sure you want to leave the apartment? Apartments with no tenants will automatically be deleted.'
+                        }
+                        <button onClick={() => leaveApartment()}>{'Yes'}</button>
+                        <button onClick={() => setLeaveApartmentPressed(false)}>{'No'}</button>
+                    </p>
+                </div>
+            )}
+            {message.length === 0 ? null : <p style={{ color: 'red' }}>{message}</p>}
+        </div>
+    );
+};
+
+const initializeServerApartment = (apartment: ServerApartment): Apartment => {
     initializeServerMessages(apartment.messages);
     initializeServerBillsInfo(apartment.billsInfo);
     initializeServerChoresInfo(apartment.choresInfo);
+    // apartment.manuallyAddedContacts = initializeServerContacts(
+    //     apartment.manuallyAddedContacts,
+    // ) as ServerContact[];
     initializeServerContacts(apartment.manuallyAddedContacts);
     initializeServerFriendsInfo(apartment.friendsInfo);
     initializeServerEventsInfo(apartment.eventsInfo);
-    return;
+    return (apartment as unknown) as Apartment;
 };
 
 export default Mates;

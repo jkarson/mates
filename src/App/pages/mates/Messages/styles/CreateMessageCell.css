@@ -1,0 +1,47 @@
+.create-message-cell-container {
+    width: 100%;
+    padding: 0em;
+    margin: 0em;
+    display: inline-flex;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 40px;
+}
+
+.create-message-cell-input-container {
+    flex: 1;
+}
+
+.create-message-cell-hidden-div {
+    display: none;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+.create-message-cell-hidden-div,
+.create-message-cell-input-container > textarea {
+    max-height: 10rem;
+    box-sizing: border-box;
+    width: 100%;
+    line-height: 1.5rem;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    border: none;
+    resize: none;
+    padding: 0.5rem 1.5rem;
+    background-color: unset;
+}
+
+.create-message-cell-input-container > textarea {
+    display: block;
+}
+
+.create-message-cell-input-container textarea:focus {
+    outline: none;
+}
+
+.create-message-cell-buttons-div {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-right: 2rem;
+}

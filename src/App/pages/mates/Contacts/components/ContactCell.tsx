@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { formatPhoneNumber } from '../../../../common/utilities';
 import { Contact } from '../models/Contact';
 import { getInitials } from '../utilities';
+import SimpleButton from '../../../../common/components/SimpleButton';
+
+import '../styles/ContactCell.css';
+import YesNoMessageModal from '../../../../common/components/YesNoMessageModal';
 
 interface ContactCellProps {
     contact: Contact;
@@ -10,16 +15,32 @@ interface ContactCellProps {
 const ContactCell: React.FC<ContactCellProps> = ({ contact, handleDelete }) => {
     const handleClick = () => handleDelete(contact);
 
-    return (
-        <div style={{ borderTop: '1px solid black', marginTop: 5, marginBottom: 5 }}>
-            <Initials name={contact.name} />
+    const [showModal, setShowModal] = useState(false);
 
-            <p>{'Name: ' + contact.name}</p>
-            {contact.number ? <p>{'Number: ' + contact.number}</p> : null}
-            {contact.email ? <p>{'Email: ' + contact.email}</p> : null}
-            {contact.manuallyAdded ? (
-                <button onClick={handleClick}>{'Delete Contact'}</button>
-            ) : null}
+    return (
+        <div className="contact-cell-container">
+            <div className="contact-cell-modal-container">
+                <YesNoMessageModal
+                    show={showModal}
+                    setShow={setShowModal}
+                    yesText="Delete"
+                    onClickYes={handleClick}
+                    message={'Delete contact?'}
+                />
+            </div>
+            <div className="contact-cell-initials-container">
+                <Initials name={contact.name} />
+            </div>
+            <div className="contact-cell-content-container">
+                <span>{contact.name}</span>
+                {contact.number ? <span>{formatPhoneNumber(contact.number)}</span> : null}
+                {contact.email ? <span>{contact.email}</span> : null}
+            </div>
+            <div className="contact-cell-delete-button-container">
+                {contact.manuallyAdded ? (
+                    <span onClick={() => setShowModal(true)}>{'X'}</span>
+                ) : null}
+            </div>
         </div>
     );
 };
@@ -27,31 +48,13 @@ const ContactCell: React.FC<ContactCellProps> = ({ contact, handleDelete }) => {
 interface InitialsProps {
     name: string;
 }
-
+//to do: modularize
 const Initials: React.FC<InitialsProps> = ({ name }) => {
     const initials = getInitials(name);
     return (
-        <div style={{ display: 'flex' }}>
-            <div
-                style={{
-                    borderRadius: '50%',
-                    border: '1px solid blue',
-                    width: 40,
-                    height: 40,
-                    marginTop: 5,
-                    marginBottom: -5,
-                    alignItems: 'center',
-                    display: 'flex',
-                }}
-            >
-                <span
-                    style={{
-                        textAlign: 'center',
-                        flex: 1,
-                    }}
-                >
-                    {initials}
-                </span>
+        <div className="contact-cell-initials-container">
+            <div className="contact-cell-initials-circle">
+                <span className="contact-cell-initials-content">{initials}</span>
             </div>
         </div>
     );

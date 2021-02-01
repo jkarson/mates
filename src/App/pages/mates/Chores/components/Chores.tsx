@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useLayoutEffect, useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import DescriptionCell from '../../../../common/components/DescriptionCell';
 import Tabs from '../../../../common/components/Tabs';
@@ -12,8 +12,7 @@ import {
     getPutOptions,
     getDeleteOptions,
 } from '../../../../common/utilities';
-import { Chore } from '../models/Chore';
-import { ChoreGeneratorID } from '../models/ChoreGenerator';
+import { Chore, ChoreGeneratorID } from '../models/ChoresInfo';
 import { ChoresTabType, choresTabNames } from '../models/ChoresTabs';
 import {
     updateChoresFromChoreGenerators,
@@ -23,12 +22,6 @@ import {
 import ChoreCell from './ChoreCell';
 import ChoreGeneratorCell from './ChoreGeneratorCell';
 import CreateChoreGeneratorCell from './CreateChoreGeneratorCell';
-
-//PICKUP: These little TODOS fall under next week's tasks. Chores server is DONE. Onto Events!
-
-//TO DO: user should know that "old, uncompleted" chores will be swiftly deletedx
-
-//TO DO: reverse sorting on 'today' tab is confusing/bad UI... re-name tab and reconsider sort order
 
 //EXTENSION: Optimize useEffect calls w/ dependency arrays
 
@@ -47,6 +40,22 @@ const Chores: React.FC = () => {
     const choreGenerators = user.apartment.choresInfo.choreGenerators;
     const chores = user.apartment.choresInfo.chores;
 
+    useLayoutEffect(() => {
+        if (getTodaysChores().length > 0) {
+            setTab('Today');
+            return;
+        }
+        if (getUpcomingChores().length > 0) {
+            setTab('Upcoming');
+            return;
+        }
+        if (getFutureChores().length > 0) {
+            setTab('Future');
+            return;
+        }
+        setTab('Create New');
+    }, []);
+
     useEffect(() => {
         setMessage('');
     }, [tab]);
@@ -60,7 +69,6 @@ const Chores: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        //TO DO: add server call
         const unauthenticated = purgeOldChores(user, setUser);
         if (unauthenticated) {
             setRedirect(true);
@@ -205,7 +213,7 @@ const Chores: React.FC = () => {
                     isSameDayMonthYear(chore.date, getTodaysDate()) ||
                     (isPreviousDate(chore.date, getTodaysDate()) && chore.showUntilCompleted),
             )
-            .sort((a, b) => b.date.getTime() - a.date.getTime());
+            .sort((a, b) => a.date.getTime() - b.date.getTime());
 
     const getUpcomingChores = () =>
         getFutureChores()
@@ -286,7 +294,8 @@ const ChoresDescriptionCell: React.FC<ChoresDescriptionCellProps> = ({ tab }) =>
     let content: string;
     switch (tab) {
         case 'Today':
-            content = "Today's chores. Chores assigned to you will be highlighted in red.";
+            content =
+                "Today's chores, as well as past chores that remain uncompleted. Chores assigned to you will be highlighted in red.";
             break;
         case 'Upcoming':
             content =

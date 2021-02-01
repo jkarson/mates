@@ -1,4 +1,5 @@
 import React from 'react';
+import '../styles/VerificationCell.css';
 
 interface VerificationCellProps {
     isVerified: boolean;
@@ -7,14 +8,14 @@ interface VerificationCellProps {
 const VerificationCell: React.FC<VerificationCellProps> = ({ isVerified }) => {
     if (isVerified) {
         return (
-            <div>
-                <span style={{ color: 'green' }}>{'✓'}</span>
+            <div className="verification-cell-green">
+                <span>{'✓'}</span>
             </div>
         );
     } else {
         return (
-            <div>
-                <span style={{ color: 'red' }}>{'X'}</span>
+            <div className="verification-cell-red">
+                <span>{'X'}</span>
             </div>
         );
     }

@@ -1,6 +1,6 @@
 import React from 'react';
-import { ProfileInfo } from '../../../../common/models';
 import { StateProps } from '../../../../common/types';
+import { ProfileInfo } from '../models/ProfileInfo';
 
 // EXTENSION: Add autocomplete and/or verification for address input, perhaps using Google Places API
 // https://developers.google.com/maps/documentation/javascript/places-autocomplete

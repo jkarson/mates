@@ -1,61 +1,34 @@
-import { Contact } from '../pages/mates/Contacts/models/Contact';
+import { FriendProfile, ApartmentSummary } from '../pages/mates/Friends/models/FriendsInfo';
+import {
+    ServerFriendProfile,
+    ServerApartmentSummary,
+} from '../pages/mates/Friends/models/ServerFriendsInfo';
 import { months, weekdays } from './constants';
-import {
-    Apartment,
-    ApartmentSummary,
-    FriendProfile,
-    FriendsInfo,
-    MatesUser,
-    Tenant,
-    UserId,
-} from './models';
-import {
-    ObjectWithId,
-    Month,
-    Weekday,
-    Frequency,
-    TimeInputType,
-    DateTimeInputType,
-    ServerClass,
-    ClientClass,
-} from './types';
+import { Apartment, ClientClass, MatesUser, Tenant, UserId } from './models';
+import { ServerClass } from './serverModels';
+import { Month, Weekday, Frequency, TimeInputType, DateTimeInputType } from './types';
 
 function assertUnreachable(x: never): never {
     throw new Error("Didn't expect to get here");
 }
 
-/* This is obviously a simplistic getNewId... it won't work,
-for instance, if object deletion is allowed. Of course, ID assignment
-should be coming from the back-end. Determining what and where those endpoints 
-are is something you're struggling with right now. I think a good thing to remember is 
-to embrace the struggle. The struggle is the process of you getting smarter and your
-code getting better. The time crunch is imaginary. Do your work and do it with art */
-
-//DEPRECATED
-// function getNewId<T extends ObjectWithId>(objects: T[]): string {
-//     if (objects.length === 0) {
-//         return '1';
-//     }
-//     const maxId = Math.max(...objects.map((object) => parseInt(object.id, 10)));
-//     const newId = maxId + 1;
-//     return newId.toString();
-// }
-
-//DEPRECATED
-// function getNewIds<T extends ObjectWithId>(objects: T[], quantity: number): string[] {
-//     const newId = getNewId(objects);
-//     const newIds: string[] = [];
-
-//     let ID = parseInt(newId, 10);
-//     for (quantity; quantity > 0; quantity--) {
-//         newIds.push(ID.toString());
-//         ID += 1;
-//     }
-//     return newIds;
-// }
-
 function isLetter(c: string): boolean {
     return c.length === 1 && c.toLocaleLowerCase() !== c.toLocaleUpperCase();
+}
+
+function isNumberMates(c: string): boolean {
+    return (
+        c === '0' ||
+        c === '1' ||
+        c === '2' ||
+        c === '3' ||
+        c === '4' ||
+        c === '5' ||
+        c === '6' ||
+        c === '7' ||
+        c === '8' ||
+        c === '9'
+    );
 }
 
 function getTenant(matesUser: MatesUser): Tenant {
@@ -394,6 +367,20 @@ function verifyAndSetNumericStringInput(
     }
 }
 
+function verifyAgeInput(ageInput: string) {
+    const lastCharacter = ageInput.charAt(ageInput.length - 1);
+    if (ageInput === '0') {
+        return false;
+    }
+    if (lastCharacter === ' ' || lastCharacter === '-' || lastCharacter === '.') {
+        return false;
+    } else if (isNaN(ageInput as any)) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
 function formatNames(names: string[]) {
     if (names.length === 0) {
         return '';
@@ -494,7 +481,9 @@ function initializeDates(uninitializedArray: ServerClass[], parameterName: strin
     return clientResult;
 }
 
-function getFriendProfilesFromServerFriends(friends: any[]): FriendProfile[] {
+function getFriendProfilesFromServerFriendProfiles(
+    friends: ServerFriendProfile[],
+): FriendProfile[] {
     return friends.map((friend) => {
         return {
             apartmentId: friend._id,
@@ -507,12 +496,14 @@ function getFriendProfilesFromServerFriends(friends: any[]): FriendProfile[] {
     });
 }
 
-function getApartmentSummariesFromServerFriendRequests(requests: any[]): ApartmentSummary[] {
-    return requests.map((requestApt) => {
+function getApartmentSummariesFromServerApartmentSummaries(
+    apartmentSummaries: ServerApartmentSummary[],
+): ApartmentSummary[] {
+    return apartmentSummaries.map((summary) => {
         return {
-            apartmentId: requestApt._id,
-            name: requestApt.profile.name,
-            tenantNames: requestApt.tenants.map((tenant) => tenant.name),
+            apartmentId: summary._id,
+            name: summary.profile.name,
+            tenantNames: summary.tenants.map((tenant) => tenant.name),
         };
     });
 }
@@ -528,11 +519,98 @@ function getFriendProfileFromApartment(apartment: Apartment): FriendProfile {
     };
 }
 
+function getApartmentSummaryFromFriendProfile(friendProfile: FriendProfile): ApartmentSummary {
+    return {
+        apartmentId: friendProfile.apartmentId,
+        name: friendProfile.name,
+        tenantNames: friendProfile.tenants.map((tenant) => tenant.name),
+    };
+}
+
+function formatPhoneNumber(s: string): string {
+    if (s.length <= 3) {
+        return s;
+    }
+    const firstThree = s.substring(0, 3);
+    if (s.length <= 6) {
+        return '(' + firstThree + ') ' + s.substring(3);
+    }
+    const nextThree = s.substring(3, 6);
+    return '(' + firstThree + ') ' + nextThree + ' - ' + s.substring(6);
+}
+
+function countDigits(s: string): number {
+    const chars = [...s];
+    return chars.filter((c) => isNumberMates(c)).length;
+}
+
+function getDigits(s: string): string {
+    const chars = [...s];
+    const digits = chars.filter((c) => isNumberMates(c));
+    return digits.join('');
+}
+
+function getTwoDigitDateString(d: Date): string {
+    const month = d.getMonth();
+    let monthString = '';
+    switch (month) {
+        case 0:
+            monthString = '01';
+            break;
+        case 1:
+            monthString = '02';
+            break;
+        case 2:
+            monthString = '03';
+            break;
+        case 3:
+            monthString = '04';
+            break;
+        case 4:
+            monthString = '05';
+            break;
+        case 5:
+            monthString = '06';
+            break;
+        case 6:
+            monthString = '07';
+            break;
+        case 7:
+            monthString = '08';
+            break;
+        case 8:
+            monthString = '09';
+            break;
+        case 9:
+            monthString = '10';
+            break;
+        case 10:
+            monthString = '11';
+            break;
+        case 11:
+            monthString = '12';
+            break;
+        default:
+            assertUnreachable(month as never);
+    }
+
+    const dayOfMonth = d.getDate();
+    let dayOfMonthString = '';
+    if (dayOfMonth < 10) {
+        dayOfMonthString = '0' + dayOfMonth;
+    } else {
+        dayOfMonthString = dayOfMonth + '';
+    }
+
+    const year = d.getFullYear();
+    const yearShortened = year % 1000;
+    return monthString + '/' + dayOfMonthString + '/' + yearShortened;
+}
+
 export {
     assertUnreachable,
-    // getNewId,
-    // getNewIds,
     isLetter,
+    isNumberMates,
     getTenant,
     getTenantByTenantId,
     convertDaysToMS,
@@ -564,6 +642,7 @@ export {
     handleBlurNumericStringInput,
     handleFocusNumericStringInput,
     verifyAndSetNumericStringInput,
+    verifyAgeInput,
     formatNames,
     getApartmentSummaryString,
     getFriendProfileSummaryString,
@@ -574,8 +653,13 @@ export {
     getPutOptions,
     getDeleteOptions,
     initializeDates,
+    getFriendProfilesFromServerFriendProfiles,
     getFriendProfileFromApartment,
-    getFriendProfilesFromServerFriends,
-    getApartmentSummariesFromServerFriendRequests,
+    getApartmentSummaryFromFriendProfile,
+    getApartmentSummariesFromServerApartmentSummaries,
+    formatPhoneNumber,
+    countDigits,
+    getDigits,
+    getTwoDigitDateString,
     getLaterDateToTest, //TEMP
 };

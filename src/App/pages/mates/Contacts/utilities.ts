@@ -1,5 +1,6 @@
 import { isLetter } from '../../../common/utilities';
 import { Contact } from './models/Contact';
+import { ServerContact } from './models/ServerContact';
 
 export const getInitials = (name: string) => {
     let initials: string = '';
@@ -17,11 +18,9 @@ export const getInitials = (name: string) => {
     return initials;
 };
 
-export const initializeServerContacts = (manuallyAddedContacts: Contact[]) => {
-    return markManuallyAddedContacts(manuallyAddedContacts);
-};
-
-const markManuallyAddedContacts = (contacts: Contact[]): Contact[] => {
-    contacts.map((contact) => (contact.manuallyAdded = true));
-    return contacts;
+export const initializeServerContacts = (manuallyAddedContacts: ServerContact[]) => {
+    manuallyAddedContacts.forEach((contact) => {
+        contact.manuallyAdded = true;
+    });
+    return manuallyAddedContacts as Contact[];
 };

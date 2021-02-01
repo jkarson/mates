@@ -1,4 +1,4 @@
-import { ChoresInfo, MatesUser } from '../../../common/models';
+import { MatesUser } from '../../../common/models';
 import {
     isSameDayMonthYear,
     getMaxDate,
@@ -7,11 +7,14 @@ import {
     getTodaysDate,
     initializeDates,
     getPostOptions,
-    getLaterDateToTest,
     getDeleteOptions,
 } from '../../../common/utilities';
-import { Chore, ChoreWithoutId } from './models/Chore';
-import { ChoreGenerator, ChoreGeneratorWithoutId } from './models/ChoreGenerator';
+import {
+    ChoreGenerator,
+    ChoreWithoutId,
+    ChoreGeneratorWithoutId,
+    ChoresInfo,
+} from './models/ChoresInfo';
 import { ServerChoresInfo } from './models/ServerChoresInfo';
 
 export const updateChoresFromChoreGenerators = (
@@ -62,27 +65,9 @@ export const updateChoresFromChoreGenerators = (
             });
         }),
     );
-    // matesUser.apartment.choresInfo.chores.push(...newChores);
-    //setMatesUser({ ...matesUser });
-    //TO DO: SAVE NEW CHORES TO DATABASE
 };
 
-// const getChoresFromChoreGenerator = (
-//     choreGenerator: ChoreGenerator,
-//     generationStartDate: Date,
-// ): Chore[] => {
-//     const choresWithoutId = getChoresWithoutIdFromChoreGenerator(
-//         choreGenerator,
-//         generationStartDate,
-//     );
-//     //const newIds = getNewIds(previousChores, choresWithoutId.length);
-//     //const newIds = choresWithoutId.map(() => '-1'); //TO DO: OVERRIDE W ID FROM SERVER
-//     const chores: Chore[] = [];
-//     choresWithoutId.forEach((chore, index) => chores.push({ ...chore, _id: newIds[index] }));
-//     return chores;
-// };
-
-const getChoresWithoutIdFromChoreGenerator = ({
+export const getChoresWithoutIdFromChoreGenerator = ({
     _id: id,
     name,
     assigneeIds,
@@ -178,15 +163,6 @@ export const purgeOldChores = (
             return false;
         }),
     );
-
-    // deletionIndices.forEach((index) => {
-    //     existingChores.splice(index, 1);
-    // });
-
-    // if (deletionIndices.length > 0) {
-    //     //TO DO: Save deletions to database
-    //     setMatesUser({ ...matesUser });
-    // }
 };
 
 // Completed chores will be deleted after they are 1 month old.

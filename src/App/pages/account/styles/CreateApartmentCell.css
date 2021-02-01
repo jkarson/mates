@@ -1,0 +1,86 @@
+.create-apartment-cell-container {
+    height: 100%;
+    width: 100%;
+    display: grid;
+    box-sizing: border-box;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 8vh 30vh 5vh 1fr;
+    grid-template-areas:
+        'apartment-header tenant-header'
+        'apartment tenant'
+        'clear-apartment clear-tenant'
+        'button button';
+}
+
+.create-apartment-cell-apartment-header {
+    grid-area: apartment-header;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.create-apartment-cell-tenant-header {
+    grid-area: tenant-header;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.create-apartment-cell-apartment-container {
+    grid-area: apartment;
+    margin: 0 auto;
+}
+
+.create-apartment-cell-tenant-container {
+    grid-area: tenant;
+    margin: 0 auto;
+}
+
+@media only screen and (max-width: 600px) {
+    .create-apartment-cell-apartment-container *,
+    .create-apartment-cell-tenant-container * {
+        width: 13rem;
+    }
+}
+
+.create-apartment-cell-clear-apartment-container {
+    grid-area: clear-apartment;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.create-apartment-cell-clear-tenant-container {
+    grid-area: clear-tenant;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.create-apartment-cell-create-button-outer-container {
+    grid-area: button;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 5vh;
+}
+
+.create-apartment-cell-message-container {
+    position: absolute;
+    bottom: 9vh;
+    text-align: center;
+    left: 0;
+    right: 0;
+}
+
+.create-apartment-cell-faux-create-button-container button {
+    background-color: gray;
+}
+
+.create-apartment-cell-faux-create-button-container button:hover {
+    box-shadow: none;
+}
+
+.create-apartment-cell-faux-create-button-container button:active {
+    color: white;
+    background-color: gray;
+}

@@ -1,10 +1,14 @@
 import React, { useContext, useState } from 'react';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
-//import { Apartments } from '../../../../common/mockData';
-import { Apartment, ApartmentSummary } from '../../../../common/models';
-import { getPostOptions } from '../../../../common/utilities';
+import {
+    getApartmentSummariesFromServerApartmentSummaries,
+    getPostOptions,
+} from '../../../../common/utilities';
+import { ServerApartmentEvent } from '../../Events/models/ServerEventsInfo';
+import { ApartmentSummary } from '../models/FriendsInfo';
 import { FriendsTabType } from '../models/FriendsTabs';
-import FriendProfileSummaryCell, { ApartmentSummaryCell } from './FriendSummaryCell';
+import { ServerApartmentSummary } from '../models/ServerFriendsInfo';
+import ApartmentSummaryCell from './ApartmentSummaryCell';
 
 interface CreateFriendRequestCellProps {
     setTab: React.Dispatch<React.SetStateAction<FriendsTabType>>;
@@ -14,12 +18,7 @@ const CreateFriendRequestCell: React.FC<CreateFriendRequestCellProps> = ({ setTa
     const { matesUser: user, setMatesUser: setUser } = useContext(
         MatesUserContext,
     ) as MatesUserContextType;
-    //const { friends, outgoingRequests, incomingRequests } = user.apartment.friendsInfo;
 
-    //TO DO: ultimately, the pool of apartments will come from the server rather than be loaded from
-    //mockData.ts
-    //const allApartments = Object.values([Apartments]);
-    //const allApartments: Apartment[] = [];
     const [input, setInput] = useState('');
     const [friendSummary, setFriendSummary] = useState<ApartmentSummary | null>(null);
     const [redirect, setRedirect] = useState(false);
@@ -71,16 +70,9 @@ const CreateFriendRequestCell: React.FC<CreateFriendRequestCellProps> = ({ setTa
                     setError('Sorry, your friend request could not be sent');
                     return;
                 }
-                //to do: modularize this better w utils
                 const { newOutgoingRequests } = json;
-                const outgoingRequestSummaries: ApartmentSummary[] = newOutgoingRequests.map(
-                    (requestApt) => {
-                        return {
-                            apartmentId: requestApt._id,
-                            name: requestApt.profile.name,
-                            tenantNames: requestApt.tenants.map((tenant) => tenant.name),
-                        };
-                    },
+                const outgoingRequestSummaries = getApartmentSummariesFromServerApartmentSummaries(
+                    newOutgoingRequests,
                 );
                 setUser({
                     ...user,
@@ -95,15 +87,6 @@ const CreateFriendRequestCell: React.FC<CreateFriendRequestCellProps> = ({ setTa
                 setInput('');
                 setTab('Outgoing Requests');
             });
-        // .then((json) => {
-        //     console.log(json);
-        // });
-
-        // setInput('');
-        // user.apartment.friendsInfo.outgoingRequests.push(apartment);
-        // //TO DO: SAVE TO DATABASE
-        // setUser({ ...user });
-        // setTab('Outgoing Requests');
     };
 
     if (redirect) {

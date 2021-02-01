@@ -6,15 +6,31 @@ import AddContactCell from './AddContactCell';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import DescriptionCell from '../../../../common/components/DescriptionCell';
 import Tabs from '../../../../common/components/Tabs';
-import { Apartment, FriendProfile, Tenant } from '../../../../common/models';
+import { Apartment } from '../../../../common/models';
 import { assertUnreachable, getDeleteOptions, getPostOptions } from '../../../../common/utilities';
 import { Redirect } from 'react-router-dom';
 import { initializeServerContacts } from '../utilities';
+import { FriendProfile } from '../../Friends/models/FriendsInfo';
+import RedMessageCell from '../../../../common/components/RedMessageCell';
+
+//PICK UP / TO DO:
+/*
+    -make sure phone number input formatting / restricting is taken care of
+    -add the house icon to the top left and have this be accessible as a refresh in Mates and a mates link in the profile link screen
+    -modularize components or come up w a better system for similar common buttons... separating out
+     the css shows how useful it is though
+     -Friends, Events, Chores, Bills, Profile
+     -Demo needs to be in sync too!
+*/
+
+//EXTENSION: Edit contacts
 
 //EXTENSION: each Contact / tab could be color coded by type of contact
 
 //EXTENSION: Manually added contacts can have manually added photos; other contacts have photos
 //as defined in profile
+
+import '../styles/Contacts.css';
 
 const Contacts: React.FC = () => {
     const { matesUser: user, setMatesUser: setUser } = useContext(
@@ -38,7 +54,7 @@ const Contacts: React.FC = () => {
                 email: tenant.email,
                 number: tenant.number,
                 manuallyAdded: false,
-                _id: tenant.userId,
+                _id: tenant.userId, //TO DO: is this guaranteed unique from a server-created contact _id?
             });
         });
         return apartmentContacts.sort((a, b) =>
@@ -110,7 +126,10 @@ const Contacts: React.FC = () => {
                 const markedContacts = initializeServerContacts(manuallyAddedContacts);
                 setUser({
                     ...user,
-                    apartment: { ...user.apartment, manuallyAddedContacts: markedContacts },
+                    apartment: {
+                        ...user.apartment,
+                        manuallyAddedContacts: (markedContacts as unknown) as Contact[],
+                    },
                 });
                 setTab('Manually Added');
             });
@@ -137,7 +156,7 @@ const Contacts: React.FC = () => {
                     ...user,
                     apartment: {
                         ...user.apartment,
-                        manuallyAddedContacts: markedContacts,
+                        manuallyAddedContacts: markedContacts as Contact[],
                     },
                 });
                 setMessage('Contact deleted');
@@ -148,23 +167,64 @@ const Contacts: React.FC = () => {
         return <Redirect to="/" />;
     }
 
+    let content: JSX.Element;
+    if (tab === 'Add New Contact') {
+        content = <AddContactCell handleNewContact={handleNewContact} />;
+    } else {
+        content = <ContactsList handleDelete={handleDeleteContact} contacts={contacts} />;
+    }
+
     return (
-        <div>
-            <Tabs<ContactsTabType> currentTab={tab} setTab={setTab} tabNames={contactsTabNames} />
-            {message.length === 0 ? null : <p style={{ color: 'red' }}>{message}</p>}
-            {tab === 'All' ? <ContactsDescriptionCell /> : null}
-            {tab === 'Add New Contact' ? (
-                <AddContactCell handleNewContact={handleNewContact} />
-            ) : (
-                <ContactsList handleDelete={handleDeleteContact} contacts={contacts} />
-            )}
+        <div className="contacts-container">
+            <div className="contacts-tabs-container">
+                <Tabs<ContactsTabType>
+                    currentTab={tab}
+                    setTab={setTab}
+                    tabNames={contactsTabNames}
+                />
+            </div>
+            <div className="contacts-error-container">
+                {message.length === 0 ? null : (
+                    <div className="contacts-error-inner-container">
+                        <RedMessageCell message={message} />
+                    </div>
+                )}
+            </div>
+            {tab !== 'Add New Contact' ? (
+                <div className="contacts-description-container">
+                    <ContactsDescriptionCell tab={tab} />
+                </div>
+            ) : null}
+            <div className="contacts-main-content-container">{content}</div>
         </div>
     );
 };
 
-const ContactsDescriptionCell: React.FC = () => (
-    <DescriptionCell content={'Only manually added contacts can be deleted.'} />
-);
+interface ContactsDescriptionCellProps {
+    tab: ContactsTabType;
+}
+
+const ContactsDescriptionCell: React.FC<ContactsDescriptionCellProps> = ({ tab }) => {
+    let content: string;
+    switch (tab) {
+        case 'All':
+            content = 'A list of all your contacts. Only manually added contacts can be deleted.';
+            break;
+        case 'Your Apartment':
+            content = 'The contact information of the tenants in your apartment';
+            break;
+        case 'Friends':
+            content = "The contact information of your apartments's friends";
+            break;
+        case 'Manually Added':
+            content = 'Contacts that were manually added by tenants of your apartment.';
+            break;
+        case 'Add New Contact':
+            content = '';
+            break;
+    }
+    return <DescriptionCell content={content} />;
+};
 
 interface ContactsListProps {
     contacts: Contact[];

@@ -1,8 +1,19 @@
-.container {
+.page-cell-container {
     height: 100vh;
+    width: 100vw;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    background-color: #d3e0ea;
+    /* background-image: linear-gradient(to right, #f46b45, #eea849); */
+    /*    background-image: linear-gradient(90deg, #1cb5e0 0%, #000851 100%);*/
 }
 
-.content {
-    display: block;
-    padding-left: 50px;
+.page-cell-header-block {
+    flex: 0 0 auto;
+}
+
+.page-cell-content-block {
+    flex: 1;
+    overflow-y: scroll;
 }

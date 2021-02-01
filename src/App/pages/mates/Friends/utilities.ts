@@ -1,20 +1,20 @@
-import { FriendsInfo } from '../../../common/models';
 import {
-    getFriendProfilesFromServerFriends,
-    getApartmentSummariesFromServerFriendRequests,
+    getApartmentSummariesFromServerApartmentSummaries,
+    getFriendProfilesFromServerFriendProfiles,
 } from '../../../common/utilities';
+import { FriendsInfo } from './models/FriendsInfo';
+import { ServerFriendsInfo } from './models/ServerFriendsInfo';
 
-//to do: change type to server friends Info
-export const initializeServerFriendsInfo = (friendsInfo: any) => {
+export const initializeServerFriendsInfo = (friendsInfo: ServerFriendsInfo) => {
     formatFriendsInfo(friendsInfo);
 };
 
 function formatFriendsInfo(friendsInfo: any): FriendsInfo {
-    friendsInfo.friends = getFriendProfilesFromServerFriends(friendsInfo.friends);
-    friendsInfo.incomingRequests = getApartmentSummariesFromServerFriendRequests(
+    friendsInfo.friends = getFriendProfilesFromServerFriendProfiles(friendsInfo.friends);
+    friendsInfo.incomingRequests = getApartmentSummariesFromServerApartmentSummaries(
         friendsInfo.incomingRequests,
     );
-    friendsInfo.outgoingRequests = getApartmentSummariesFromServerFriendRequests(
+    friendsInfo.outgoingRequests = getApartmentSummariesFromServerApartmentSummaries(
         friendsInfo.outgoingRequests,
     );
     return friendsInfo;

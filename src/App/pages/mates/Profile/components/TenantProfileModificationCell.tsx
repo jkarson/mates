@@ -3,11 +3,19 @@ import { Redirect } from 'react-router-dom';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { Tenant } from '../../../../common/models';
 import { StateProps } from '../../../../common/types';
-import { getPutOptions, getTenant } from '../../../../common/utilities';
+import {
+    countDigits,
+    formatPhoneNumber,
+    getDigits,
+    getPutOptions,
+    getTenant,
+    isNumberMates,
+    verifyAgeInput,
+} from '../../../../common/utilities';
 import TenantProfileCellBody from './TenantProfileCellBody';
 
 // EXTENSION: Add e-mail / phone number verification.
-// If email is used for the server, Re-configure as "public display email" or "toggle display"
+//to do: disallow leading, trailing whitespace
 
 const TenantProfileModificationCell: React.FC = () => {
     const { matesUser: user, setMatesUser: setUser } = useContext(
@@ -23,10 +31,6 @@ const TenantProfileModificationCell: React.FC = () => {
         if (!edit) {
             setEdit(true);
         } else {
-            //const { apartment } = user;
-            //const tenantIndex = apartment.tenants.indexOf(tenant);
-            //apartment.tenants.splice(tenantIndex, 1, input);
-            //TO DO: SAVE TO DATABASE!
             const data = { apartmentId: user.apartment._id, ...input };
             const options = getPutOptions(data);
             fetch('/mates/updateTenantProfile', options)
@@ -73,32 +77,61 @@ const InputTenantCell: React.FC<StateProps<Tenant>> = ({ state, setState }) => {
         setState({ ...state, [name]: value });
     };
 
+    const handleChangeAge = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const verifiedInput = verifyAgeInput(event.target.value);
+        if (verifiedInput) {
+            setState({ ...state, age: event.target.value });
+        }
+    };
+
+    const handleChangePhoneNumber = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const numberInState = state.number ? state.number : '';
+        const inputPhoneNumber = event.target.value;
+        if (countDigits(inputPhoneNumber) < countDigits(numberInState)) {
+            setState({ ...state, number: getDigits(inputPhoneNumber) });
+            return;
+        }
+        const newCharacter = inputPhoneNumber.charAt(inputPhoneNumber.length - 1);
+        if (!isNumberMates(newCharacter)) {
+            return;
+        }
+        setState({ ...state, number: getDigits(inputPhoneNumber) });
+    };
+
     return (
         <div style={{ padding: 5 }}>
-            <form>
+            <input
+                name="name"
+                type="text"
+                value={state.name}
+                style={{ fontWeight: 'bold' }}
+                onChange={handleChange}
+            />
+            <br />
+            <label>
+                {'Age: '}
                 <input
-                    name="name"
+                    name="age"
                     type="text"
-                    value={state.name}
-                    style={{ fontWeight: 'bold' }}
-                    onChange={handleChange}
+                    value={state.age ? state.age : ''}
+                    onChange={handleChangeAge}
                 />
-                <br />
-                <label>
-                    {'Age: '}
-                    <input name="age" type="number" value={state.age} onChange={handleChange} />
-                </label>
-                <br />
-                <label>
-                    {'E-Mail: '}
-                    <input name="email" type="email" value={state.email} onChange={handleChange} />
-                </label>
-                <br />
-                <label>
-                    {'Phone Number: '}
-                    <input name="number" type="tel" value={state.number} onChange={handleChange} />
-                </label>
-            </form>
+            </label>
+            <br />
+            <label>
+                {'E-Mail: '}
+                <input name="email" type="email" value={state.email} onChange={handleChange} />
+            </label>
+            <br />
+            <label>
+                {'Phone Number: '}
+                <input
+                    name="number"
+                    type="tel"
+                    value={state.number ? formatPhoneNumber(state.number) : state.number}
+                    onChange={handleChangePhoneNumber}
+                />
+            </label>
         </div>
     );
 };

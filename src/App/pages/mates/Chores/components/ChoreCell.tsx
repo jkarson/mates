@@ -6,8 +6,7 @@ import {
     getFormattedDateString,
     formatNames,
 } from '../../../../common/utilities';
-import { Chore } from '../models/Chore';
-import { ChoreGeneratorID } from '../models/ChoreGenerator';
+import { Chore, ChoreGeneratorID } from '../models/ChoresInfo';
 
 interface ChoreCellProps {
     chore: Chore;
@@ -31,9 +30,24 @@ const ChoreCell: React.FC<ChoreCellProps> = ({
     const completedBy: Tenant | undefined = chore.completedBy
         ? getTenantByTenantId(matesUser, chore.completedBy)
         : undefined;
+    const redHeading = () => {
+        if (completedBy) {
+            if (completedBy.userId === matesUser.userId) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            if (assignedToUser) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    };
     return (
         <div style={{ borderTop: '1px solid black' }}>
-            <h3 style={assignedToUser ? { color: 'red' } : {}}>{chore.name}</h3>
+            <h3 style={redHeading() ? { color: 'red' } : {}}>{chore.name}</h3>
             <h5>{getFormattedDateString(chore.date)}</h5>
             <div>
                 <p>

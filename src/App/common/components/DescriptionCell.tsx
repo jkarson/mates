@@ -1,11 +1,12 @@
 import React from 'react';
+import StandardStyledText from './StandardStyledText';
 
 interface DescriptionCellProps {
     content: string;
 }
 
 const DescriptionCell: React.FC<DescriptionCellProps> = ({ content }) => (
-    <p style={{ fontWeight: 'bold' }}>{content}</p>
+    <StandardStyledText text={content} />
 );
 
 export default DescriptionCell;

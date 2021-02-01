@@ -1,0 +1,56 @@
+.yesnomessage-modal-container {
+    height: 100%;
+    width: 100%;
+    /* background-color: rgb(255, 60, 0); */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 3fr 1fr;
+    grid-template-areas:
+        'message message'
+        'no yes';
+    /* border: 2px dotted black; */
+}
+
+.yesnomessage-modal-message-container {
+    grid-area: message;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* background-color: green; */
+}
+
+.yesnomessage-modal-message-container span {
+    color: red;
+    line-height: 1.5rem;
+    margin: 0px;
+    font-size: 1.1rem;
+    text-align: center;
+    font-weight: 600;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.yesnomessage-modal-no-button-container {
+    grid-area: no;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.yesnomessage-modal-no-button-container * {
+    width: 100%;
+    margin-left: 0.5rem;
+    margin-right: 0.25rem;
+}
+.yesnomessage-modal-yes-button-container * {
+    width: 100%;
+    margin-left: 0.25rem;
+    margin-right: 0.5rem;
+}
+
+.yesnomessage-modal-yes-button-container {
+    grid-area: yes;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

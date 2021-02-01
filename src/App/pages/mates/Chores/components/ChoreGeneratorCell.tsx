@@ -6,7 +6,7 @@ import {
     getFormattedDateString,
     formatNames,
 } from '../../../../common/utilities';
-import { ChoreGenerator, ChoreGeneratorID } from '../models/ChoreGenerator';
+import { ChoreGenerator, ChoreGeneratorID } from '../models/ChoresInfo';
 
 interface ChoreGeneratorCellProps {
     choreGenerator: ChoreGenerator;

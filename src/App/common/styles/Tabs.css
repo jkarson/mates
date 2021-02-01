@@ -1,5 +1,13 @@
+.tab-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
 .tab {
     cursor: pointer;
     font-weight: bold;
-    padding: 5px;
+    padding: 12px;
+    color: rgb(255, 0, 157);
 }

@@ -1,28 +1,40 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useLayoutEffect, useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import DescriptionCell from '../../../../common/components/DescriptionCell';
 import Tabs from '../../../../common/components/Tabs';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
-import { Apartment, ApartmentSummary, FriendProfile } from '../../../../common/models';
 import {
     assertUnreachable,
-    getApartmentSummariesFromServerFriendRequests,
+    getApartmentSummariesFromServerApartmentSummaries,
     getDeleteOptions,
-    getFriendProfileFromApartment,
-    getFriendProfilesFromServerFriends,
+    getFriendProfilesFromServerFriendProfiles,
     getPostOptions,
 } from '../../../../common/utilities';
+import { ApartmentSummary, FriendProfile } from '../models/FriendsInfo';
 import { friendsTabNames, FriendsTabType } from '../models/FriendsTabs';
 import CreateFriendRequestCell from './CreateFriendRequestCell';
 import FriendCell from './FriendCell';
 import RequestCell from './RequestCell';
 
-//TO DO: all add/delete/create friend request actions are bi-directional.
-//on the front end, we only need to display changes for current user. but on the back-end,
-//we obviously need to adjust the other party accordingly.
+// to do: should i have a message when friends are deleted? or is the messaging really more for development?
+//or for errors? i kind of think a message can help... see DemoFriends for method of handling
+//delete friend message and erasing error when a friend cell is expanded
 
 const Friends: React.FC = () => {
     const [tab, setTab] = useState<FriendsTabType>('Friends');
+    const { matesUser } = useContext(MatesUserContext) as MatesUserContextType;
+
+    useLayoutEffect(() => {
+        if (matesUser.apartment.friendsInfo.incomingRequests.length > 0) {
+            setTab('Incoming Requests');
+            return;
+        }
+        if (matesUser.apartment.friendsInfo.friends.length > 0) {
+            setTab('Friends');
+            return;
+        }
+        setTab('Add New Friend');
+    }, []);
 
     let content: JSX.Element;
     switch (tab) {
@@ -30,10 +42,10 @@ const Friends: React.FC = () => {
             content = <FriendsCell />;
             break;
         case 'Incoming Requests':
-            content = <RequestsCell incoming={true} setTab={setTab} />;
+            content = <RequestsCell incoming={true} setTab={setTab} tab={tab} />;
             break;
         case 'Outgoing Requests':
-            content = <RequestsCell incoming={false} setTab={setTab} />;
+            content = <RequestsCell incoming={false} setTab={setTab} tab={tab} />;
             break;
         case 'Add New Friend':
             content = <CreateFriendRequestCell setTab={setTab} />;
@@ -59,12 +71,14 @@ const FriendsDescriptionCell: React.FC = () => (
     />
 );
 
+//TO DO: verify that message / tab as prop work as they should
 interface RequestsCellProps {
     setTab: React.Dispatch<React.SetStateAction<FriendsTabType>>;
     incoming: boolean;
+    tab: FriendsTabType;
 }
 
-const RequestsCell: React.FC<RequestsCellProps> = ({ incoming, setTab }) => {
+const RequestsCell: React.FC<RequestsCellProps> = ({ incoming, setTab, tab }) => {
     const { matesUser: user, setMatesUser: setUser } = useContext(
         MatesUserContext,
     ) as MatesUserContextType;
@@ -92,8 +106,8 @@ const RequestsCell: React.FC<RequestsCellProps> = ({ incoming, setTab }) => {
                     return;
                 }
                 const { friends, incomingRequests } = json;
-                const formattedFriends = getFriendProfilesFromServerFriends(friends);
-                const formattedIncomingRequests = getApartmentSummariesFromServerFriendRequests(
+                const formattedFriends = getFriendProfilesFromServerFriendProfiles(friends);
+                const formattedIncomingRequests = getApartmentSummariesFromServerApartmentSummaries(
                     incomingRequests,
                 );
                 setUser({
@@ -122,10 +136,6 @@ const RequestsCell: React.FC<RequestsCellProps> = ({ incoming, setTab }) => {
         } else {
             deleteOutgoingRequest(options);
         }
-        // const requestIndex = requests.indexOf(apartment);
-        // requests.splice(requestIndex, 1);
-        // setUser({ ...user });
-        //TO DO: IMPLEMENT W SERVER
     };
 
     const deleteIncomingRequest = (options: object) => {
@@ -142,7 +152,7 @@ const RequestsCell: React.FC<RequestsCellProps> = ({ incoming, setTab }) => {
                     return;
                 }
                 const { incomingRequests } = json;
-                const formattedIncomingRequests = getApartmentSummariesFromServerFriendRequests(
+                const formattedIncomingRequests = getApartmentSummariesFromServerApartmentSummaries(
                     incomingRequests,
                 );
                 setUser({
@@ -155,7 +165,7 @@ const RequestsCell: React.FC<RequestsCellProps> = ({ incoming, setTab }) => {
                         },
                     },
                 });
-                setError('');
+                setError('Friend request deleted');
             });
     };
 
@@ -173,7 +183,7 @@ const RequestsCell: React.FC<RequestsCellProps> = ({ incoming, setTab }) => {
                     return;
                 }
                 const { outgoingRequests } = json;
-                const formattedOutgoingRequests = getApartmentSummariesFromServerFriendRequests(
+                const formattedOutgoingRequests = getApartmentSummariesFromServerApartmentSummaries(
                     outgoingRequests,
                 );
                 setUser({
@@ -186,7 +196,7 @@ const RequestsCell: React.FC<RequestsCellProps> = ({ incoming, setTab }) => {
                         },
                     },
                 });
-                setError('');
+                setError('Outgoing friend request deleted');
             });
         //);
     };
@@ -246,7 +256,7 @@ const FriendsCell: React.FC = () => {
                     return;
                 }
                 const { friends } = json;
-                const formattedFriends = getFriendProfilesFromServerFriends(friends);
+                const formattedFriends = getFriendProfilesFromServerFriendProfiles(friends);
                 setUser({
                     ...user,
                     apartment: {
@@ -254,6 +264,7 @@ const FriendsCell: React.FC = () => {
                         friendsInfo: { ...user.apartment.friendsInfo, friends: formattedFriends },
                     },
                 });
+                setError('Friend deleted');
             });
     };
 
@@ -276,6 +287,7 @@ const FriendsCell: React.FC = () => {
                                 key={friend.apartmentId}
                                 friend={friend}
                                 handleDelete={handleDelete}
+                                setError={setError}
                             />
                         ))}
                 </>

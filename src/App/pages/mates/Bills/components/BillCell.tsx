@@ -1,16 +1,16 @@
 import React, { useContext } from 'react';
-import { Bill, BillId } from '../models/Bill';
-import { BillGeneratorID } from '../models/BillGenerator';
 import { getTotalCurrentAssignedValue } from '../utilities';
 import { AmountOwed } from '../models/AmountOwed';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { getFormattedDateString, getTenantByTenantId } from '../../../../common/utilities';
 import { UserId } from '../../../../common/models';
+import { Bill, BillId, BillGeneratorID } from '../models/BillsInfo';
 
 interface BillCellProps {
     bill: Bill;
     isPaid: boolean;
     isPrivate: boolean;
+    isResolved: boolean;
     userPortionIsPaid: boolean;
     handleDeleteBill: (billId: BillId) => void;
     handleDeleteBillSeries: (bgId: BillGeneratorID) => void;
@@ -25,6 +25,7 @@ const BillCell: React.FC<BillCellProps> = ({
     bill,
     isPaid,
     isPrivate,
+    isResolved,
     userPortionIsPaid,
     handleDeleteBill,
     handleDeleteBillSeries,
@@ -57,7 +58,7 @@ const BillCell: React.FC<BillCellProps> = ({
                     handlePayPortionToTenant={handlePayPortionToTenantBound}
                 />
             </span>
-            {isPrivate ? null : (
+            {isPrivate || isResolved ? null : (
                 <button onClick={() => handleResolveBill(bill._id)}>{'Resolve all debts.'}</button>
             )}
             <button onClick={() => handleResetBill(bill._id)}>{'Reset'}</button>
@@ -76,8 +77,6 @@ interface AmountsOwedDisplayCellProps {
     handlePayPortionToTenant: (payeeId: UserId) => void;
 }
 
-//TO DO: make sure it's protected from 2 users paying the bill at the same time.
-//this will require the server i would think.
 const AmountsOwedDisplayCell: React.FC<AmountsOwedDisplayCellProps> = ({
     amountsOwed,
     userPortionIsPaid,
@@ -131,11 +130,11 @@ const AmountOwedDisplayCell: React.FC<AmountOwedDisplayCellProps> = ({
 }) => {
     let content = '';
     if (currentAmount === 0 && initialAmount > 0) {
-        content = name + ' paid $' + initialAmount;
+        content = name + ' paid $' + initialAmount.toFixed(2);
     } else if (currentAmount >= 0) {
-        content = name + ' owes $' + currentAmount;
+        content = name + ' owes $' + currentAmount.toFixed(2);
     } else {
-        content = name + ' is owed $' + -1 * currentAmount;
+        content = name + ' is owed $' + (-1 * currentAmount).toFixed(2);
     }
     return (
         <div>
@@ -165,7 +164,8 @@ const PayableToDisplayCell: React.FC<PayableToDisplayCellProps> = ({
     handlePayPortionToPayable,
     handlePayBalance,
 }) => {
-    const payableToString = payableTo + (isPaid ? ' (PAID)' : ' (BALANCE: $' + totalOwed + ')');
+    const payableToString =
+        payableTo + (isPaid ? ' (PAID)' : ' (BALANCE: $' + totalOwed.toFixed(2) + ')');
     return (
         <div>
             <p>

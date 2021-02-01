@@ -1,7 +1,7 @@
 import React from 'react';
-import { Apartment, FriendProfile } from '../../../../common/models';
-import { TenantsProfileCell } from '../components/Profile';
+import { FriendProfile } from '../../Friends/models/FriendsInfo';
 import ApartmentProfileCellBody from './ApartmentProfileCellBody';
+import { TenantsProfileCell } from './TenantsProfileCell';
 
 interface StaticApartmentProfileProps {
     apartment: FriendProfile;

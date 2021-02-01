@@ -1,5 +1,5 @@
 import React from 'react';
-import { BillsInfo, MatesUser } from '../../../common/models';
+import { MatesUser } from '../../../common/models';
 import {
     roundToHundredth,
     isSameDayMonthYear,
@@ -14,8 +14,12 @@ import {
 } from '../../../common/utilities';
 import { AmountOwed } from './models/AmountOwed';
 import { AmountWithPercentOwed } from './models/AmountWithPercentOwed';
-import { Bill, BillWithoutId } from './models/Bill';
-import { BillGenerator, BillGeneratorWithoutId } from './models/BillGenerator';
+import {
+    BillGenerator,
+    BillWithoutId,
+    BillGeneratorWithoutId,
+    BillsInfo,
+} from './models/BillsInfo';
 import { ServerBillsInfo } from './models/ServerBillsInfo';
 
 export const getInitialAmountsWithPercentOwed = (matesUser: MatesUser): AmountWithPercentOwed[] => {
@@ -100,20 +104,7 @@ export const updateBillsFromBillGenerators = (
         });
 };
 
-// const getBillsFromBillGenerator = (
-//     billGenerator: BillGenerator,
-//     generationStartDate: Date,
-// ): BillWithoutId[] => {
-//     const billsWithoutId = getBillsWithoutIdFromBillGenerator(billGenerator, generationStartDate);
-//     // const newIds = getNewIds(previousBills, billsWithoutId.length);
-//     // const newIds = billsWithoutId.map(() => '-1'); //TO DO: override w retrieving id from server
-//     const bills: Bill[] = [];
-//     billsWithoutId.forEach((bill, index) => bills.push({ ...bill, id: newIds[index] }));
-//     return bills;
-// };
-
 export const getBillsWithoutIdFromBillGeneratorWithoutId = ({
-    //_id: id,
     name,
     payableTo,
     isPrivate,
@@ -232,7 +223,7 @@ export const purgeOldBills = (
 };
 
 // Resolved bills will be deleted after they are 3 month old.
-const getMinDate = () => {
+export const getMinDate = () => {
     const current = getTodaysDate();
     const currentMonth = current.getMonth();
     current.setMonth(currentMonth - 3);

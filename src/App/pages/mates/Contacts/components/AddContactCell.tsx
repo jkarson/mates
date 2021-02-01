@@ -1,5 +1,31 @@
 import React, { useState } from 'react';
+import BiggerSimpleButton from '../../../../common/components/BiggerSimpleButton';
+import FauxSimpleButton, {
+    BiggerFauxSimpleButton,
+} from '../../../../common/components/FauxSimpleButton';
+import SimpleButton from '../../../../common/components/SimpleButton';
+import StyledInput from '../../../../common/components/StyledInput';
 import { ContactWithoutId } from '../models/Contact';
+
+import '../styles/AddContactCell.css';
+
+//TO DO: don't we limit phone numbers to numbers somewhere?
+//control the input!
+
+/*
+    const handleChangePhoneNumber = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const inputPhoneNumber = event.target.value;
+        if (countDigits(inputPhoneNumber) < countDigits(input.number)) {
+            setInput({ ...input, number: getDigits(inputPhoneNumber) });
+            return;
+        }
+        const newCharacter = inputPhoneNumber.charAt(inputPhoneNumber.length - 1);
+        if (!isNumberMates(newCharacter)) {
+            return;
+        }
+        setInput({ ...input, number: getDigits(inputPhoneNumber) });
+    };
+*/
 
 interface AddContactState {
     name: string;
@@ -48,35 +74,35 @@ const AddContactCell: React.FC<AddContactCellProps> = ({ handleNewContact }) => 
     };
 
     return (
-        <div>
-            <form>
-                <label>
-                    {'Name (required)'}
-                    <input type="text" name="name" value={formInput.name} onChange={handleChange} />
-                </label>
-                <br />
-                <label>
-                    {'Phone Number (optional'}
-                    <input
-                        type="tel"
-                        name="number"
-                        value={formInput.number}
-                        onChange={handleChange}
-                    />
-                </label>
-                <br />
-                <label>
-                    {'E-mail Address (optional)'}
-                    <input
-                        type="email"
-                        name="email"
-                        value={formInput.email}
-                        onChange={handleChange}
-                    />
-                </label>
-                <br />
-            </form>
-            <button onClick={handleSubmit}>{'Create New Contact'}</button>
+        <div className="add-contact-cell-container">
+            <StyledInput
+                type="text"
+                name="name"
+                value={formInput.name}
+                onChange={handleChange}
+                placeholder="* Name"
+            />
+            <StyledInput
+                type="tel"
+                name="number"
+                value={formInput.number}
+                onChange={handleChange}
+                placeholder={'Phone Number'}
+            />
+            <StyledInput
+                type="email"
+                name="email"
+                value={formInput.email}
+                onChange={handleChange}
+                placeholder={'E-mail'}
+            />
+            <div className="add-contact-cell-buttons-container">
+                {isValid(formInput) ? (
+                    <BiggerSimpleButton onClick={handleSubmit} text="Save New Contact" />
+                ) : (
+                    <BiggerFauxSimpleButton text={'Save New Contact'} />
+                )}
+            </div>
         </div>
     );
 };

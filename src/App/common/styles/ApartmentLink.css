@@ -1,0 +1,32 @@
+.apartment-link-container {
+    position: absolute;
+    left: 5vw;
+    top: 2vh;
+    padding: 0.5vh 1vw;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 20px;
+}
+
+.apartment-link-container:hover {
+    background-color: rgba(128, 128, 128, 0.3);
+}
+
+.apartment-link-container:active {
+    color: purple;
+}
+
+.apartment-link-inner-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.apartment-link-icon-container {
+    margin-right: 5px;
+}
+
+.apartment-link-icon-container * {
+    font-size: 1rem;
+}

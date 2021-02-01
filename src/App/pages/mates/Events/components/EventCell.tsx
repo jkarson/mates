@@ -1,15 +1,13 @@
 import React, { useContext, useState } from 'react';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
-import { Apartment, ApartmentId, ApartmentSummary, FriendProfile } from '../../../../common/models';
+import { ApartmentId } from '../../../../common/models';
 import {
     getFormattedDateTimeString,
-    getApartmentSummaryString,
     getFriendProfileSummaryString,
 } from '../../../../common/utilities';
-import FriendProfileSummaryCell, {
-    ApartmentSummaryCell,
-} from '../../Friends/components/FriendSummaryCell';
-import { ApartmentEvent } from '../models/ApartmentEvent';
+import ApartmentSummaryCell from '../../Friends/components/ApartmentSummaryCell';
+import { ApartmentSummary } from '../../Friends/models/FriendsInfo';
+import { ApartmentEvent } from '../models/EventsInfo';
 import { isFutureEvent, isPresentEvent } from '../utilities';
 
 interface EventCellProps {

@@ -1,14 +1,23 @@
-.header {
-    text-align: center;
-    color: dodgerblue;
-    font-size: x-large;
-    margin-block-start: 0.3em;
-    margin-block-end: 0.3em;
+.header-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
-.subHeader {
-    text-align: center;
+.header-container-logo-container > span {
+    color: rgb(6, 114, 223);
+    font-size: 3rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+.header-container-subheader-container {
+    margin-top: -10px;
+}
+
+.header-container-subheader-container > span {
     font-size: small;
-    display: block;
-    margin-top: -8px;
+    cursor: default;
 }

@@ -1,0 +1,12 @@
+.faux-simple-button-container button {
+    background-color: rgba(128, 128, 128, 0.7);
+}
+
+.faux-simple-button-container button:hover {
+    box-shadow: none;
+}
+
+.faux-simple-button-container button:active {
+    background-color: rgba(128, 128, 128, 0.7);
+    color: white;
+}

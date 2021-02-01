@@ -1,11 +1,10 @@
-import { EventsInfo } from '../../../common/models';
 import {
     convertHoursToMS,
-    getApartmentSummariesFromServerFriendRequests,
-    getFriendProfilesFromServerFriends,
+    getApartmentSummariesFromServerApartmentSummaries,
     initializeDates,
 } from '../../../common/utilities';
-import { ApartmentEvent } from './models/ApartmentEvent';
+import { ServerApartmentSummary } from '../Friends/models/ServerFriendsInfo';
+import { ApartmentEvent, EventsInfo } from './models/EventsInfo';
 import { ServerEventsInfo } from './models/ServerEventsInfo';
 
 export function isPastEvent(event: ApartmentEvent) {
@@ -27,12 +26,20 @@ export function initializeServerEventsInfo(serverEventsInfo: ServerEventsInfo) {
     initializeDates(serverEventsInfo.events, 'time');
     initializeDates(serverEventsInfo.invitations, 'time');
     serverEventsInfo.events.forEach((event) => {
-        event.invitees = getApartmentSummariesFromServerFriendRequests(event.invitees);
-        event.attendees = getApartmentSummariesFromServerFriendRequests(event.attendees);
+        event.invitees = (getApartmentSummariesFromServerApartmentSummaries(
+            event.invitees,
+        ) as unknown) as ServerApartmentSummary[];
+        event.attendees = (getApartmentSummariesFromServerApartmentSummaries(
+            event.attendees,
+        ) as unknown) as ServerApartmentSummary[];
     });
     serverEventsInfo.invitations.forEach((event) => {
-        event.attendees = getApartmentSummariesFromServerFriendRequests(event.attendees);
-        event.invitees = getApartmentSummariesFromServerFriendRequests(event.invitees);
+        event.attendees = (getApartmentSummariesFromServerApartmentSummaries(
+            event.attendees,
+        ) as unknown) as ServerApartmentSummary[];
+        event.invitees = (getApartmentSummariesFromServerApartmentSummaries(
+            event.invitees,
+        ) as unknown) as ServerApartmentSummary[];
     });
     console.log('server events info after formatting:');
     console.log(serverEventsInfo);

@@ -1,0 +1,44 @@
+.account-settings-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.account-settings-header-message-container {
+    flex: 2;
+    display: flex;
+    padding: 0 10vw;
+    justify-content: center;
+    align-items: center;
+    font-size: large;
+    line-height: 2.5rem;
+    text-align: center;
+}
+
+.account-settings-logout-button-container {
+    flex: 2;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.account-settings-delete-account-button-container {
+    flex: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.account-settings-delete-account-button-container > * {
+    background-color: rgb(52, 189, 155);
+    color: white;
+}
+
+.account-settings-delete-account-button-container > *:active {
+    color: rgb(52, 189, 155);
+}
+
+.account-settings-footer-message-container {
+    height: 5vh;
+    text-align: center;
+}

@@ -13,10 +13,8 @@ import {
     getMaxDate,
     getPostOptions,
 } from '../../../../common/utilities';
-import { Chore, ChoreWithoutId } from '../models/Chore';
-
 import { choreFrequencies, ChoreFrequency } from '../models/ChoreFrequency';
-import { ChoreGenerator, ChoreGeneratorWithoutId } from '../models/ChoreGenerator';
+import { ChoreGeneratorWithoutId, ChoreWithoutId } from '../models/ChoresInfo';
 import { ChoresTabType } from '../models/ChoresTabs';
 import {
     getChoresWithoutIdFromChoreGeneratorWithoutId,
@@ -85,8 +83,6 @@ const CreateChoreGeneratorCell: React.FC<CreateChoreGeneratorCellProps> = ({ set
                 : user.apartment.tenants.map((tenant) => tenant.userId);
         const starting = new Date(input.starting.getTime());
         const newChoreGenerator: ChoreGeneratorWithoutId = {
-            //id: getNewId(user.apartment.choresInfo.choreGenerators),
-            //id: '-1', //TO DO: OVERRIDE W ID FROM SERVER
             name: input.name,
             assigneeIds: [...assigneeIds],
             frequency: input.frequency,
@@ -172,9 +168,9 @@ const CreateChoreGeneratorCell: React.FC<CreateChoreGeneratorCellProps> = ({ set
                 <button onClick={toggleShowUntilCompleted}>{'Toggle'}</button>
             </p>
             <p style={{ fontWeight: 'bold' }}>
-                {
-                    'By default, chores will remain in your chore lists until they are completed. To turn off this behavior for this chore set, and automatically delete these chores once their assigned date passes, use the toggle option above.'
-                }
+                {input.showUntilCompleted
+                    ? 'These chores will remain in your chore list until they are completed, even if their date passes.'
+                    : 'These chores will be automatically deleted when their date passes, whether or not they have been completed.'}
             </p>
             <button onClick={createChoreGenerator}>{'Create Chore Set'}</button>
         </div>

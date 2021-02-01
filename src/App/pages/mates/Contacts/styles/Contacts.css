@@ -1,0 +1,23 @@
+.contacts-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0 2vw;
+}
+
+.contacts-main-content-container {
+    flex: 1;
+    overflow-y: scroll;
+    margin-bottom: 1rem;
+    padding: 0 2rem;
+}
+
+.contacts-description-container {
+    margin-left: 1rem;
+    margin-bottom: 1rem;
+}
+
+.contacts-error-inner-container {
+    padding: 1rem 0;
+    text-align: center;
+}

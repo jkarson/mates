@@ -1,19 +1,23 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { Redirect, RouteComponentProps } from 'react-router-dom';
 import PageCell from '../../common/components/PageCell';
 import Tabs from '../../common/components/Tabs';
 import { AccountContext } from '../../common/context';
 import { User } from '../../common/models';
-import { accountTabNames, AccountTabType } from './AccountTabs';
-import ApartmentsCell from './ApartmentsCell';
-import CreateApartmentCell from './CreateApartmentCell';
-import JoinApartmentCell from './JoinApartmentCell';
-import JoinRequestsCell from './JoinRequestsCell';
+import ApartmentsCell from './components/ApartmentsCell';
+import CreateApartmentCell from './components/CreateApartmentCell';
+import JoinApartmentCell from './components/JoinApartmentCell';
+import JoinRequestsCell from './components/JoinRequestsCell';
+import { AccountTabType, accountTabNames } from './models/AccountTabs';
+
+import './Account.css';
+import RedMessageCell from '../../common/components/RedMessageCell';
+import ProfileLink from '../../common/components/ProfileLink';
+import ApartmentLink from '../../common/components/ApartmentLink';
 
 const Account: React.FC<RouteComponentProps> = (props) => {
-    const [redirectToLogin, setRedirectToLogin] = useState(false);
-
     const [user, setUser] = useState<User | null>(null);
+    const [redirectToLogin, setRedirectToLogin] = useState(false);
 
     useLayoutEffect(() => {
         fetch('/account')
@@ -25,7 +29,7 @@ const Account: React.FC<RouteComponentProps> = (props) => {
                     console.log('initiating redirect');
                     setRedirectToLogin(true);
                 } else {
-                    const user = json.user;
+                    const { user } = json;
                     setUser({ ...user });
                 }
             })
@@ -34,6 +38,10 @@ const Account: React.FC<RouteComponentProps> = (props) => {
 
     const [tab, setTab] = useState<AccountTabType>('Your Apartments');
     const tabs = <Tabs currentTab={tab} setTab={setTab} tabNames={accountTabNames} />;
+
+    const handleProfileLinkClick = () => {
+        props.history.push('account-settings');
+    };
 
     let currentComponent: JSX.Element | undefined;
     switch (tab) {
@@ -54,22 +62,31 @@ const Account: React.FC<RouteComponentProps> = (props) => {
     if (redirectToLogin) {
         return <Redirect to="/" />;
     }
+
     if (!user) {
         return null;
     }
+
     return (
         <AccountContext.Provider
             value={{ user: user, setUser: setUser as React.Dispatch<React.SetStateAction<User>> }}
         >
             <div>
                 <PageCell
+                    onHeaderClick={() => props.history.go(0)}
                     tabs={tabs}
                     content={
-                        <div>
-                            {!redirectToLogin ? null : <Redirect to="/" />}
-                            <h3 style={{ color: 'dodgerblue' }}>
-                                {user ? 'Welcome, ' + user.username : null}
-                            </h3>
+                        <div className="account-content-container">
+                            <ProfileLink
+                                accountName={user.username}
+                                onClick={handleProfileLinkClick}
+                            />
+                            {user.selectedApartmentName ? (
+                                <ApartmentLink
+                                    apartmentName={user.selectedApartmentName}
+                                    onClick={() => props.history.push('mates')}
+                                />
+                            ) : null}
                             {currentComponent}
                         </div>
                     }

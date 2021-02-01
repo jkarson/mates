@@ -10,7 +10,7 @@ import {
     convertToDateWithTime,
     getPostOptions,
 } from '../../../../common/utilities';
-import { ApartmentEvent, ApartmentEventWithoutId } from '../models/ApartmentEvent';
+import { ApartmentEventWithoutId } from '../models/EventsInfo';
 import { EventsTabType } from '../models/EventsTabs';
 import { initializeServerEventsInfo, isPastEvent, isPresentEvent } from '../utilities';
 
@@ -51,16 +51,7 @@ const CreateEventCell: React.FC<CreateEventCellProps> = ({ setTab }) => {
         if (input.title) {
             const tenant = getTenant(user) as Tenant;
 
-            //TO DO: This isn't a sufficiently large IDPool, if IDs need to be universally unique.
-            //This will require a server to be remedied.
-            // const IDPool = [
-            //     ...user.apartment.eventsInfo.events,
-            //     ...user.apartment.eventsInfo.invitations,
-            // ];
-
-            //const newId = getNewId(IDPool);
             const newEvent: ApartmentEventWithoutId = {
-                //id: '-1', //to do: override w id from server
                 creator: tenant.name + ' (' + user.apartment.profile.name + ')',
                 creatorId: tenant.userId,
                 time: convertToDateWithTime(input.time),

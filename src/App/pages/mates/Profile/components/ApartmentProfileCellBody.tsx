@@ -1,7 +1,5 @@
 import React from 'react';
-import { Apartment, FriendProfile } from '../../../../common/models';
-
-//TO DO: Refactor so this just gets the profile info and not the whole apt
+import { FriendProfile } from '../../Friends/models/FriendsInfo';
 
 interface ApartmentProfileCellBodyProps {
     apartment: FriendProfile;
