@@ -1,14 +1,14 @@
 .contact-cell-container {
-    border-left: 1px dashed purple;
-    border-bottom: 1px dashed purple;
-    border-right: 1px dashed purple;
+    border-left: 1px solid black;
+    border-bottom: 1px solid black;
+    border-right: 1px solid black;
     display: flex;
     flex-direction: row;
     padding: 1rem;
 }
 
 .contact-cell-container:first-child {
-    border-top: 1px dashed purple;
+    border-top: 1px solid black;
 }
 
 .contact-cell-initials-container {

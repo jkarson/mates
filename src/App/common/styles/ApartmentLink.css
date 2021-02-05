@@ -30,3 +30,10 @@
 .apartment-link-icon-container * {
     font-size: 1rem;
 }
+
+.apartment-link-name-container {
+    max-width: 15vw;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}

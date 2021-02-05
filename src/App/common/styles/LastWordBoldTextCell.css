@@ -1,0 +1,10 @@
+.last-word-bold-text-cell-non-bold-container,
+.last-word-bold-text-cell-non-bold-container .styled-text,
+.last-word-bold-text-cell-bold-container,
+.last-word-bold-text-cell-bold-container .styled-text {
+    display: inline;
+}
+
+.last-word-bold-text-cell-bold-container .styled-text {
+    font-weight: bold;
+}

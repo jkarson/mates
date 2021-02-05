@@ -1,5 +1,10 @@
 import React from 'react';
+import SimpleButton from '../../../../common/components/SimpleButton';
 import { JoinRequest } from '../models/ProfileInfo';
+
+import '../styles/ProfileJoinRequestCell.css';
+
+//to do: join causing issues w server
 
 interface ProfileJoinRequestCellProps {
     joinRequest: JoinRequest;
@@ -12,10 +17,18 @@ const ProfileJoinRequestCell: React.FC<ProfileJoinRequestCellProps> = ({
     handleAccept,
     handleDelete,
 }) => (
-    <div style={{ borderBottom: '1px solid black' }}>
-        <h3>{joinRequest.username}</h3>
-        <button onClick={() => handleAccept(joinRequest)}>{'Add to apartment'}</button>
-        <button onClick={() => handleDelete(joinRequest)}>{'Delete Request '}</button>
+    <div className="profile-join-request-cell-container">
+        <div className="profile-join-request-cell-buttons-container">
+            <div className="profile-join-request-cell-add-button-container">
+                <SimpleButton onClick={() => handleAccept(joinRequest)} text={'Add to Apartment'} />
+            </div>
+            <div className="profile-join-request-cell-delete-button-container">
+                <SimpleButton onClick={() => handleDelete(joinRequest)} text={'Delete Request'} />
+            </div>
+        </div>
+        <div className="profile-join-request-cell-username-container">
+            <span>{joinRequest.username}</span>
+        </div>
     </div>
 );
 

@@ -1,0 +1,31 @@
+.friend-cell-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 1rem 0.5rem;
+}
+
+.friend-cell-apartment-container {
+    flex: 1;
+}
+
+.friend-cell-apartment-container .apartment-summary-cell-info {
+    text-align: left;
+}
+
+.friend-cell-apartment-container i {
+    cursor: pointer;
+}
+
+.friend-cell-apartment-container .apartment-summary-cell-info > h3:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.friend-cell-delete-button-container button {
+    background-color: rgb(52, 189, 155);
+}
+
+.friend-cell-delete-button-container button:active {
+    color: rgb(52, 189, 155);
+}

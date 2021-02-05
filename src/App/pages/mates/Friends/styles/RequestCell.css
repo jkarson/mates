@@ -1,0 +1,72 @@
+/* IncomingRequestCell styles */
+.incoming-request-cell-container {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+    align-items: center;
+    width: calc(21rem + 20vw);
+    padding: 1.5rem 1rem;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+.incoming-request-cell-container:first-child {
+    border-top: 1px solid black;
+}
+
+.incoming-request-cell-apartment-container {
+    flex: 1;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.incoming-request-cell-buttons-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.incoming-request-cell-add-button-container {
+    margin: 0 1rem 0 0;
+}
+
+.incoming-request-cell-delete-button-container button {
+    background-color: rgb(52, 189, 155);
+}
+
+.incoming-request-cell-delete-button-container button:active {
+    color: rgb(52, 189, 155);
+}
+/* OutgoingRequestCell styles */
+.outgoing-request-cell-container {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 1rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.outgoing-request-cell-apartment-container {
+    flex: 1;
+}
+
+.outgoing-request-cell-delete-button-container {
+    margin-left: 1rem;
+}
+
+.outgoing-request-cell-delete-button-container button {
+    background-color: rgb(52, 189, 155);
+}
+
+.outgoing-request-cell-delete-button-container button:active {
+    color: rgb(52, 189, 155);
+}

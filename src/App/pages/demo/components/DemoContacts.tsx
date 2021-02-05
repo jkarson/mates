@@ -130,7 +130,7 @@ const ContactsDescriptionCell: React.FC<ContactsDescriptionCellProps> = ({ tab }
             content = 'The contact information of the tenants in your apartment';
             break;
         case 'Friends':
-            content = "The contact information of your apartments's friends";
+            content = "The contact information of your apartment's friends";
             break;
         case 'Manually Added':
             content = 'Contacts that were manually added by tenants of your apartment.';

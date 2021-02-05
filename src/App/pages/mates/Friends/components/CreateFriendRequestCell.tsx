@@ -1,14 +1,21 @@
 import React, { useContext, useState } from 'react';
+import { Redirect } from 'react-router-dom';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import {
     getApartmentSummariesFromServerApartmentSummaries,
     getPostOptions,
 } from '../../../../common/utilities';
-import { ServerApartmentEvent } from '../../Events/models/ServerEventsInfo';
 import { ApartmentSummary } from '../models/FriendsInfo';
 import { FriendsTabType } from '../models/FriendsTabs';
-import { ServerApartmentSummary } from '../models/ServerFriendsInfo';
 import ApartmentSummaryCell from './ApartmentSummaryCell';
+
+import '../styles/CreateFriendRequestCell.css';
+import StandardStyledText from '../../../../common/components/StandardStyledText';
+import LastWordBoldTextCell from '../../../../common/components/LastWordBoldTextCell';
+import StyledInput from '../../../../common/components/StyledInput';
+import BiggerSimpleButton from '../../../../common/components/BiggerSimpleButton';
+import RedMessageCell from '../../../../common/components/RedMessageCell';
+import AddFriendCell from './AddFriendCell';
 
 interface CreateFriendRequestCellProps {
     setTab: React.Dispatch<React.SetStateAction<FriendsTabType>>;
@@ -22,11 +29,12 @@ const CreateFriendRequestCell: React.FC<CreateFriendRequestCellProps> = ({ setTa
     const [input, setInput] = useState('');
     const [friendSummary, setFriendSummary] = useState<ApartmentSummary | null>(null);
     const [redirect, setRedirect] = useState(false);
-    const [error, setError] = useState('');
+    const [searchError, setSearchError] = useState('');
+    const [footerError, setFooterError] = useState('');
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInput(event.target.value);
-        setError('');
+        setSearchError('');
         setFriendSummary(null);
     };
 
@@ -43,9 +51,10 @@ const CreateFriendRequestCell: React.FC<CreateFriendRequestCellProps> = ({ setTa
                     return;
                 }
                 if (!success) {
-                    setError('Sorry, that code is invalid.');
+                    setSearchError('Sorry, that code is invalid.');
                     return;
                 }
+                setSearchError('');
                 const { apartmentSummary } = json;
                 console.log(apartmentSummary);
                 setFriendSummary(apartmentSummary);
@@ -67,7 +76,7 @@ const CreateFriendRequestCell: React.FC<CreateFriendRequestCellProps> = ({ setTa
                     return;
                 }
                 if (!success) {
-                    setError('Sorry, your friend request could not be sent');
+                    setFooterError('Sorry, your friend request could not be sent');
                     return;
                 }
                 const { newOutgoingRequests } = json;
@@ -84,49 +93,44 @@ const CreateFriendRequestCell: React.FC<CreateFriendRequestCellProps> = ({ setTa
                         },
                     },
                 });
+                setFooterError('');
                 setInput('');
                 setTab('Outgoing Requests');
             });
     };
 
     if (redirect) {
-        setRedirect(true);
+        return <Redirect to="/" />;
     }
 
     return (
-        <div>
-            <label>
-                {'Search for other apartments by unique code to add them as friends'}
-                <br />
-                <input
-                    type="text"
-                    placeholder={'e.g. mH8aP2'}
-                    value={input}
-                    onChange={handleChange}
+        <div className="create-friend-request-cell-container">
+            <div className="create-friend-request-cell-text-container">
+                <StandardStyledText text={'Search for other apartments by unique code.'} />
+                <div className="create-friend-request-cell-line-break" />
+                <LastWordBoldTextCell
+                    mainText={" Your apartment's unique code is: "}
+                    lastWord={user.apartment.profile.code}
                 />
-                <button onClick={() => handleSearchCode()}>{'Search'}</button>
-                {error.length === 0 ? null : <p style={{ color: 'red' }}>{error}</p>}
-            </label>
-            {!friendSummary ? null : (
-                <AddFriendCell
-                    potentialFriend={friendSummary}
-                    handleAdd={handleSendFriendRequest}
-                />
-            )}
+            </div>
+            <div className="create-friend-request-cell-search-container">
+                <StyledInput type="text" value={input} onChange={handleChange} />
+                <BiggerSimpleButton onClick={handleSearchCode} text={'Search'} />
+                {searchError.length === 0 ? null : <RedMessageCell message={searchError} />}
+            </div>
+            <div className="create-friend-request-cell-add-friend-container">
+                {!friendSummary ? null : (
+                    <AddFriendCell
+                        potentialFriend={friendSummary}
+                        handleAdd={handleSendFriendRequest}
+                    />
+                )}
+            </div>
+            <div className="create-friend-request-cell-error-container">
+                {footerError.length === 0 ? null : <RedMessageCell message={footerError} />}
+            </div>
         </div>
     );
 };
-
-interface AddFriendCellProps {
-    potentialFriend: ApartmentSummary;
-    handleAdd: (apartment: ApartmentSummary) => void;
-}
-
-const AddFriendCell: React.FC<AddFriendCellProps> = ({ potentialFriend, handleAdd }) => (
-    <>
-        <ApartmentSummaryCell friend={potentialFriend} />
-        <button onClick={() => handleAdd(potentialFriend)}>{'Send Request'}</button>
-    </>
-);
 
 export default CreateFriendRequestCell;

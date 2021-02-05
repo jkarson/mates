@@ -9,6 +9,10 @@ import {
     getDayFromDayIndex,
 } from '../utilities';
 
+import '../styles/DateInputCell.css';
+import SimpleButton from './SimpleButton';
+import StyledSelect from './StyledSelect';
+
 interface DateInputCellProps extends StateProps<Date> {
     showReset?: boolean;
 }
@@ -89,21 +93,28 @@ const DateInputCell: React.FC<DateInputCellProps> = ({ state, setState, showRese
     };
 
     return (
-        <div>
-            <label>
-                {'Date: ' + getDayFromDayIndex(dateInput.getDay()) + ', '}
-                <select value={getMonthByIndex(dateInput.getMonth())} onChange={handleChangeMonth}>
-                    {getMonthOptions()}
-                </select>
-                <select value={dateInput.getDate()} onChange={handleChangeDay}>
-                    {getDayOptions(dateInput.getMonth(), dateInput.getFullYear())}
-                </select>
-                <select value={dateInput.getFullYear()} onChange={handleChangeYear}>
-                    {getYearOptions()}
-                </select>
-            </label>
-            <br />
-            {showReset ? <button onClick={handleClickReset}>{'Reset Date'}</button> : null}
+        <div className="date-input-cell-container">
+            <div className="date-input-cell-input-container">
+                <span>{'Date: ' + getDayFromDayIndex(dateInput.getDay()) + ', '}</span>
+                <StyledSelect
+                    value={getMonthByIndex(dateInput.getMonth())}
+                    onChange={handleChangeMonth}
+                    options={getMonthOptions()}
+                />
+                <StyledSelect
+                    value={dateInput.getDate()}
+                    onChange={handleChangeDay}
+                    options={getDayOptions(dateInput.getMonth(), dateInput.getFullYear())}
+                />
+                <StyledSelect
+                    value={dateInput.getFullYear()}
+                    onChange={handleChangeYear}
+                    options={getYearOptions()}
+                />
+            </div>
+            <div className="date-input-cell-reset-button-container">
+                {showReset ? <SimpleButton onClick={handleClickReset} text={'Reset Date'} /> : null}
+            </div>
         </div>
     );
 };

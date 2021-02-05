@@ -1,7 +1,9 @@
 import React from 'react';
+import StyledInput from '../../../../common/components/StyledInput';
 import { StateProps } from '../../../../common/types';
 import { ProfileInfo } from '../models/ProfileInfo';
 
+import '../styles/ApartmentProfileModificationCell.css';
 // EXTENSION: Add autocomplete and/or verification for address input, perhaps using Google Places API
 // https://developers.google.com/maps/documentation/javascript/places-autocomplete
 
@@ -14,41 +16,35 @@ const ApartmentProfileModificationCell: React.FC<StateProps<ProfileInfo>> = ({
     ) => {
         const name = event.target.name;
         const value = event.target.value;
-        setState({ ...state, [name]: value });
+        if (value === ' ') {
+            return;
+        }
+        setState({ ...state, [name]: value.trimStart() });
     };
 
     return (
-        <form>
-            <input
+        <div className="apartment-profile-modification-cell-container">
+            <StyledInput
                 name="name"
                 type="text"
                 onChange={handleChange}
                 value={state.name}
-                style={{ fontSize: 20, fontWeight: 'bold' }}
+                placeholder={'Apartment Name'}
             />
-            <br />
-            <label>
-                {'Address: '}
-                <input
-                    name="address"
-                    type="text"
-                    onChange={handleChange}
-                    value={state.address}
-                    style={{ width: 300 }}
-                />
-            </label>
-            <br />
-            <label>
-                {'Quote: '}
-                <textarea
-                    name="quote"
-                    onChange={handleChange}
-                    value={state.quote}
-                    cols={50}
-                    rows={1}
-                />
-            </label>
-        </form>
+            <StyledInput
+                name="address"
+                type="text"
+                onChange={handleChange}
+                value={state.address}
+                placeholder={'Address'}
+            />
+            <StyledInput
+                name="quote"
+                onChange={handleChange}
+                value={state.quote}
+                placeholder={'Quote (e.g., "Can I have the last La Croix?")'}
+            />
+        </div>
     );
 };
 

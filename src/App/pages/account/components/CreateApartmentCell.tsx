@@ -154,7 +154,7 @@ const CreateApartmentCell: React.FC<CreateApartmentCellProps> = ({ setTab }) => 
                     value={input.quote}
                     onChange={handleChange}
                     name="quote"
-                    placeholder={'Quote'}
+                    placeholder={'Quote (e.g., "Can I have the last La Croix?")'}
                 />
             </div>
             <div className="create-apartment-cell-clear-apartment-container">

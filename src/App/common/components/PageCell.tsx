@@ -12,7 +12,7 @@ const PageCell: React.FC<PageCellProps> = ({ tabs, content, onHeaderClick }) => 
     <div className="page-cell-container">
         <div className="page-cell-header-block">
             <Header onClick={onHeaderClick} />
-            {tabs ? tabs : null}
+            <div className="page-cell-header-tabs-container">{tabs ? tabs : null}</div>
         </div>
         <div className="page-cell-content-block">{content}</div>
     </div>

@@ -10,7 +10,7 @@
 
 .join-apartment-cell-search {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 2fr 1fr;
     grid-template-rows: 1fr 5vh;
     grid-template-areas:
         '. input button'
@@ -23,7 +23,7 @@
     font-size: 7vw;
     text-align: center;
     margin: 0px;
-    width: calc(20vw + 16rem);
+    width: 100%;
 }
 
 .join-apartment-cell-search > *:nth-child(2) {
@@ -31,6 +31,7 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
+    padding-left: 1rem;
 }
 
 .join-apartment-cell-search > *:nth-child(3) {

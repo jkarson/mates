@@ -1,0 +1,44 @@
+.profile-join-request-cell-container {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+    align-items: center;
+    width: calc(25rem + 10vw);
+    padding: 1.5rem 1rem;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+.profile-join-request-cell-container:first-child {
+    border-top: 1px solid black;
+}
+
+.profile-join-request-cell-username-container {
+    flex: 1;
+    text-align: center;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.profile-join-request-cell-buttons-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-join-request-cell-add-button-container {
+    margin: 0 1rem;
+}
+
+.profile-join-request-cell-delete-button-container button {
+    background-color: rgb(52, 189, 155);
+}
+
+.profile-join-request-cell-delete-button-container button:active {
+    color: rgb(52, 189, 155);
+}

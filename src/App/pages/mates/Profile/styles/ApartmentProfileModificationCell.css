@@ -1,0 +1,17 @@
+.apartment-profile-modification-cell-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.apartment-profile-modification-cell-container input {
+    padding: 0px;
+    margin: 0px;
+    width: 50vw;
+}
+
+.apartment-profile-modification-cell-container input:placeholder-shown {
+    text-overflow: ellipsis;
+}

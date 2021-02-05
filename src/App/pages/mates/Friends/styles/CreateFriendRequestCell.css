@@ -1,0 +1,63 @@
+.create-friend-request-cell-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.create-friend-request-cell-text-container {
+    text-align: center;
+    padding: 1vh 2vw 0;
+    line-height: 1.5rem;
+}
+
+.create-friend-request-cell-line-break {
+    height: 0.5rem;
+}
+
+.create-friend-request-cell-search-container {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-rows: 1fr 5vh;
+    grid-template-areas:
+        '. input button'
+        'message message message';
+}
+
+.create-friend-request-cell-search-container > *:nth-child(1) {
+    grid-area: input;
+    color: rgb(0, 113, 226) !important;
+    font-size: 7vw;
+    text-align: center;
+    margin: 0px;
+    width: 100%;
+}
+
+.create-friend-request-cell-search-container > *:nth-child(2) {
+    grid-area: button;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding-left: 1rem;
+}
+
+.create-friend-request-cell-search-container > *:nth-child(3) {
+    grid-area: message;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.create-friend-request-cell-add-friend-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    margin-top: 6vh;
+    align-items: flex-start;
+}
+
+.create-friend-request-cell-error-container {
+    position: absolute;
+    bottom: 9vh;
+    text-align: center;
+    left: 0;
+    right: 0;
+}

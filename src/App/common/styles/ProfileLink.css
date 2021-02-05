@@ -16,3 +16,10 @@
 .profile-link-container:active {
     color: purple;
 }
+
+.profile-link-name-container {
+    max-width: 15vw;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}

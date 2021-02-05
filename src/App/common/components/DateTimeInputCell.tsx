@@ -2,7 +2,10 @@ import React from 'react';
 import { DateTimeInputType, StateProps, TimeInputType } from '../types';
 import { getCurrentDateTime } from '../utilities';
 import DateInputCell from './DateInputCell';
+import SimpleButton from './SimpleButton';
 import TimeInputCell from './TimeInputCell';
+
+import '../styles/DateTimeInputCell.css';
 
 const DateTimeInputCell: React.FC<StateProps<DateTimeInputType>> = ({ state, setState }) => {
     const [dateTimeInput, setDateTimeInput] = [state, setState];
@@ -20,10 +23,12 @@ const DateTimeInputCell: React.FC<StateProps<DateTimeInputType>> = ({ state, set
     };
 
     return (
-        <div>
+        <div className="date-time-input-cell-container">
             <DateInputCell state={state.date} setState={handleSetDate} showReset={false} />
             <TimeInputCell state={state.time} setState={handleSetTime} showReset={false} />
-            <button onClick={handleClickReset}>{'Reset Date and Time'}</button>
+            <div className="date-time-input-cell-button-container">
+                <SimpleButton onClick={handleClickReset} text={'Reset Date and Time'} />
+            </div>
         </div>
     );
 };

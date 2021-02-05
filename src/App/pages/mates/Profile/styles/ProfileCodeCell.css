@@ -1,0 +1,47 @@
+.profile-code-cell-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.profile-code-cell-description-container {
+    margin: 0 auto;
+    width: 45rem;
+    padding: 1.2rem;
+    text-align: center;
+    background-color: rgba(200, 200, 200, 0.5);
+    border-radius: 50px;
+}
+
+@media only screen and (max-width: 800px) {
+    .profile-code-cell-description-container {
+        align-self: center;
+        margin-left: 1rem;
+        margin-right: 1rem;
+        width: 90vw;
+        padding: 1.2rem 1rem;
+    }
+}
+
+.profile-code-cell-description-container .styled-text {
+    font-size: 1.1rem;
+    line-height: 1.8rem;
+}
+
+.profile-code-cell-description-container .styled-text:first-child {
+    font-size: 1.4rem;
+    line-height: 2.2rem;
+}
+
+.profile-code-cell-code-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-code-cell-code-container span {
+    color: dodgerblue;
+    font-size: calc(5rem + 5vw);
+    margin-top: -20vh;
+}

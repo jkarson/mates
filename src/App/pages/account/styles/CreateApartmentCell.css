@@ -36,11 +36,13 @@
     margin: 0 auto;
 }
 
-@media only screen and (max-width: 600px) {
-    .create-apartment-cell-apartment-container *,
-    .create-apartment-cell-tenant-container * {
-        width: 13rem;
-    }
+.create-apartment-cell-apartment-container input,
+.create-apartment-cell-tenant-container input {
+    width: calc(5rem + 32vw);
+}
+
+.create-apartment-cell-apartment-container input:placeholder-shown {
+    text-overflow: ellipsis;
 }
 
 .create-apartment-cell-clear-apartment-container {

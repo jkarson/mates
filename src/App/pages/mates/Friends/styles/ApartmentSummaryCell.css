@@ -1,18 +1,26 @@
+/*
+    Extension: Can I make the tenants span re-size when a line breaks? This would help with spacing
+    when I want to center the text, although it only really matters for long words.
+*/
+
 .apartment-summary-cell-container {
     display: flex;
     justify-content: center;
     align-items: center;
     width: fit-content;
-    padding: 0 1vw;
 }
 
 .apartment-summary-cell-info {
-    text-align: center;
-    padding: 0 2vw;
+    margin-left: 1rem;
+    display: flex;
+    flex-direction: column;
 }
 
 .apartment-summary-cell-info > h3 {
     margin: 0px;
     margin-bottom: 0.5rem;
+    padding-bottom: 2px;
     text-transform: uppercase;
+    width: fit-content;
+    box-sizing: border-box;
 }

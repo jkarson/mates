@@ -1,0 +1,28 @@
+.profile-join-requests-cell-container {
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-join-requests-cell-description-container {
+    margin: 1rem 0;
+    text-align: center;
+}
+
+.profile-join-requests-cell-code-description-container {
+    margin-top: 1rem;
+}
+
+.profile-join-requests-cell-error-container {
+    text-align: center;
+}
+
+.profile-join-requests-cell-content-container {
+    margin-top: 3vh;
+    flex: 1;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

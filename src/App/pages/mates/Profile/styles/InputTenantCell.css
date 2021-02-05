@@ -1,0 +1,25 @@
+.input-tenant-cell-container-outer {
+    width: 25rem;
+    height: 20rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.input-tenant-cell-container-inner {
+    width: 16rem;
+    height: 16rem;
+    display: flex;
+    flex-direction: column;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1.1rem;
+    border: 1px solid purple;
+    justify-content: center;
+    align-items: center;
+}
+
+.input-tenant-cell-container-inner input {
+    padding: 0;
+    margin: 1rem 0;
+}

@@ -1,6 +1,10 @@
 import React from 'react';
 import { StateProps, TimeInputType } from '../types';
 import { getCurrentTime } from '../utilities';
+import SimpleButton from './SimpleButton';
+
+import '../styles/TimeInputCell.css';
+import StyledSelect from './StyledSelect';
 
 interface TimeInputCellProps extends StateProps<TimeInputType> {
     showReset?: boolean;
@@ -49,21 +53,28 @@ const TimeInputCell: React.FC<TimeInputCellProps> = ({ state, setState, showRese
     };
 
     return (
-        <div>
-            <label>
-                {'Time: '}
-                <select value={timeInput.hour} name="hour" onChange={handleChangeTime}>
-                    {getHourOptions()}
-                </select>
-                <span style={{ fontWeight: 'bold' }}>{' : '}</span>
-                <select value={timeInput.minute} name="minute" onChange={handleChangeTime}>
-                    {getMinuteOptions()}
-                </select>
-                <span style={{ fontWeight: 'bold' }}>{' ' + timeInput.ampm + ' '}</span>
-                <button onClick={handleToggleAMPM}>{'Toggle'}</button>
-                <br />
-                {showReset ? <button onClick={handleClickReset}>{'Reset Time'}</button> : null}
-            </label>
+        <div className="time-input-cell-container">
+            <div className="time-input-cell-input-container">
+                <span>{'Time: '}</span>
+                <StyledSelect
+                    value={timeInput.hour}
+                    name="hour"
+                    onChange={handleChangeTime}
+                    options={getHourOptions()}
+                />
+                <span>{' : '}</span>
+                <StyledSelect
+                    value={timeInput.minute}
+                    name="minute"
+                    onChange={handleChangeTime}
+                    options={getMinuteOptions()}
+                />
+                <span>{' ' + timeInput.ampm + ' '}</span>
+                <SimpleButton onClick={handleToggleAMPM} text={'Toggle'} />
+            </div>
+            <div className="time-input-cell-reset-button-container">
+                {showReset ? <SimpleButton onClick={handleClickReset} text={'Reset Time'} /> : null}
+            </div>
         </div>
     );
 };

@@ -1,0 +1,31 @@
+.modifiable-apartment-profile-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.modifiable-apartment-profile-content-container {
+    width: 80vw;
+    height: 15vh;
+    position: relative;
+}
+
+.modifiable-apartment-profile-icon-container {
+    position: absolute;
+    padding: 0 1vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    right: -5px;
+    top: calc(7.5vh - 16px);
+}
+
+.modifiable-apartment-profile-icon-container i {
+    font-size: 2rem;
+}
+
+.modifiable-apartment-profile-error-container {
+    height: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

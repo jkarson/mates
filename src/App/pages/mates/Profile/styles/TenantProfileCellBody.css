@@ -1,0 +1,29 @@
+.tenant-profile-cell-body-outer-container {
+    width: 25rem;
+    height: 20rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.tenant-profile-cell-body-inner-container {
+    width: 16rem;
+    height: 16rem;
+    display: flex;
+    flex-direction: column;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1.1rem;
+    border: 1px solid purple;
+    justify-content: center;
+    align-items: center;
+}
+
+.tenant-profile-cell-body-inner-container > span {
+    margin: 1vh 0;
+    text-align: center;
+}
+
+.tenant-profile-cell-body-inner-container > span:first-child {
+    font-weight: bold;
+}

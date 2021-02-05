@@ -17,7 +17,7 @@ const ApartmentSummaryCell: React.FC<ApartmentSummaryCellProps> = ({ friend, onI
             <ApartmentIcon />
         </div>
         <div className="apartment-summary-cell-info">
-            <h3>{friend.name}</h3>
+            <h3 onClick={onIconClick}>{friend.name}</h3>
             <StandardStyledText text={'Tenants: ' + formatNames(friend.tenantNames)} />
         </div>
     </div>

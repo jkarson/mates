@@ -10,8 +10,8 @@ interface ApartmentLinkProps {
 
 const ApartmentLink: React.FC<ApartmentLinkProps> = ({ apartmentName, onClick }) => {
     return (
-        <div className="apartment-link-container">
-            <div className="apartment-link-inner-container" onClick={onClick}>
+        <div className="apartment-link-container" onClick={onClick}>
+            <div className="apartment-link-inner-container">
                 <div className="apartment-link-icon-container">
                     <ApartmentIcon />
                 </div>

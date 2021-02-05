@@ -6,6 +6,7 @@
     font-size: medium;
     padding: 5px 10px;
     font-family: Georgia, 'Times New Roman', Times, serif;
+    white-space: nowrap;
 }
 
 .simple-button:hover {

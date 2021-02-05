@@ -1,0 +1,19 @@
+.friends-cell-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.friends-cell-error-container {
+    text-align: center;
+}
+
+.friends-cell-description-container {
+    padding: 0.5rem 1rem;
+    line-height: 1.5rem;
+}
+
+.friends-cell-content-container {
+    flex: 1;
+    overflow-y: scroll;
+}

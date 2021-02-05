@@ -1,0 +1,26 @@
+.requests-cell-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.requests-cell-description-container {
+    padding: 1vh 2vw;
+}
+
+.requests-cell-description-incoming-centered-container {
+    text-align: center;
+}
+
+.requests-cell-error-container {
+    text-align: center;
+}
+
+.requests-cell-content-container {
+    flex: 1;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1rem 0;
+}

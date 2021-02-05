@@ -1,6 +1,9 @@
 import React from 'react';
+import SimpleButton from '../../../../common/components/SimpleButton';
 import { getFormattedDateTimeString } from '../../../../common/utilities';
 import { ApartmentEvent } from '../models/EventsInfo';
+
+import '../styles/InvitationCell.css';
 
 interface InvitationCellProps {
     invitation: ApartmentEvent;
@@ -14,12 +17,12 @@ const InvitationCell: React.FC<InvitationCellProps> = ({
     handleDelete,
 }) => {
     return (
-        <div>
-            <p style={{ fontWeight: 'bold' }}>{invitation.title}</p>
-            <h5>{getFormattedDateTimeString(invitation.time)}</h5>
-            <p>{'Created by ' + invitation.creator}</p>
-            <button onClick={() => handleAccept(invitation)}>{'Accept Invitation'}</button>
-            <button onClick={() => handleDelete(invitation)}>{'Reject Invitation'}</button>
+        <div className="invitation-cell-container">
+            <span>{invitation.title}</span>
+            <span>{getFormattedDateTimeString(invitation.time)}</span>
+            <span>{'Created by ' + invitation.creator}</span>
+            <SimpleButton onClick={() => handleAccept(invitation)} text={'Accept Invitation'} />
+            <SimpleButton onClick={() => handleDelete(invitation)} text={'Reject Invitation'} />
         </div>
     );
 };

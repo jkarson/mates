@@ -1,6 +1,9 @@
 import React, { useContext, useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import DateTimeInputCell from '../../../../common/components/DateTimeInputCell';
+import RedMessageCell from '../../../../common/components/RedMessageCell';
+import SimpleButton from '../../../../common/components/SimpleButton';
+import StyledInput from '../../../../common/components/StyledInput';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { Tenant } from '../../../../common/models';
 import { DateTimeInputType } from '../../../../common/types';
@@ -13,6 +16,8 @@ import {
 import { ApartmentEventWithoutId } from '../models/EventsInfo';
 import { EventsTabType } from '../models/EventsTabs';
 import { initializeServerEventsInfo, isPastEvent, isPresentEvent } from '../utilities';
+
+import '../styles/CreateEventCell.css';
 
 interface CreateEventInputType {
     title: string;
@@ -109,35 +114,28 @@ const CreateEventCell: React.FC<CreateEventCellProps> = ({ setTab }) => {
     }
 
     return (
-        <div>
-            {error.length === 0 ? null : <p style={{ color: 'red' }}>{error}</p>}
-            <label>
-                {'Event Title: '}
-                <input
-                    type="text"
-                    name="title"
-                    placeholder={'required'}
-                    value={input.title}
-                    onChange={handleChange}
-                />
-            </label>
-            <br />
-            <label>
-                {'Event Description:'}
-                <input
-                    type="text"
-                    name="description"
-                    placeholder={'optional'}
-                    value={input.description}
-                    onChange={handleChange}
-                />
-            </label>
-            <br />
-            <br />
+        <div className="create-event-cell-container">
+            <div className="create-event-cell-error-container">
+                {error.length === 0 ? null : <RedMessageCell message={error} />}
+            </div>
+            <StyledInput
+                type="text"
+                name="title"
+                placeholder={'* Title'}
+                value={input.title}
+                onChange={handleChange}
+            />
+            <StyledInput
+                type="text"
+                name="description"
+                placeholder={'Description'}
+                value={input.description}
+                onChange={handleChange}
+            />
             <DateTimeInputCell state={input.time} setState={setDateTimeState} />
-            <br />
-            <br />
-            <button onClick={handleCreateEvent}>{'Create Event'}</button>
+            <div className="create-event-cell-button-container">
+                <SimpleButton onClick={handleCreateEvent} text="Create Event" />
+            </div>
         </div>
     );
 };

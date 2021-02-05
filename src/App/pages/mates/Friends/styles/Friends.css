@@ -1,0 +1,22 @@
+.friends-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+@media only screen and (max-width: 572px) {
+    .friends-tabs-container .tab {
+        padding: 12px 2px;
+    }
+
+    .friends-tabs-container .tab-container {
+        justify-content: space-between;
+    }
+}
+
+.friends-content-container {
+    flex: 1;
+    overflow-y: scroll;
+    padding: 0 1vw;
+}
