@@ -126,63 +126,26 @@ const Mates: React.FC<RouteComponentProps> = (props) => {
                 setMatesUser: setMatesUser as React.Dispatch<React.SetStateAction<MatesUser>>,
             }}
         >
-            <PageCell
-                onHeaderClick={() => props.history.push('/account')}
-                tabs={<Tabs currentTab={tab} setTab={setTab} tabNames={matesTabNames} />}
-                content={
-                    <div className="mates-content-container">
-                        <ProfileLink
-                            accountName={matesUser.username}
-                            onClick={handleProfileLinkClick}
-                        />
-                        <ApartmentLink
-                            apartmentName={matesUser.apartment.profile.name}
-                            onClick={handleApartmentLinkClick}
-                        />
-                        {currentComponent}
-                    </div>
-                }
-                // footer={
-                //     <MatesFooterComponent
-                //         logOutOfApartment={logOutOfApartment}
-                //         leaveApartment={leaveApartment}
-                //         message={message}
-                //     />
-                // }
-            />
+            <div className="mates-container">
+                <PageCell
+                    onHeaderClick={() => props.history.push('/account')}
+                    tabs={<Tabs currentTab={tab} setTab={setTab} tabNames={matesTabNames} />}
+                    content={
+                        <div className="mates-content-container">
+                            <ProfileLink
+                                accountName={matesUser.username}
+                                onClick={handleProfileLinkClick}
+                            />
+                            <ApartmentLink
+                                apartmentName={matesUser.apartment.profile.name}
+                                onClick={handleApartmentLinkClick}
+                            />
+                            {currentComponent}
+                        </div>
+                    }
+                />
+            </div>
         </MatesUserContext.Provider>
-    );
-};
-
-interface MatesFooterComponentProps {
-    logOutOfApartment: () => void;
-    leaveApartment: () => void;
-    message: string;
-}
-
-const MatesFooterComponent: React.FC<MatesFooterComponentProps> = ({
-    logOutOfApartment,
-    leaveApartment,
-    message,
-}) => {
-    const [leaveApartmentPressed, setLeaveApartmentPressed] = useState(false);
-    return (
-        <div>
-            <button onClick={logOutOfApartment}>{'Return To Account Page'}</button>
-            <button onClick={() => setLeaveApartmentPressed(true)}>{'Leave Apartment'}</button>
-            {!leaveApartmentPressed ? null : (
-                <div>
-                    <p>
-                        {
-                            'Are you sure you want to leave the apartment? Apartments with no tenants will automatically be deleted.'
-                        }
-                        <button onClick={() => leaveApartment()}>{'Yes'}</button>
-                        <button onClick={() => setLeaveApartmentPressed(false)}>{'No'}</button>
-                    </p>
-                </div>
-            )}
-            {message.length === 0 ? null : <p style={{ color: 'red' }}>{message}</p>}
-        </div>
     );
 };
 
@@ -190,9 +153,6 @@ const initializeServerApartment = (apartment: ServerApartment): Apartment => {
     initializeServerMessages(apartment.messages);
     initializeServerBillsInfo(apartment.billsInfo);
     initializeServerChoresInfo(apartment.choresInfo);
-    // apartment.manuallyAddedContacts = initializeServerContacts(
-    //     apartment.manuallyAddedContacts,
-    // ) as ServerContact[];
     initializeServerContacts(apartment.manuallyAddedContacts);
     initializeServerFriendsInfo(apartment.friendsInfo);
     initializeServerEventsInfo(apartment.eventsInfo);

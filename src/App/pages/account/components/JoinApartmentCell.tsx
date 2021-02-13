@@ -101,16 +101,20 @@ const JoinApartmentCell: React.FC<JoinApartmentCellProps> = ({ setTab }) => {
             </div>
             <div className="join-apartment-cell-join-cell-container">
                 {!apartmentSummary ? null : (
-                    <JoinCell
-                        apartmentSummary={apartmentSummary}
-                        handleClickJoin={handleClickJoin}
-                    />
+                    <div className="join-apartment-cell-join-cell-inner-container">
+                        <JoinCell
+                            apartmentSummary={apartmentSummary}
+                            handleClickJoin={handleClickJoin}
+                        />
+                    </div>
                 )}
-            </div>
-            <div className="join-apartment-cell-error">
-                {!showJoinError ? null : (
-                    <RedMessageCell message={'Sorry, your join request could not be completed'} />
-                )}
+                <div className="join-apartment-cell-error">
+                    {!showJoinError ? null : (
+                        <RedMessageCell
+                            message={'Sorry, your join request could not be completed'}
+                        />
+                    )}
+                </div>
             </div>
         </div>
     );

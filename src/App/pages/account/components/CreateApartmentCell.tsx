@@ -1,8 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import BiggerSimpleButton, {
-    HugeSimpleButton,
-} from '../../../common/components/BiggerSimpleButton';
+import BiggerSimpleButton from '../../../common/components/BiggerSimpleButton';
 import { SmallerStyledInput } from '../../../common/components/BiggerStyledInput';
 import RedMessageCell from '../../../common/components/RedMessageCell';
 import SimpleButton from '../../../common/components/SimpleButton';
@@ -208,9 +206,9 @@ const CreateApartmentCell: React.FC<CreateApartmentCellProps> = ({ setTab }) => 
                         />
                     </div>
                 )}
-            </div>
-            <div className="create-apartment-cell-message-container">
-                {message.length === 0 ? null : <RedMessageCell message={message} />}
+                <div className="create-apartment-cell-message-container">
+                    {message.length === 0 ? null : <RedMessageCell message={message} />}
+                </div>
             </div>
         </div>
     );

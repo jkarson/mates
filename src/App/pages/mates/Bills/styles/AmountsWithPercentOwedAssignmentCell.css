@@ -1,0 +1,109 @@
+.amounts-with-percent-owed-assignment-cell-private-container,
+.amounts-with-percent-owed-assignment-cell-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.amounts-with-percent-owed-assignment-cell-container {
+    background-color: rgba(128, 128, 128, 0.2);
+}
+
+.amounts-with-percent-owed-assignment-cell-total-assigned-container {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    margin: 1rem 0;
+}
+
+.amounts-with-percent-owed-assignment-cell-total-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.amounts-with-percent-owed-assignment-cell-total-container > span {
+    font-weight: bold;
+    color: rgb(6, 114, 223);
+}
+
+.amounts-with-percent-owed-assignment-cell-total-input-container {
+    position: relative;
+}
+
+.amounts-with-percent-owed-assignment-cell-total-input-container .styled-input {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    width: 8rem;
+    padding-top: 10px;
+    margin: 0;
+    text-align: center;
+}
+
+.amounts-with-percent-owed-assignment-cell-total-icon-container {
+    position: absolute;
+    left: 0rem;
+    bottom: 0.8rem;
+}
+
+.amounts-with-percent-owed-assignment-cell-total-icon-container i {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.amounts-with-percent-owed-assignment-cell-assigned-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.amounts-with-percent-owed-assignment-cell-assigned-container > span {
+    font-weight: bold;
+    color: rgb(6, 114, 223);
+}
+
+.amounts-with-percent-owed-assignment-cell-assigned-value-container {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 8rem;
+    padding-top: 10px;
+}
+
+.amounts-with-percent-owed-assignment-cell-assigned-value-container > span {
+    padding: 0 1rem;
+}
+
+.amounts-with-percent-owed-assignment-cell-assigned-value-container span {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: bold;
+}
+
+.amounts-with-percent-owed-assignment-cell-assigned-icon-container {
+    position: absolute;
+    left: 0;
+}
+
+.amounts-with-percent-owed-assignment-cell-assigned-icon-container i {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.amounts-with-percent-owed-assignment-cell-green-assigned-container > span {
+    color: green;
+}
+
+.amounts-with-percent-owed-assignment-cell-red-assigned-container > span {
+    color: rgb(230, 0, 0);
+}
+
+.amounts-with-percent-owed-assignment-cell-split-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}

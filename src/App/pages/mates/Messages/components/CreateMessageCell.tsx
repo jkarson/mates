@@ -38,7 +38,6 @@ const CreateMessageCell: React.FC<CreateMessageCellProps> = ({
         if (textAreaRef.current) {
             textAreaRef.current.style.height = 'unset';
         }
-        //event.preventDefault();
     };
 
     const handleChangeInput = (event: React.ChangeEvent<HTMLTextAreaElement>): void => {
@@ -69,13 +68,6 @@ const CreateMessageCell: React.FC<CreateMessageCellProps> = ({
                     rows={1}
                 />
             </div>
-            {/* <div className="create-message-cell-buttons-div">
-                {state.length > 0 ? (
-                    <SimpleButton onClick={handleSubmit} text="Send" />
-                ) : (
-                    <FauxSimpleButton text="Send" />
-                )}
-            </div> */}
         </div>
     );
 };

@@ -28,3 +28,9 @@
 .styled-input:-webkit-autofill {
     -webkit-background-clip: text !important;
 }
+
+.styled-input:-webkit-autofill::first-line {
+    font-size: 1rem;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: 550;
+}

@@ -4,6 +4,7 @@
     border-right: 1px solid black;
     display: flex;
     flex-direction: row;
+    align-items: center;
     padding: 1rem;
 }
 
@@ -22,6 +23,9 @@
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    min-width: 1%;
     /* background-color: red; */
 }
 
@@ -30,19 +34,31 @@
     font-size: 1.1rem;
 }
 
-.contact-cell-content-container span:nth-child(1) {
+.contact-cell-name-container {
     font-weight: bold;
+}
+
+.contact-cell-number-container {
+    margin-top: 1rem;
+}
+
+.contact-cell-email-container {
+    margin-top: 1rem;
 }
 
 .contact-cell-delete-button-container {
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-left: 1rem;
 }
 
-.contact-cell-delete-button-container > span {
-    font-size: 2rem;
-    color: red;
+.contact-cell-delete-button-container button {
+    background-color: rgb(52, 189, 155);
+}
+
+.contact-cell-delete-button-container button:active {
+    color: rgb(52, 189, 155);
 }
 
 /* MODAL STYLES */

@@ -7,13 +7,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: fit-content;
+    max-width: 100%;
 }
 
 .apartment-summary-cell-info {
     margin-left: 1rem;
     display: flex;
     flex-direction: column;
+    overflow-wrap: break-word;
+    min-width: 1%;
 }
 
 .apartment-summary-cell-info > h3 {
@@ -21,6 +23,5 @@
     margin-bottom: 0.5rem;
     padding-bottom: 2px;
     text-transform: uppercase;
-    width: fit-content;
     box-sizing: border-box;
 }

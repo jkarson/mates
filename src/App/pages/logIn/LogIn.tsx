@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
-import { Redirect, RouteComponentProps } from 'react-router-dom';
+import { RouteComponentProps } from 'react-router-dom';
 import BiggerSimpleButton from '../../common/components/BiggerSimpleButton';
-import BiggerStyledInput from '../../common/components/BiggerStyledInput';
-import FooterButton from '../../common/components/FooterButton';
-import FooterComponent from '../../common/components/FooterComponent';
 import PageCell from '../../common/components/PageCell';
 import RedMessageCell from '../../common/components/RedMessageCell';
 import StyledInput from '../../common/components/StyledInput';
@@ -99,15 +96,5 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({ error }) => {
         return null;
     }
 };
-
-/*
-
-[
-                //<FooterButton onClick={handleClickSignUp} text="Or, Sign Up" />,
-                <FooterButton onClick={() => setShowModal(true)} text="Or, Sign Up" />,
-                <FooterButton onClick={() => setGoToDemo(true)} text="Go To Demo Page" />,
-            ]
-
-*/
 
 export default LogIn;

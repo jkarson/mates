@@ -1,4 +1,4 @@
-import { isLetter } from '../../../common/utilities';
+import { isLetter, isNumberMates } from '../../../common/utilities';
 import { Contact } from './models/Contact';
 import { ServerContact } from './models/ServerContact';
 
@@ -11,7 +11,7 @@ export const getInitials = (name: string) => {
     const firstThreeLetters = firstLetters.length <= 3 ? firstLetters : firstLetters.slice(0, 3);
 
     firstThreeLetters.forEach((firstLetter) => {
-        if (isLetter(firstLetter)) {
+        if (isLetter(firstLetter) || isNumberMates(firstLetter)) {
             initials += firstLetter.toUpperCase();
         }
     });

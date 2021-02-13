@@ -71,7 +71,7 @@ const Account: React.FC<RouteComponentProps> = (props) => {
         <AccountContext.Provider
             value={{ user: user, setUser: setUser as React.Dispatch<React.SetStateAction<User>> }}
         >
-            <div>
+            <div className="account-container">
                 <PageCell
                     onHeaderClick={() => props.history.go(0)}
                     tabs={tabs}

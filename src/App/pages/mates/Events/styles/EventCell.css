@@ -1,20 +1,87 @@
 .event-cell-container {
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+    border-bottom: 1px solid black;
 }
-.event-cell-delete-button-container {
+
+.event-cell-container:first-child {
+    border-top: 1px solid black;
 }
-.event-cell-event-description-container {
+
+.event-cell-inner-container {
+    position: relative;
 }
-.event-cell-event-title-hosting-container {
-}
-.event-cell-event-title-not-hosting-container {
-}
-.event-cell-show-invite-cell-button-container {
-}
-.event-cell-send-invitation-cell-container {
-}
-.event-cell-invitees-cell-container {
-}
-.event-cell-attendees-cell-container {
-}
+
+.event-cell-delete-button-container,
 .event-cell-leave-event-button-container {
+    position: absolute;
+    right: 0.5rem;
+    top: 1rem;
+}
+
+.event-cell-delete-button-container button,
+.event-cell-leave-event-button-container button {
+    background-color: rgb(52, 189, 155);
+}
+
+.event-cell-delete-button-container button:active,
+.event-cell-leave-event-button-container button:active {
+    color: rgb(52, 189, 155);
+}
+
+.event-cell-event-info-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1rem;
+    line-height: 1.2rem;
+    padding: 0 3vw;
+    text-align: center;
+}
+
+.event-cell-event-title-container {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 1.6rem;
+    line-height: 1.6rem;
+    font-weight: bold;
+    margin: 1rem 0;
+    padding: 0 8rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.event-cell-event-date-container {
+    margin: 1rem 0 2rem;
+}
+
+.event-cell-event-created-by-container {
+    margin-bottom: 0.5rem;
+    width: 100%;
+    margin: 0 1rem;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+.event-cell-event-created-by-container i {
+    margin-right: 0.25rem;
+}
+
+.event-cell-event-description-container {
+    margin-top: 2rem;
+    text-align: left;
+}
+
+.event-cell-buttons-container {
+    margin-top: 3rem;
+    padding: 1rem 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.event-cell-buttons-container button {
+    width: 10rem;
 }

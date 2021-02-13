@@ -1,0 +1,108 @@
+.amounts-with-percent-owed-display-cell-container {
+    margin: 2rem 0 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.amounts-with-percent-owed-display-cell-content-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.amounts-with-percent-owed-header-container {
+    width: 100%;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    text-align: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1rem;
+    line-height: 1.2rem;
+}
+
+/* TenantOwedDisplayCell styles */
+.tenant-owed-display-cell-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    width: 100%;
+    overflow-wrap: break-word;
+    box-sizing: border-box;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1rem;
+    line-height: 1.2rem;
+}
+
+.tenant-owed-display-cell-inner {
+    display: flex;
+    width: 100%;
+    flex-direction: row-reverse;
+    justify-content: center;
+    align-items: center;
+}
+
+.tenant-owed-display-cell-amount-container {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    overflow-wrap: break-word;
+}
+
+.tenant-owed-display-cell-name-container {
+    text-align: right;
+    flex: 1;
+    min-width: 1%;
+    padding-right: 0.6rem;
+}
+
+.tenant-owed-display-cell-amount-container span {
+    color: green;
+    font-weight: bold;
+}
+
+.tenant-owed-display-cell-dollar-sign-container {
+    padding-left: 0.15rem;
+}
+
+/* TotalAmountOwed styles */
+.total-amount-owed-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.total-amount-owed-text-container {
+    width: 25%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.total-amount-owed-text-container span {
+    font-size: 1.2rem;
+    line-height: 1.5rem;
+    font-weight: bold;
+    color: rgb(6, 114, 223);
+}
+
+.total-amount-owed-value-container {
+    width: 25%;
+    display: flex;
+    flex-direction: row;
+    margin-left: 0.75rem;
+}
+
+.total-amount-owed-dollar-sign-container {
+    font-size: 1.2rem;
+    line-height: 1.5rem;
+}
+
+.total-amont-owed-amount-container span {
+    font-weight: bold;
+    color: green;
+    font-size: 1.2rem;
+    line-height: 1.5rem;
+}

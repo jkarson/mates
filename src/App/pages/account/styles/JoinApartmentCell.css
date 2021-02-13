@@ -1,6 +1,7 @@
 .join-apartment-cell-container {
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
 .join-apartment-cell-text {
@@ -11,7 +12,7 @@
 .join-apartment-cell-search {
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
-    grid-template-rows: 1fr 5vh;
+    grid-template-rows: 1fr 2rem;
     grid-template-areas:
         '. input button'
         'message message message';
@@ -42,16 +43,22 @@
 }
 
 .join-apartment-cell-join-cell-container {
+    position: relative;
     flex: 1;
     display: flex;
     justify-content: center;
-    margin-top: 6vh;
-    align-items: flex-start;
+    align-items: center;
+    padding-bottom: 2rem;
+    width: 100%;
+}
+
+.join-apartment-cell-join-cell-inner-container {
+    max-width: 20rem;
 }
 
 .join-apartment-cell-error {
     position: absolute;
-    bottom: 9vh;
+    bottom: 3vh;
     text-align: center;
     left: 0;
     right: 0;

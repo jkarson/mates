@@ -1,7 +1,5 @@
 import React from 'react';
-import BiggerSimpleButton from './BiggerSimpleButton';
 import Modal from './Modal';
-import StandardStyledText from './StandardStyledText';
 
 import '../styles/YesNoMessageModal.css';
 import SimpleButton from './SimpleButton';

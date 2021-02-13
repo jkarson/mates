@@ -1,7 +1,7 @@
 .apartment-link-container {
     position: absolute;
     left: 5vw;
-    top: 2vh;
+    top: 1.25rem;
     padding: 0.5vh 1vw;
     font-weight: bold;
     cursor: pointer;

@@ -1,5 +1,8 @@
 import React from 'react';
 import { Frequency, StateProps } from '../types';
+import StyledSelect from './StyledSelect';
+
+import '../styles/FrequencySelectCell.css';
 
 interface FrequencySelectCellProps<T> extends StateProps<T> {
     frequencies: readonly T[];
@@ -20,13 +23,9 @@ const FrequencySelectCell = <T extends Frequency>({
         setState(selectedFrequency);
     };
     return (
-        <div>
-            <label>
-                {'Repeat: '}
-                <select value={state} onChange={handleChange}>
-                    {frequencyOptions}
-                </select>
-            </label>
+        <div className="frequency-select-cell-container">
+            <span className="frequency-select-cell-text-container">{'Repeat: '}</span>
+            <StyledSelect value={state} onChange={handleChange} options={frequencyOptions} />
         </div>
     );
 };

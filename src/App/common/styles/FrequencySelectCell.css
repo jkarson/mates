@@ -1,0 +1,14 @@
+.frequency-select-cell-container {
+    display: flex;
+    flex-direction: row;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1rem;
+    line-height: 1.2rem;
+    width: fit-content;
+    align-items: baseline;
+}
+
+.frequency-select-cell-text-container {
+    margin-right: 0.75rem;
+    font-weight: bold;
+}

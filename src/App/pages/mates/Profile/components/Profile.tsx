@@ -1,20 +1,13 @@
 import React, { useContext, useLayoutEffect, useState } from 'react';
-import { Redirect } from 'react-router-dom';
-import DescriptionCell from '../../../../common/components/DescriptionCell';
 import Tabs from '../../../../common/components/Tabs';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
-import { assertUnreachable, getDeleteOptions, getPostOptions } from '../../../../common/utilities';
-import { JoinRequest } from '../models/ProfileInfo';
+import { assertUnreachable } from '../../../../common/utilities';
 import { profileTabNames, ProfileTabType } from '../models/ProfileTabs';
-
-import ModifiableApartmentProfile from './ModifiableApartmentProfile';
-import ProfileJoinRequestCell from './ProfileJoinRequestCell';
-import { TenantsProfileCell } from './TenantsProfileCell';
-
-import '../styles/Profile.css';
 import ProfileCodeCell from './ProfileCodeCell';
 import ProfileCell from './ProfileCell';
 import ProfileJoinRequestsCell from './ProfileJoinRequestsCell';
+
+import '../styles/Profile.css';
 
 //EXTENSION: Could incorporate birthdays, calculate age automatically,
 //send a notification, make it pretty, etc

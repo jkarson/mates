@@ -1,0 +1,62 @@
+.tenant-amount-assignment-cell-container {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    width: calc(24rem + 16vw);
+    box-sizing: border-box;
+    padding: 2rem;
+}
+
+.tenant-amount-assignment-cell-container .styled-input {
+    margin: 0;
+    padding-top: 10px;
+}
+
+.tenant-amount-assignment-cell-name-container {
+    flex: 1;
+    min-width: 1%;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: bold;
+    overflow-wrap: break-word;
+}
+
+.tenant-amount-assignment-cell-dollars-container {
+    position: relative;
+    margin-left: 1rem;
+}
+
+.tenant-amount-assignment-cell-dollars-container .styled-input {
+    padding-left: 1rem;
+    width: 8rem;
+}
+
+.tenant-amount-assignment-cell-dollar-sign-container {
+    position: absolute;
+    left: 0rem;
+    bottom: 0.75rem;
+}
+
+.tenant-amount-assignment-cell-dollar-sign-container i {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.tenant-amount-assignment-cell-percent-container {
+    position: relative;
+    margin: 0 1rem;
+}
+
+.tenant-amount-assignment-cell-percent-container .styled-input {
+    padding-left: 1.2rem;
+    width: 6rem;
+}
+
+.tenant-amount-assignment-cell-percent-sign-container {
+    position: absolute;
+    left: 0rem;
+    bottom: 0.75rem;
+}
+
+.tenant-amount-assignment-cell-percent-sign-container i {
+    font-size: 1rem;
+}

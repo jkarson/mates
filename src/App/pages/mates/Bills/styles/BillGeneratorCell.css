@@ -1,0 +1,79 @@
+.bill-generator-cell-container {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+    border-left: 1px solid black;
+}
+
+.bill-generator-cell-container:first-child {
+    border-top: 1px solid black;
+}
+
+.bill-generator-cell-top-line-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    padding: 1rem 0;
+}
+
+.bill-generator-cell-private-title-container,
+.bill-generator-cell-title-container {
+    flex: 1;
+    padding-left: 10rem;
+    text-align: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: bold;
+    min-width: 1%;
+    overflow-wrap: break-word;
+}
+
+.bill-generator-cell-private-title-container {
+    color: rgb(230, 0, 0);
+}
+
+.bill-generator-cell-delete-button-container {
+    width: 10rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.bill-generator-cell-delete-button-container button {
+    background-color: rgb(52, 189, 155);
+}
+
+.bill-generator-cell-delete-button-container button:active {
+    color: rgb(52, 189, 155);
+}
+
+.bill-generator-cell-info-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1rem;
+    line-height: 1.2rem;
+    width: 100%;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+}
+
+.bill-generator-cell-payable-container {
+    width: 100%;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+
+.bill-generator-cell-payable-container .last-word-bold-text-cell-container {
+    text-align: center;
+}
+
+.bill-generator-cell-frequency-container {
+    width: 100%;
+    text-align: center;
+}

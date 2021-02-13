@@ -1,0 +1,21 @@
+.amounts-owed-display-cell-tenant-container {
+    padding: 0.5rem 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.amounts-owed-display-cell-amount-owed-container {
+    flex: 1;
+    min-width: 1%;
+}
+
+.amounts-owed-display-cell-button-container {
+    width: 83px;
+    padding-left: 1rem;
+    padding-right: 2rem;
+    box-sizing: content-box;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+}

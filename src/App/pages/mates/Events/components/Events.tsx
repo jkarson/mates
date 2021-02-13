@@ -2,7 +2,6 @@ import React, { useContext, useLayoutEffect, useState } from 'react';
 import { eventsTabNames, EventsTabType } from '../models/EventsTabs';
 import CreateEventCell from './CreateEventCell';
 import { isFutureEvent, isPastEvent, isPresentEvent } from '../utilities';
-import DescriptionCell from '../../../../common/components/DescriptionCell';
 import Tabs from '../../../../common/components/Tabs';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { assertUnreachable } from '../../../../common/utilities';
@@ -10,6 +9,8 @@ import IncomingInvitationsCell from './IncomingInvitationsCell';
 import EventsComponent from './EventsComponent';
 
 import '../styles/Events.css';
+
+//TO DO: Server side, don't let one apartment be added to same event twice!
 
 //EXTENSION: Guarantee that events move from past to present and to future
 //in real time at the 24 hour mark
@@ -77,43 +78,9 @@ const Events: React.FC = () => {
             <div className="events-tabs-container">
                 <Tabs currentTab={tab} setTab={setTab} tabNames={eventsTabNames} />
             </div>
-            {/* <EventsDescription tab={tab} /> */}
             <div className="events-content-container">{content}</div>
         </div>
     );
-};
-
-interface EventsDescriptionProps {
-    tab: EventsTabType;
-}
-
-//TO DO: move this content into module specific locations
-//unless there's a good reason to keep it here
-const EventsDescription: React.FC<EventsDescriptionProps> = ({ tab }) => {
-    let content: string;
-    switch (tab) {
-        case 'Future':
-            content =
-                'All events more than 24 hours in the future. Events hosted by your apartment are highlighted in red. Events hosted by other apartments are highlighted in blue.';
-            break;
-        case 'Past':
-            content =
-                'All events more than 24 hours in the past. Other apartments cannot be invited to these events, but enjoy a trip down memory lane. Events hosted by your apartment are highlighted in red. Events hosted by other apartments are highlighted in blue.';
-            break;
-        case 'Present':
-            content =
-                'All events within 24 hours of now. Events hosted by your apartment are highlighted in red. Events hosted by other apartments are highlighted in blue.';
-            break;
-        case 'Create New Event':
-            content = '*other apartments can be invited after the event is created.';
-            break;
-        case 'Event Invitations':
-            content = '';
-            break;
-        default:
-            assertUnreachable(tab);
-    }
-    return <DescriptionCell content={content} />;
 };
 
 export default Events;

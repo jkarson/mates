@@ -40,21 +40,27 @@ const Contacts: React.FC = () => {
     const [tab, setTab] = useState<ContactsTabType>('All');
     const [redirect, setRedirect] = useState(false);
     const [message, setMessage] = useState('');
+    const [newContactError, setNewContactError] = useState('');
 
     useEffect(() => {
         setMessage('');
     }, [tab]);
 
+    function isFriend(apartment: Apartment | FriendProfile): apartment is FriendProfile {
+        return (apartment as FriendProfile).apartmentId !== undefined;
+    }
+
     const getTenantContacts = (apartment: Apartment | FriendProfile): Contact[] => {
         const tenants = apartment.tenants;
         const apartmentContacts: Contact[] = [];
+
         tenants.forEach((tenant) => {
             apartmentContacts.push({
                 name: tenant.name,
                 email: tenant.email,
                 number: tenant.number,
                 manuallyAdded: false,
-                _id: tenant.userId, //TO DO: is this guaranteed unique from a server-created contact _id?
+                _id: tenant.userId + (isFriend(apartment) ? apartment.apartmentId : apartment._id),
             });
         });
         return apartmentContacts.sort((a, b) =>
@@ -105,34 +111,35 @@ const Contacts: React.FC = () => {
     }
 
     const handleNewContact = (c: ContactWithoutId) => {
-        const data = {
-            apartmentId: user.apartment._id,
-            contact: c,
-        };
-        const options = getPostOptions(data);
-        fetch('/mates/addNewContact', options)
-            .then((response) => response.json())
-            .then((json) => {
-                const { authenticated, success } = json;
-                if (!authenticated) {
-                    setRedirect(true);
-                    return;
-                }
-                if (!success) {
-                    setMessage('Sorry, the contact could not be saved');
-                    return;
-                }
-                const { manuallyAddedContacts } = json;
-                const markedContacts = initializeServerContacts(manuallyAddedContacts);
-                setUser({
-                    ...user,
-                    apartment: {
-                        ...user.apartment,
-                        manuallyAddedContacts: (markedContacts as unknown) as Contact[],
-                    },
-                });
-                setTab('Manually Added');
-            });
+        // const data = {
+        //     apartmentId: user.apartment._id,
+        //     contact: c,
+        // };
+        // const options = getPostOptions(data);
+        // fetch('/mates/addNewContact', options)
+        //     .then((response) => response.json())
+        //     .then((json) => {
+        //         const { authenticated, success } = json;
+        //         if (!authenticated) {
+        //             setRedirect(true);
+        //             return;
+        //         }
+        //         if (!success) {
+        //             setNewContactError('Sorry, the contact could not be saved');
+        //             return;
+        //         }
+        //         const { manuallyAddedContacts } = json;
+        //         const markedContacts = initializeServerContacts(manuallyAddedContacts);
+        //         setUser({
+        //             ...user,
+        //             apartment: {
+        //                 ...user.apartment,
+        //                 manuallyAddedContacts: (markedContacts as unknown) as Contact[],
+        //             },
+        //         });
+        //         setTab('Manually Added');
+        //     });
+        setNewContactError('Sorry, the contact could not be saved.');
     };
 
     const handleDeleteContact = (c: Contact) => {
@@ -169,7 +176,13 @@ const Contacts: React.FC = () => {
 
     let content: JSX.Element;
     if (tab === 'Add New Contact') {
-        content = <AddContactCell handleNewContact={handleNewContact} />;
+        content = (
+            <AddContactCell
+                handleNewContact={handleNewContact}
+                newContactError={newContactError}
+                setNewContactError={setNewContactError}
+            />
+        );
     } else {
         content = <ContactsList handleDelete={handleDeleteContact} contacts={contacts} />;
     }

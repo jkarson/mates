@@ -26,9 +26,6 @@ const DateTimeInputCell: React.FC<StateProps<DateTimeInputType>> = ({ state, set
         <div className="date-time-input-cell-container">
             <DateInputCell state={state.date} setState={handleSetDate} showReset={false} />
             <TimeInputCell state={state.time} setState={handleSetTime} showReset={false} />
-            <div className="date-time-input-cell-button-container">
-                <SimpleButton onClick={handleClickReset} text={'Reset Date and Time'} />
-            </div>
         </div>
     );
 };

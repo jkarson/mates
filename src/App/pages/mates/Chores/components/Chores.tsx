@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useLayoutEffect, useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import DescriptionCell from '../../../../common/components/DescriptionCell';
+import RedMessageCell from '../../../../common/components/RedMessageCell';
 import Tabs from '../../../../common/components/Tabs';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import {
@@ -22,6 +22,9 @@ import {
 import ChoreCell from './ChoreCell';
 import ChoreGeneratorCell from './ChoreGeneratorCell';
 import CreateChoreGeneratorCell from './CreateChoreGeneratorCell';
+
+import '../styles/Chores.css';
+import StandardStyledText from '../../../../common/components/StandardStyledText';
 
 //EXTENSION: Optimize useEffect calls w/ dependency arrays
 
@@ -248,25 +251,25 @@ const Chores: React.FC = () => {
         />
     );
 
-    let content: JSX.Element;
+    let content: JSX.Element[];
     switch (tab) {
         case 'Today':
-            content = <div>{getTodaysChores().map(getChoreCell)}</div>;
+            content = getTodaysChores().map(getChoreCell);
             break;
         case 'Upcoming':
-            content = <div>{getUpcomingChores().map(getChoreCell)}</div>;
+            content = getUpcomingChores().map(getChoreCell);
             break;
         case 'Future':
-            content = <div>{getFutureChores().map(getChoreCell)}</div>;
+            content = getFutureChores().map(getChoreCell);
             break;
         case 'Summary':
-            content = <div>{getChoreGeneratorCells()}</div>;
+            content = getChoreGeneratorCells();
             break;
         case 'Completed':
-            content = <div>{getCompletedChores().map(getChoreCell)}</div>;
+            content = getCompletedChores().map(getChoreCell);
             break;
         case 'Create New':
-            content = <CreateChoreGeneratorCell setTab={setTab} />;
+            content = [];
             break;
         default:
             assertUnreachable(tab);
@@ -277,48 +280,48 @@ const Chores: React.FC = () => {
     }
 
     return (
-        <div>
-            <Tabs currentTab={tab} setTab={setTab} tabNames={choresTabNames} />
-            <ChoresDescriptionCell tab={tab} />
-            {message.length === 0 ? null : <p style={{ color: 'red' }}>{message}</p>}
-            <div>{content}</div>
+        <div className="chores-container">
+            <div className="chores-tabs-container">
+                <Tabs currentTab={tab} setTab={setTab} tabNames={choresTabNames} />
+            </div>
+            <div className="chores-content-container">
+                {tab === 'Create New' ? (
+                    <CreateChoreGeneratorCell setTab={setTab} />
+                ) : (
+                    <>
+                        <div className="chores-description-container">
+                            <StandardStyledText text={getChoresDescriptionText(tab)} />
+                        </div>
+                        {message.length === 0 ? null : (
+                            <div className="chores-error-container">
+                                <RedMessageCell message={message} />
+                            </div>
+                        )}
+                        <div className="chores-content-list-main-content-container">{content}</div>
+                    </>
+                )}
+            </div>
         </div>
     );
 };
 
-interface ChoresDescriptionCellProps {
-    tab: ChoresTabType;
-}
-
-const ChoresDescriptionCell: React.FC<ChoresDescriptionCellProps> = ({ tab }) => {
-    let content: string;
+const getChoresDescriptionText = (tab: ChoresTabType) => {
     switch (tab) {
         case 'Today':
-            content =
-                "Today's chores, as well as past chores that remain uncompleted. Chores assigned to you will be highlighted in red.";
-            break;
+            return "Today's chores, as well as past chores that remain uncompleted. Chores assigned to you will be marked.";
         case 'Upcoming':
-            content =
-                'Chores for the upcoming month. Chores assigned to you will be highlighted in red.';
-            break;
+            return 'Chores for the upcoming month. Chores assigned to you will be red.';
         case 'Future':
-            content =
-                'Chores for the upcoming year. Chores assigned to you will be highlighted in red.';
-            break;
+            return 'Chores for the upcoming year. Chores assigned to you will be red.';
         case 'Summary':
-            content = 'Overview of all chores. Chores assigned to you will be highlighted in red.';
-            break;
+            return 'Overview of all chores. Chores assigned to you will be red.';
         case 'Completed':
-            content =
-                'Completed chores. Completed chores will be automatically deleted one month past their date. Chores that you completed will be highlighted in red.';
-            break;
+            return 'Completed chores. Completed chores will be automatically deleted one month past their date. Chores that you completed will be green.';
         case 'Create New':
-            content = '';
-            break;
+            return '';
         default:
             assertUnreachable(tab);
     }
-    return <DescriptionCell content={content} />;
 };
 
 export default Chores;

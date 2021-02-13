@@ -1,31 +1,17 @@
 import React, { useState } from 'react';
 import BiggerSimpleButton from '../../../../common/components/BiggerSimpleButton';
-import FauxSimpleButton, {
-    BiggerFauxSimpleButton,
-} from '../../../../common/components/FauxSimpleButton';
-import SimpleButton from '../../../../common/components/SimpleButton';
+import { BiggerFauxSimpleButton } from '../../../../common/components/FauxSimpleButton';
+import RedMessageCell from '../../../../common/components/RedMessageCell';
 import StyledInput from '../../../../common/components/StyledInput';
+import {
+    countDigits,
+    formatPhoneNumber,
+    getDigits,
+    isNumberMates,
+} from '../../../../common/utilities';
 import { ContactWithoutId } from '../models/Contact';
 
 import '../styles/AddContactCell.css';
-
-//TO DO: don't we limit phone numbers to numbers somewhere?
-//control the input!
-
-/*
-    const handleChangePhoneNumber = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const inputPhoneNumber = event.target.value;
-        if (countDigits(inputPhoneNumber) < countDigits(input.number)) {
-            setInput({ ...input, number: getDigits(inputPhoneNumber) });
-            return;
-        }
-        const newCharacter = inputPhoneNumber.charAt(inputPhoneNumber.length - 1);
-        if (!isNumberMates(newCharacter)) {
-            return;
-        }
-        setInput({ ...input, number: getDigits(inputPhoneNumber) });
-    };
-*/
 
 interface AddContactState {
     name: string;
@@ -41,22 +27,49 @@ const emptyAddContactState: AddContactState = {
 
 interface AddContactCellProps {
     handleNewContact: (c: ContactWithoutId) => void;
+    newContactError: string;
+    setNewContactError: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const AddContactCell: React.FC<AddContactCellProps> = ({ handleNewContact }) => {
+const AddContactCell: React.FC<AddContactCellProps> = ({
+    handleNewContact,
+    newContactError,
+    setNewContactError,
+}) => {
     const [formInput, setFormInput] = useState<AddContactState>(emptyAddContactState);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setNewContactError('');
         const value = event.target.value;
-        setFormInput({
-            ...formInput,
-            [event.target.name]: value,
-        });
+        if (value !== ' ') {
+            setFormInput({
+                ...formInput,
+                [event.target.name]: value.trimStart(),
+            });
+        }
+    };
+
+    const handleChangePhoneNumber = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setNewContactError('');
+        const inputPhoneNumber = event.target.value;
+        if (countDigits(inputPhoneNumber) < countDigits(formInput.number)) {
+            setFormInput({ ...formInput, number: getDigits(inputPhoneNumber) });
+            return;
+        }
+        const newCharacter = inputPhoneNumber.charAt(inputPhoneNumber.length - 1);
+        if (!isNumberMates(newCharacter)) {
+            return;
+        }
+        setFormInput({ ...formInput, number: getDigits(inputPhoneNumber) });
     };
 
     const handleSubmit = () => {
         if (isValid(formInput)) {
             setFormInput(emptyAddContactState);
+
+            formInput.name = formInput.name.trim();
+            formInput.email = formInput.email.trim();
+
             const newContact: ContactWithoutId = {
                 name: formInput.name,
                 number: formInput.number,
@@ -83,14 +96,14 @@ const AddContactCell: React.FC<AddContactCellProps> = ({ handleNewContact }) => 
                 placeholder="* Name"
             />
             <StyledInput
-                type="tel"
+                type="text"
                 name="number"
-                value={formInput.number}
-                onChange={handleChange}
+                value={formatPhoneNumber(formInput.number)}
+                onChange={handleChangePhoneNumber}
                 placeholder={'Phone Number'}
             />
             <StyledInput
-                type="email"
+                type="text"
                 name="email"
                 value={formInput.email}
                 onChange={handleChange}
@@ -102,6 +115,9 @@ const AddContactCell: React.FC<AddContactCellProps> = ({ handleNewContact }) => 
                 ) : (
                     <BiggerFauxSimpleButton text={'Save New Contact'} />
                 )}
+                <div className="add-contact-cell-error-container">
+                    <RedMessageCell message={newContactError} />
+                </div>
             </div>
         </div>
     );

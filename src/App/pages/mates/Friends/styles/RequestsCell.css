@@ -16,11 +16,13 @@
     text-align: center;
 }
 
-.requests-cell-content-container {
+.requests-cell-content-incoming-container {
     flex: 1;
     overflow-y: scroll;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 1rem 0;
+    margin: 1rem auto;
+}
+
+.requests-cell-content-outgoing-container {
+    flex: 1;
+    overflow-y: scroll;
 }

@@ -15,32 +15,19 @@
     padding: 0.5rem 1rem;
 }
 
-/* .message-cell-timestamp-container,
-.user-message-cell-timestamp-container {
-    grid-area: date;
-    font-size: small;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: fit-content;
-    padding: 0.1rem;
-} */
-
 .message-cell-content-container {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
 .message-cell-content-container span {
+    min-width: 1%;
     background-color: rgba(128, 128, 128, 0.3);
     border-radius: 30px;
     padding: 0.5rem 1rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-width: 3rem;
     max-width: 60rem;
 }
 
@@ -48,17 +35,18 @@
     display: flex;
     flex-direction: row-reverse;
     justify-content: flex-start;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
 .user-message-cell-content-container span {
+    min-width: 1%;
     background-color: rgb(0, 81, 255);
     color: white;
     border-radius: 30px;
     padding: 0.5rem 1rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-width: 3rem;
+    /* text-align: left; */
+    /* min-width: 3rem; */
     max-width: 60rem;
 }
 

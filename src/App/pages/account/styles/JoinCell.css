@@ -3,11 +3,14 @@
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
-    width: fit-content;
-    height: 10rem;
     padding: 0 1vw;
+    min-width: 1%;
 }
 
 .join-cell-container > *:nth-child(1) i {
     font-size: 4rem;
+}
+
+.join-cell-container > *:nth-child(1) {
+    margin-bottom: 1.5rem;
 }

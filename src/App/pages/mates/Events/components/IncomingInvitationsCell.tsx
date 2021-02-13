@@ -40,11 +40,12 @@ const IncomingInvitationsCell: React.FC<IncomingInvitationsCellProps> = ({ setTa
                     setMessage('Sorry, the invitation can not be accepted at this time');
                     return;
                 }
-                const { eventsInfo } = json;
+                const { eventsInfo, newEventId } = json;
                 const formattedEventsInfo = initializeServerEventsInfo(eventsInfo);
-                //TO DO: This doesn't seem like the best way to do this, the server should explicitly
-                //return the new event.
-                const newEvent = formattedEventsInfo.events[formattedEventsInfo.events.length - 1];
+
+                const newEvent = formattedEventsInfo.events.find(
+                    (event) => event._id.toString() === newEventId.toString(),
+                ) as ApartmentEvent;
                 setUser({
                     ...user,
                     apartment: { ...user.apartment, eventsInfo: formattedEventsInfo },
@@ -103,13 +104,13 @@ const IncomingInvitationsCell: React.FC<IncomingInvitationsCellProps> = ({ setTa
 
     return (
         <div className="incoming-invitations-cell-container">
+            {invitations.length === 0 ? (
+                <div className="incoming-invitations-cell-message-container">
+                    <StandardStyledText text={'You have not been invited to any events.'} />
+                </div>
+            ) : null}
             <div className="incoming-invitations-cell-error-container">
                 {message.length === 0 ? null : <RedMessageCell message={message} />}
-            </div>
-            <div className="incoming-invitations-cell-message-container">
-                {invitations.length === 0 ? (
-                    <StandardStyledText text={'You have not been invited to any events.'} />
-                ) : null}
             </div>
             <div className="incoming-invitations-cell-content-container">{content}</div>
         </div>

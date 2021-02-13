@@ -1,3 +1,4 @@
+import { ApartmentEvent } from '../pages/mates/Events/models/EventsInfo';
 import { FriendProfile, ApartmentSummary } from '../pages/mates/Friends/models/FriendsInfo';
 import {
     ServerFriendProfile,
@@ -104,6 +105,14 @@ function getFormattedDateString(date: Date) {
         month: 'numeric',
         day: 'numeric',
         weekday: 'long',
+    });
+}
+
+function getFormattedDateStringNoDay(date: Date) {
+    return date.toLocaleDateString([], {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
     });
 }
 
@@ -311,7 +320,7 @@ function handleFocusNumericStringInput(
     input: React.RefObject<HTMLInputElement>,
     setAmount: (amount: string) => void,
 ) {
-    if (input.current && input.current.value === '0.00') {
+    if (input.current && (input.current.value === '0.00' || input.current.value === '0.0')) {
         setAmount('');
     }
     return;
@@ -395,7 +404,10 @@ function formatNames(names: string[]) {
 
 function getApartmentSummaryString(apartment: Apartment) {
     return (
-        apartment.profile.name + ': ' + formatNames(apartment.tenants.map((tenant) => tenant.name))
+        apartment.profile.name +
+        ' (' +
+        formatNames(apartment.tenants.map((tenant) => tenant.name)) +
+        ')'
     );
 }
 
@@ -607,6 +619,19 @@ function getTwoDigitDateString(d: Date): string {
     return monthString + '/' + dayOfMonthString + '/' + yearShortened;
 }
 
+function getNullEvent(): ApartmentEvent {
+    return {
+        _id: '',
+        creator: '',
+        creatorId: '',
+        hostApartmentId: '',
+        time: new Date(Date.now()),
+        invitees: [],
+        attendees: [],
+        title: '',
+    };
+}
+
 export {
     assertUnreachable,
     isLetter,
@@ -620,6 +645,7 @@ export {
     getMonthIndexByMonth,
     getFormattedDateTimeString,
     getFormattedDateString,
+    getFormattedDateStringNoDay,
     isSameDayMonthYear,
     isPreviousDate,
     isFutureDate,
@@ -661,5 +687,6 @@ export {
     countDigits,
     getDigits,
     getTwoDigitDateString,
+    getNullEvent,
     getLaterDateToTest, //TEMP
 };

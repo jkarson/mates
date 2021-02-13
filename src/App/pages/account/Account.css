@@ -10,6 +10,23 @@
         'message'; */
 }
 
+@media only screen and (max-width: 685px) {
+    .account-container .page-cell-header-tabs-container .tab {
+        padding: 12px 2px;
+    }
+
+    .account-container .page-cell-header-tabs-container .tab-container {
+        justify-content: space-between;
+    }
+}
+
+@media only screen and (max-width: 620px) {
+    .account-container .page-cell-header-tabs-container .tab {
+        font-size: 0.8rem;
+        padding: 12px 1px;
+    }
+}
+
 .account-content-container > *:nth-child(2) {
     grid-area: main;
 }

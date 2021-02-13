@@ -1,0 +1,63 @@
+.chore-generator-cell-container {
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+    border-left: 1px solid black;
+    padding: 1rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.chore-generator-cell-container:first-child {
+    border-top: 1px solid black;
+}
+
+.chore-generator-cell-info-container {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    word-wrap: break-word;
+    max-width: 62%;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.chore-generator-cell-title-container {
+    width: 100%;
+}
+
+.chore-generator-cell-title-container span {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.chore-generator-cell-title-red-container {
+    color: rgb(230, 0, 0);
+}
+
+.chore-generator-cell-frequency-container {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.chore-generator-cell-show-container span:nth-child(2) {
+    font-weight: bold;
+}
+
+.chore-generator-cell-button-container {
+    margin-left: 1rem;
+}
+
+.chore-generator-cell-button-container button {
+    background-color: rgb(52, 189, 155);
+}
+
+.chore-generator-cell-button-container button:active {
+    color: rgb(52, 189, 155);
+}
+
+.chore-generator-cell-assignment-container {
+    width: 100%;
+}

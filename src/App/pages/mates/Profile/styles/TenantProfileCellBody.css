@@ -17,10 +17,13 @@
     border: 1px solid purple;
     justify-content: center;
     align-items: center;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
 .tenant-profile-cell-body-inner-container > span {
-    margin: 1vh 0;
+    margin: 0.75rem 0;
+    width: 100%;
     text-align: center;
 }
 

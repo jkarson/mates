@@ -1,0 +1,54 @@
+.amount-owed-display-cell-container {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    display: flex;
+    width: 100%;
+    overflow-wrap: break-word;
+}
+
+.amount-owed-display-cell-name-container {
+    flex: 1;
+    min-width: 1%;
+    font-weight: bold;
+    text-align: right;
+    margin: auto 0;
+    padding-left: 1rem;
+}
+
+.amount-owed-display-cell-verb-dollar-amount-container {
+    width: calc(50% - 41.5px - 1.5rem);
+    display: inline;
+    margin: auto 0;
+    padding: 0 0 0 1rem;
+    box-sizing: border-box;
+}
+
+.amount-owed-display-cell-verb-container {
+    display: inline-block;
+    width: 4.5rem;
+}
+
+.amount-owed-display-cell-dollar-amount-container {
+    display: inline-block;
+    max-width: 100%;
+}
+
+.amount-owed-display-cell-dollar-amount-container i {
+    display: inline;
+}
+
+.amount-owed-display-cell-amount-black-container,
+.amount-owed-display-cell-amount-green-container,
+.amount-owed-display-cell-amount-red-container {
+    display: inline;
+    font-weight: bold;
+}
+
+.amount-owed-display-cell-amount-green-container {
+    color: green;
+}
+
+.amount-owed-display-cell-amount-red-container {
+    color: rgb(230, 0, 0);
+}

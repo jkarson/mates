@@ -7,6 +7,11 @@
 
 .friend-cell-apartment-container {
     flex: 1;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    min-width: 1%;
+    margin-right: 1rem;
 }
 
 .friend-cell-apartment-container .apartment-summary-cell-info {

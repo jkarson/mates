@@ -14,6 +14,12 @@ import {
 import { AmountWithPercentOwed } from '../models/AmountWithPercentOwed';
 import { getTotalAssignedValue } from '../utilities';
 
+import '../styles/AmountsWithPercentOwedAssignmentCell.css';
+import { StyledInputWithRef } from '../../../../common/components/StyledInput';
+import TenantAmountAssignmentCell from './TenantAmountAssignmentCell';
+import TotalAssignedCell from './TotalAssignedCell';
+import SimpleButton from '../../../../common/components/SimpleButton';
+
 interface AmountsWithPercentOwedAssignmentCellProps {
     amountsWithPercentOwed: AmountWithPercentOwed[];
     setAmountsWithPercentOwed: (amountsWithPercentOwed: AmountWithPercentOwed[]) => void;
@@ -58,6 +64,10 @@ const AmountsWithPercentOwedAssignmentCell: React.FC<AmountsWithPercentOwedAssig
         );
         setAmountsWithPercentOwed(newAmountsWithPercentOwed);
     };
+
+    const isTotalAssigned = () =>
+        roundToHundredth(totalValue - getTotalAssignedValue(amountsWithPercentOwed)) === 0 &&
+        totalValue > 0;
 
     const tenantAssignmentCells = amountsWithPercentOwed.map((aWPO) => {
         const tenant = getTenantByTenantId(matesUser, aWPO.userId);
@@ -115,106 +125,60 @@ const AmountsWithPercentOwedAssignmentCell: React.FC<AmountsWithPercentOwedAssig
 
     const totalInput = useRef<HTMLInputElement>(null);
     return (
-        <div style={{ marginTop: 20 }}>
-            <label style={{ fontWeight: 'bold' }}>
-                {'Total Owed: $'}
-                <input
-                    ref={totalInput}
-                    type="string"
-                    value={total}
-                    onChange={handleSetTotal}
-                    onFocus={() => handleFocusNumericStringInput(totalInput, setTotal)}
-                    onBlur={() => handleBlurNumericStringInput(totalInput, setTotal, 2)}
-                />
-            </label>
+        <div
+            className={
+                isPrivate
+                    ? 'amounts-with-percent-owed-assignment-cell-private-container'
+                    : 'amounts-with-percent-owed-assignment-cell-container'
+            }
+        >
+            <div className="amounts-with-percent-owed-assignment-cell-total-assigned-container">
+                <div className="amounts-with-percent-owed-assignment-cell-total-container">
+                    <span>{'Total Cost: '}</span>
+                    <div className="amounts-with-percent-owed-assignment-cell-total-input-container">
+                        <StyledInputWithRef
+                            ref={totalInput}
+                            type="string"
+                            value={total}
+                            onChange={handleSetTotal}
+                            onFocus={() => handleFocusNumericStringInput(totalInput, setTotal)}
+                            onBlur={() => handleBlurNumericStringInput(totalInput, setTotal, 2)}
+                        />
+                        <div className="amounts-with-percent-owed-assignment-cell-total-icon-container">
+                            <i className="fa fa-usd" />
+                        </div>
+                    </div>
+                </div>
+                {isPrivate ? null : (
+                    <div className="amounts-with-percent-owed-assignment-cell-assigned-container">
+                        <span>{'Total Assigned: '}</span>
+                        <div className="amounts-with-percent-owed-assignment-cell-assigned-value-container">
+                            <div className="amounts-with-percent-owed-assignment-cell-assigned-icon-container">
+                                <i className="fa fa-usd" />
+                            </div>
+                            <div
+                                className={
+                                    isTotalAssigned()
+                                        ? 'amounts-with-percent-owed-assignment-cell-green-assigned-container'
+                                        : 'amounts-with-percent-owed-assignment-cell-red-assigned-container'
+                                }
+                            >
+                                <span>
+                                    {getTotalAssignedValue(amountsWithPercentOwed).toFixed(2)}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
             {isPrivate ? null : (
                 <div>
                     {tenantAssignmentCells}
-                    <button onClick={handleSplitEvenly}>{'Split Total Evenly'}</button>
-                    <TotalAssignedCell
-                        totalNeeded={totalValue}
-                        totalAssigned={getTotalAssignedValue(amountsWithPercentOwed)}
-                    />
+                    <div className="amounts-with-percent-owed-assignment-cell-split-button-container">
+                        <SimpleButton onClick={handleSplitEvenly} text="Split Total Evenly" />
+                    </div>
                 </div>
             )}
-        </div>
-    );
-};
-
-interface TenantAmountAssignmentCellProps {
-    name: string;
-    amount: string;
-    percent: string;
-    setAmount: (amount: string) => void;
-    setPercent: (percent: string) => void;
-}
-
-const TenantAmountAssignmentCell: React.FC<TenantAmountAssignmentCellProps> = ({
-    name,
-    amount,
-    percent,
-    setAmount,
-    setPercent,
-}) => {
-    const handleChangeAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
-        verifyAndSetNumericStringInput(event, setAmount, 2);
-    };
-
-    const handleChangePercent = (event: React.ChangeEvent<HTMLInputElement>) => {
-        verifyAndSetNumericStringInput(event, setPercent, 1);
-    };
-
-    const amountInput = useRef<HTMLInputElement>(null);
-    const percentInput = useRef<HTMLInputElement>(null);
-    return (
-        <div>
-            <p style={{ fontWeight: 'bold' }}>{name}</p>
-            <label>
-                {'$'}
-                <input
-                    ref={amountInput}
-                    type="string"
-                    value={amount}
-                    onChange={handleChangeAmount}
-                    onFocus={() => handleFocusNumericStringInput(amountInput, setAmount)}
-                    onBlur={() => handleBlurNumericStringInput(amountInput, setAmount, 2)}
-                />
-            </label>
-            <label>
-                {'%'}
-                <input
-                    ref={percentInput}
-                    type="string"
-                    value={percent}
-                    onChange={handleChangePercent}
-                    onFocus={() => handleFocusNumericStringInput(percentInput, setPercent)}
-                    onBlur={() => handleBlurNumericStringInput(percentInput, setPercent, 1)}
-                />
-            </label>
-        </div>
-    );
-};
-
-interface TotalAssignedCellProps {
-    totalNeeded: number;
-    totalAssigned: number;
-}
-
-const TotalAssignedCell: React.FC<TotalAssignedCellProps> = ({ totalNeeded, totalAssigned }) => {
-    const difference = roundToHundredth(totalNeeded - totalAssigned);
-    return (
-        <div>
-            <p style={{ fontWeight: 'bold' }}>
-                {'Assigned total: $'}
-                <span style={difference === 0 ? { color: 'green' } : { color: 'red' }}>
-                    {totalAssigned.toFixed(2)}
-                </span>
-            </p>
-            {difference > 0 ? (
-                <p>{'Please assign $' + difference.toFixed(2)}</p>
-            ) : difference < 0 ? (
-                <p>{'You have assigned $' + (-1 * difference).toFixed(2) + ' too much.'}</p>
-            ) : null}
         </div>
     );
 };

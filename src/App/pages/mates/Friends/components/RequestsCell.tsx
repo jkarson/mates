@@ -184,24 +184,19 @@ const RequestsCell: React.FC<RequestsCellProps> = ({ incoming, setTab, tab }) =>
                         />
                     </div>
                 )}
-                {/* {requests.length === 0 ? (
-                    <StandardStyledText
-                        text={
-                            'You have no ' +
-                            (incoming ? 'incoming' : 'outgoing') +
-                            ' friend requests'
-                        }
-                    />
-                ) : (
-                    <StandardStyledText
-                        text={'Your ' + (incoming ? 'incoming' : 'outgoing') + ' friend requests'}
-                    />
-                )} */}
             </div>
             <div className="requests-cell-error-container">
                 {error.length === 0 ? null : <RedMessageCell message={error} />}
             </div>
-            <div className="requests-cell-content-container">{content}</div>
+            <div
+                className={
+                    incoming
+                        ? 'requests-cell-content-incoming-container'
+                        : 'requests-cell-content-outgoing-container'
+                }
+            >
+                {content}
+            </div>
         </div>
     );
 };

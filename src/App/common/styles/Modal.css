@@ -6,8 +6,8 @@
     height: 100vh;
     width: 100vw;
     display: grid;
-    grid-template-columns: 1fr 43vh 1fr;
-    grid-template-rows: 1fr 43vh 1fr;
+    grid-template-columns: 1fr 18rem 1fr;
+    grid-template-rows: 1fr 18rem 1fr;
     grid-template-areas:
         'empty-top empty-top empty-top'
         'empty-side-left modal empty-side-right'

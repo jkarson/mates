@@ -1,0 +1,84 @@
+.payable-to-display-cell-container {
+    display: flex;
+    flex-direction: column;
+    /* align-items: center; */
+}
+
+.payable-to-display-cell-text-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.payable-to-display-cell-text-container-inner {
+    max-width: 100%;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+    display: inline;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    text-align: center;
+}
+
+.payable-to-display-cell-text-prefix-container {
+    display: inline-block;
+}
+
+.payable-to-display-cell-payable-container {
+    margin: 0 0.5rem;
+    font-weight: bold;
+    display: inline-block;
+    max-width: 100%;
+}
+
+.payable-to-display-cell-suffix-container {
+    display: inline-block;
+}
+
+.payable-to-display-cell-suffix-paid-container {
+    display: inline;
+}
+
+.payable-to-display-cell-suffix-paid-container > span:nth-child(2) {
+    color: green;
+    font-weight: bold;
+}
+
+.payable-to-display-cell-suffix-unpaid-container {
+    display: inline;
+}
+
+.payable-to-display-cell-suffix-unpaid-container > span:first-child {
+    margin-right: 0.5rem;
+}
+
+.payable-to-display-cell-suffix-unpaid-icon-balance-container {
+    display: inline;
+}
+
+.payable-to-display-cell-suffix-unpaid-balance-container {
+    display: inline;
+    color: rgb(230, 0, 0);
+    font-weight: bold;
+}
+
+.payable-to-display-cell-buttons-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.payable-to-display-cell-buttons-container-inner {
+    width: 28rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.payable-to-display-cell-buttons-container button {
+    width: 12rem;
+}

@@ -1,0 +1,58 @@
+.send-invitation-cell-modal-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    height: 100vh;
+    width: 100vw;
+    display: grid;
+    grid-template-rows: 5vh 1fr 5vh;
+    grid-template-columns: 15vw 1fr 15vw;
+    grid-template-areas:
+        'empty-top empty-top empty-top'
+        'empty-left content empty-right'
+        'empty-bottom empty-bottom empty-bottom';
+}
+
+.send-invitation-cell-modal-empty-top {
+    grid-area: empty-top;
+}
+.send-invitation-cell-modal-empty-left {
+    grid-area: empty-left;
+}
+.send-invitation-cell-modal-empty-right {
+    grid-area: empty-right;
+}
+.send-invitation-cell-modal-empty-bottom {
+    grid-area: empty-bottom;
+}
+
+.send-invitation-cell-modal-empty-top,
+.send-invitation-cell-modal-empty-right,
+.send-invitation-cell-modal-empty-bottom,
+.send-invitation-cell-modal-empty-left {
+    background-color: rgba(220, 220, 220, 0.7);
+}
+
+.send-invitation-cell-modal-content-container {
+    grid-area: content;
+    background-color: rgb(230, 230, 230);
+    overflow-y: scroll;
+    padding-top: 3rem;
+    padding-right: 1rem;
+}
+
+.send-invitation-cell-modal-icon-close-container {
+    position: absolute;
+    top: 7vh;
+    right: 17vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.send-invitation-cell-modal-icon-close-container i {
+    font-size: 2rem;
+    color: rgb(49, 47, 47);
+}

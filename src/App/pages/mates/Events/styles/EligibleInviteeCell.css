@@ -1,6 +1,27 @@
 .eligible-invitee-cell-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 1rem;
 }
+
 .eligible-invitee-cell-summary-container {
+    flex: 1;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    display: flex;
+    justify-content: flex-start;
 }
 .eligible-invitee-cell-button-container {
+    margin-left: 0.5rem;
+}
+
+.eligible-invitee-cell-remove-attendee-button-container button,
+.eligible-invitee-cell-uninvite-button-container button {
+    background-color: rgb(52, 189, 155);
+}
+
+.eligible-invitee-cell-remove-attendee-button-container button:active,
+.eligible-invitee-cell-uninvite-button-container button:active {
+    color: rgb(52, 189, 155);
 }

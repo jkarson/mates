@@ -267,6 +267,16 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents, tab })
         }
     };
 
+    const areApartmentsToInvite = (event: ApartmentEvent) => {
+        const uninvitedFriends = user.apartment.friendsInfo.friends.filter((apartment) => {
+            const apartmentId = apartment.apartmentId;
+            const attendeeIds = event.attendees.map((attendee) => attendee.apartmentId);
+            const inviteeIds = event.invitees.map((invitee) => invitee.apartmentId);
+            return !attendeeIds.includes(apartmentId) && !inviteeIds.includes(apartmentId);
+        });
+        return uninvitedFriends.length > 0;
+    };
+
     return (
         <div>
             {message.length === 0 ? null : <p style={{ color: 'red' }}>{message}</p>}
@@ -279,12 +289,14 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents, tab })
                         event.hostApartmentId === user.apartment._id &&
                         event.creatorId === user.userId
                     }
+                    areApartmentsToInvite={areApartmentsToInvite(event)}
                     canRemoveFromEvent={event.hostApartmentId === user.apartment._id}
                     handleRemoveEvent={handleDeleteEvent}
                     handleInvite={handleInvite}
                     handleRemoveAttendee={handleRemoveAttendee}
                     handleRemoveInvitee={handleRemoveInvitee}
                     handleLeaveEvent={handleLeaveEvent}
+                    setMessage={setMessage}
                 />
             ))}
         </div>

@@ -2,6 +2,9 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    padding-bottom: 1rem;
+    box-sizing: border-box;
+    overflow-y: scroll;
 }
 
 .account-settings-header-message-container {
@@ -13,6 +16,14 @@
     font-size: large;
     line-height: 2.5rem;
     text-align: center;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    min-width: 1%;
+    margin: 1rem 0;
+}
+
+.account-settings-header-message-container span {
+    width: 100%;
 }
 
 .account-settings-logout-button-container {
@@ -20,6 +31,7 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    margin-bottom: 1rem;
 }
 
 .account-settings-delete-account-button-container {

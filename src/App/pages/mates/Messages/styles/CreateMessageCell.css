@@ -1,5 +1,5 @@
 .create-message-cell-container {
-    width: 100%;
+    width: 96vw;
     padding: 0em;
     margin: 0em;
     display: inline-flex;
@@ -13,14 +13,12 @@
 
 .create-message-cell-hidden-div {
     display: none;
-    white-space: pre-wrap;
-    word-wrap: break-word;
 }
 .create-message-cell-hidden-div,
 .create-message-cell-input-container > textarea {
     max-height: 10rem;
     box-sizing: border-box;
-    width: 100%;
+    width: 96vw;
     line-height: 1.5rem;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 1rem;
@@ -28,6 +26,9 @@
     border: none;
     resize: none;
     padding: 0.5rem 1.5rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
     background-color: unset;
 }
 

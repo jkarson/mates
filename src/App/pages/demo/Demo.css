@@ -1,6 +1,8 @@
 .demo-about-container {
     height: 100%;
     display: grid;
+    padding-top: 2rem;
+    box-sizing: border-box;
     grid-template-rows: 3fr 1fr;
     grid-template-columns: 1fr 1fr;
     grid-template-areas:

@@ -33,20 +33,14 @@ const ApartmentCell: React.FC<ApartmentCellProps> = ({
                 onClickYes={() => handleClickLeaveApartment(apartmentSummary.apartmentId)}
                 yesText={'Leave Apartment'}
             />
+            <div className="apartment-cell-leave-button-container">
+                <SimpleButton onClick={() => setShowModal(true)} text={'Leave Apartment'} />
+            </div>
             <div className="apartment-cell-main-container">
                 <ApartmentSummaryCell
                     friend={apartmentSummary}
                     onIconClick={() => handleClickViewApartment(apartmentSummary.apartmentId)}
                 />
-            </div>
-            {/* <div className="apartment-cell-view-button-container">
-                <BiggerSimpleButton
-                    onClick={() => handleClickViewApartment(apartmentSummary.apartmentId)}
-                    text="Go"
-                />
-            </div> */}
-            <div className="apartment-cell-leave-button-container">
-                <SimpleButton onClick={() => setShowModal(true)} text={'Leave Apartment'} />
             </div>
         </div>
     );

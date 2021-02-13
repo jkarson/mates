@@ -1,2 +1,47 @@
 .invitation-cell-container {
+    padding: 1rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.invitation-cell-info-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1rem;
+    min-width: 9rem;
+    overflow-wrap: break-word;
+}
+
+.invitation-cell-title-container > span {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.invitation-cell-date-container {
+    margin: 1rem 0;
+}
+
+.invitation-cell-host-container i {
+    margin-right: 0.25rem;
+}
+
+.invitation-cell-reject-button-container {
+    margin-left: 1rem;
+}
+
+.invitation-cell-reject-button-container button {
+    background-color: rgb(52, 189, 155);
+}
+
+.invitation-cell-reject-button-container button:active {
+    color: rgb(52, 189, 155);
+}
+
+.invitation-cell-accept-button-container {
+    margin-left: 1rem;
 }

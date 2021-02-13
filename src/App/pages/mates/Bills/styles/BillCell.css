@@ -1,0 +1,88 @@
+.bill-cell-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+    border-left: 1px solid black;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.bill-cell-container:first-child {
+    border-top: 1px solid black;
+}
+
+.bill-cell-top-line-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.bill-cell-top-line-container button {
+    width: 9rem;
+}
+
+.bill-cell-top-line-container button,
+.bill-cell-top-line-container button {
+    background-color: rgb(52, 189, 155);
+}
+
+.bill-cell-top-line-container button:active,
+.bill-cell-top-line-container button:active {
+    color: rgb(52, 189, 155);
+}
+
+.bill-cell-title-container,
+.bill-cell-private-title-container {
+    flex: 1;
+    margin: 0 1rem;
+    min-width: 1%;
+    overflow-wrap: break-word;
+    text-align: center;
+}
+
+.bill-cell-title-container span,
+.bill-cell-private-title-container span {
+    display: block;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1.5rem;
+    font-weight: bold;
+    line-height: 2rem;
+    text-align: center;
+}
+
+.bill-cell-date-container {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+
+.bill-cell-date-container > span:first-child {
+    margin-right: 0.5rem;
+}
+
+.bill-cell-private-title-container span {
+    color: rgb(230, 0, 0);
+}
+
+.bill-cell-payable-to-container {
+    background-color: rgb(128, 128, 128, 0.3);
+    border-radius: 3rem;
+    padding: 1rem;
+}
+
+.bill-cell-amounts-owed-container {
+    background-color: rgb(128, 128, 128, 0.3);
+    margin: 2rem 0;
+    border-radius: 3rem;
+}
+
+.bill-cell-footer-buttons-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}

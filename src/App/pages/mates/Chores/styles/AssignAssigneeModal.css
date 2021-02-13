@@ -1,0 +1,61 @@
+.assignee-modal-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    height: 100vh;
+    width: 100vw;
+    display: grid;
+    grid-template-rows: 20vh 1fr 20vh;
+    grid-template-columns: 20vw 1fr 20vw;
+    grid-template-areas:
+        'empty-top empty-top empty-top'
+        'empty-left content empty-right'
+        'empty-bottom empty-bottom empty-bottom';
+}
+
+.assignee-modal-empty-top {
+    grid-area: empty-top;
+}
+
+.assignee-modal-empty-left {
+    grid-area: empty-left;
+}
+
+.assignee-modal-empty-right {
+    grid-area: empty-right;
+}
+
+.assignee-modal-empty-bottom {
+    grid-area: empty-bottom;
+}
+
+.assignee-modal-empty-top,
+.assignee-modal-empty-right,
+.assignee-modal-empty-bottom,
+.assignee-modal-empty-left {
+    background-color: rgba(220, 220, 220, 0.7);
+}
+
+.assignee-modal-content-container {
+    grid-area: content;
+    background-color: rgb(230, 230, 230);
+    overflow-y: scroll;
+    padding-top: 1.5rem;
+    padding-right: 1rem;
+}
+
+.assignee-modal-icon-close-container {
+    position: absolute;
+    top: 22vh;
+    right: 22vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.assignee-modal-icon-close-container i {
+    font-size: 2rem;
+    color: rgb(49, 47, 47);
+}

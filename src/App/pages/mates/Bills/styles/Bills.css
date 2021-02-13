@@ -1,0 +1,35 @@
+.bills-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0 1rem;
+}
+
+@media only screen and (max-width: 719px) {
+    .bills-tabs-container .tab {
+        padding: 12px 3px;
+        font-size: 0.8rem;
+    }
+
+    .bills-tabs-container .tab-container {
+        justify-content: space-between;
+    }
+}
+.bills-description-container {
+    padding: 1rem;
+    line-height: 1.5rem;
+}
+
+.bills-error-container {
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.bills-content-container {
+    flex: 1;
+    overflow-y: scroll;
+}
+
+.bills-content-list-container {
+    padding-bottom: 2rem;
+}

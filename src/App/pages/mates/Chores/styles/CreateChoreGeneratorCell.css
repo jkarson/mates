@@ -1,0 +1,109 @@
+.create-chore-generator-cell-container {
+    min-height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: scroll;
+}
+
+.create-chore-generator-cell-main-content-container {
+    flex: 1;
+    padding-bottom: 0.1rem;
+}
+
+.create-chore-generator-cell-main-content-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.create-chore-generator-cell-input-container {
+    margin-bottom: 2rem;
+}
+
+.create-chore-generator-cell-input-container input {
+    width: 25rem;
+}
+
+.create-chore-generator-cell-starting-repeat-container {
+    background-color: unset;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 4.5rem;
+    margin-bottom: 3rem;
+}
+
+.create-chore-generator-cell-starting-container {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1rem;
+}
+
+.create-chore-generator-cell-starting-container > span {
+    margin-right: 0.75rem;
+    font-weight: bold;
+}
+
+.create-chore-generator-cell-assignment-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 20rem;
+    margin-bottom: 3rem;
+    padding: 1rem;
+    box-sizing: border-box;
+    border: 1px dotted black;
+}
+
+.create-chore-generator-cell-show-container {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 3.5rem;
+}
+
+.create-chore-generator-cell-show-first-line {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+}
+
+.create-chore-generator-cell-show-toggle-container {
+    background-color: rgb(128, 128, 128, 0.3);
+    width: 2.8rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin: 0 0.25rem;
+    padding: 0.25rem 0;
+    border-radius: 1em;
+}
+
+.create-chore-generator-cell-show-toggle-container:hover {
+    box-shadow: 1px 1px 2px black;
+}
+
+.create-chore-generator-cell-show-second-line {
+    margin-top: 0.5rem;
+    padding: 0 1vw;
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-align: center;
+    line-height: 1.3rem;
+}
+
+.create-chore-generator-cell-create-buttons-container {
+}
+
+.create-chore-generator-error-container {
+    height: 2rem;
+}

@@ -10,6 +10,9 @@ import { ApartmentSummary } from '../../mates/Friends/models/FriendsInfo';
 import '../styles/ApartmentsCell.css';
 import ApartmentCell from './ApartmentCell';
 
+//TO DO: Use word-wrap / overflow-wrap to protect
+//against long names sending the buttons out of alignment
+
 const ApartmentsCell: React.FC<RouteComponentProps> = ({ history }) => {
     const userContext = useContext(AccountContext) as AccountContextType;
 

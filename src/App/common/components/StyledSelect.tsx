@@ -14,6 +14,9 @@ const StyledSelect: React.FC<StyledSelectProps> = ({ value, onChange, options, n
         <select value={value} onChange={onChange} name={name}>
             {options}
         </select>
+        <div className="styled-select-icon-container">
+            <i className="fa fa-caret-down" />
+        </div>
     </div>
 );
 

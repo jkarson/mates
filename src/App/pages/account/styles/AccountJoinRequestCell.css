@@ -8,6 +8,11 @@
 
 .account-join-request-cell-summary-container {
     flex: 1;
+    min-width: 1%;
+    margin-right: 1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
 }
 
 .account-join-request-cell-summary-container * {

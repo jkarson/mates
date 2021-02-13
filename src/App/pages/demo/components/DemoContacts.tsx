@@ -108,7 +108,11 @@ const DemoContacts: React.FC = () => {
             {message.length === 0 ? null : <p style={{ color: 'red' }}>{message}</p>}
             <ContactsDescriptionCell tab={tab} />
             {tab === 'Add New Contact' ? (
-                <AddContactCell handleNewContact={handleNewContact} />
+                <AddContactCell
+                    handleNewContact={handleNewContact}
+                    newContactError={''}
+                    setNewContactError={() => null}
+                />
             ) : (
                 <ContactsList handleDelete={handleDeleteContact} contacts={contacts} />
             )}

@@ -5,22 +5,10 @@
     display: flex;
     flex-direction: column;
     background-color: #d3e0ea;
-    /* background-image: linear-gradient(to right, #f46b45, #eea849); */
-    /*    background-image: linear-gradient(90deg, #1cb5e0 0%, #000851 100%);*/
 }
 
 .page-cell-header-block {
     flex: 0 0 auto;
-}
-
-@media only screen and (max-width: 550px) {
-    .page-cell-header-tabs-container .tab {
-        padding: 12px 4px;
-    }
-
-    .page-cell-header-tabs-container .tab-container {
-        justify-content: space-between;
-    }
 }
 
 .page-cell-content-block {

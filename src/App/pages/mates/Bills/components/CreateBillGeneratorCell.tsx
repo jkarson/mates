@@ -18,13 +18,17 @@ import {
     getAmountFromPercent,
     roundToTenth,
     getPercent,
-    getYesterdaysDateFromDate,
-    getPutOptions,
-    initializeDates,
-    getPostOptions,
     getMaxDate,
+    getPostOptions,
+    getYesterdaysDateFromDate,
 } from '../../../../common/utilities';
 import { Redirect } from 'react-router-dom';
+import StyledInput from '../../../../common/components/StyledInput';
+import { BiggerFauxSimpleButton } from '../../../../common/components/FauxSimpleButton';
+import RedMessageCell from '../../../../common/components/RedMessageCell';
+import BiggerSimpleButton from '../../../../common/components/BiggerSimpleButton';
+
+import '../styles/CreateBillGeneratorCell.css';
 import { BillGeneratorWithoutId, BillWithoutId, Bill, BillGenerator } from '../models/BillsInfo';
 
 interface CreateBillGeneratorInput {
@@ -200,63 +204,79 @@ const CreateBillGeneratorCell: React.FC<CreateBillGeneratorCellProps> = ({ setTa
     }
 
     return (
-        <div>
-            <label>
-                {'Name: '}
-                <input
+        <div className="create-bill-generator-cell-container">
+            <div className="create-bill-generator-cell-name-container">
+                <StyledInput
                     type="text"
                     value={input.name}
                     onChange={handleChangeName}
-                    placeholder={'e.g., Electricity'}
+                    placeholder={'*Name of bill'}
                 />
-            </label>
-            <br />
-            <label>
-                {'Payable To: '}
-                <input
+            </div>
+            <div className="create-bill-generator-cell-recipient-container">
+                <StyledInput
                     type="text"
                     value={input.payableTo}
                     onChange={handleChangePayableTo}
-                    placeholder={'e.g., Con Edison'}
+                    placeholder={'*Bill recipient'}
                 />
-            </label>
-            <br />
-            <br />
-            <label>
-                {
-                    'Private bills will not be shown to your roommates. Only you can pay private bills.'
-                }
-                <p>
-                    {'This bill is '}
-                    <span style={{ fontWeight: 'bold' }}>
-                        {input.isPrivate ? 'Private' : 'Public'}
-                    </span>
-                </p>
-            </label>
-            <button onClick={handleTogglePrivate}>
-                {input.isPrivate ? 'Make Public' : 'Make Private'}
-            </button>
-            <br />
-            <br />
-            <br />
-            <FrequencySelectCell<BillFrequency>
-                state={input.frequency}
-                setState={handleSetFrequency}
-                frequencies={billFrequencies}
-            />
-            <DateInputCell state={input.starting} setState={handleSetStarting} showReset={true} />
-            <AmountsWithPercentOwedAssignmentCell
-                isPrivate={input.isPrivate}
-                amountsWithPercentOwed={input.amountsWithPercentOwed}
-                setAmountsWithPercentOwed={handleSetAmountsWithPercentOwed}
-                total={input.total}
-                totalValue={totalValue}
-                setTotal={handleSetTotal}
-            />
-            <div style={{ padding: 30 }}>
-                {canCreate() ? <button onClick={handleCreate}>{'Create Bill'}</button> : null}
             </div>
-            {error.length === 0 ? null : <p style={{ color: 'red' }}>{error}</p>}
+            <div className="create-bill-generator-cell-frequency-date-container">
+                <div className="create-bill-generator-cell-date-container">
+                    <span>{'Starting: '}</span>
+                    <DateInputCell
+                        state={input.starting}
+                        setState={handleSetStarting}
+                        showReset={false}
+                    />
+                </div>
+                <FrequencySelectCell<BillFrequency>
+                    state={input.frequency}
+                    setState={handleSetFrequency}
+                    frequencies={billFrequencies}
+                />
+            </div>
+            <div className="create-bill-generator-cell-private-container">
+                <div className="create-bill-generator-cell-clickable-line-container">
+                    <span>{'This bill is '}</span>
+                    <div
+                        className="create-bill-generator-cell-clickable-container"
+                        onClick={handleTogglePrivate}
+                    >
+                        <span>{input.isPrivate ? 'Private' : 'Public'}</span>
+                    </div>
+                </div>
+                {!input.isPrivate ? null : (
+                    <div className="create-bill-generator-cell-private-description-container">
+                        <span>
+                            {
+                                '(Private bills will not be shown to your roommates. Only you can pay private bills.)'
+                            }
+                        </span>
+                    </div>
+                )}
+            </div>
+
+            <div className="create-bill-generator-cell-awpoac-container">
+                <AmountsWithPercentOwedAssignmentCell
+                    isPrivate={input.isPrivate}
+                    amountsWithPercentOwed={input.amountsWithPercentOwed}
+                    setAmountsWithPercentOwed={handleSetAmountsWithPercentOwed}
+                    total={input.total}
+                    totalValue={totalValue}
+                    setTotal={handleSetTotal}
+                />
+            </div>
+            <div className="create-bill-generator-cell-create-button-container">
+                {canCreate() ? (
+                    <BiggerSimpleButton onClick={handleCreate} text={'Create Bill'} />
+                ) : (
+                    <BiggerFauxSimpleButton text="Create Bill" />
+                )}
+                <div className="create-bill-generator-cell-error-container">
+                    {error.length === 0 ? null : <RedMessageCell message={error} />}
+                </div>
+            </div>
         </div>
     );
 };

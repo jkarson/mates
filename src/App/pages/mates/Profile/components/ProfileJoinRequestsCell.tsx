@@ -101,19 +101,25 @@ const ProfileJoinRequestsCell: React.FC<ProfileJoinRequestsCellProps> = ({ setTa
                         content={'A list of users who have requested to join your apartment.'}
                     />
                 )}
-                <div className="profile-join-requests-cell-code-description-container">
-                    <LastWordBoldTextCell
-                        mainText={
-                            'Users can request to join your apartment using your unique code: '
-                        }
-                        lastWord={user.apartment.profile.code}
-                    />
+            </div>
+            {error.length === 0 ? null : (
+                <div className="profile-join-requests-cell-error-container">
+                    <RedMessageCell message={error} />{' '}
+                </div>
+            )}
+            <div className="profile-join-requests-cell-content-container">
+                <div className="profile-join-requests-cell-content-container-inner">
+                    <div className="profile-join-requests-cell-code-description-container">
+                        <LastWordBoldTextCell
+                            mainText={
+                                'Users can request to join your apartment using your unique code: '
+                            }
+                            lastWord={user.apartment.profile.code}
+                        />
+                    </div>
+                    <div>{content}</div>
                 </div>
             </div>
-            <div className="profile-join-requests-cell-error-container">
-                {error.length === 0 ? null : <RedMessageCell message={error} />}
-            </div>
-            <div className="profile-join-requests-cell-content-container">{content}</div>
         </div>
     );
 };

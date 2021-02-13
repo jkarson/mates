@@ -1,0 +1,39 @@
+.chores-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.chores-content-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    padding: 0 1vw 2vh 1vw;
+}
+
+@media only screen and (max-width: 570px) {
+    .chores-tabs-container .tab {
+        padding: 12px 4px;
+    }
+
+    .chores-tabs-container .tab-container {
+        justify-content: space-between;
+    }
+}
+
+.chores-error-container {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.chores-description-container {
+    padding: 1rem;
+    line-height: 1.5rem;
+}
+
+.chores-content-list-main-content-container {
+    flex: 1;
+    overflow-y: scroll;
+    padding: 1rem 0;
+}

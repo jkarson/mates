@@ -1,4 +1,11 @@
 .date-time-input-cell-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 4.2rem;
+    align-items: center;
 }
-.date-time-input-cell-button-container {
+.date-time-input-cell-button-container button {
+    font-size: 0.9rem;
+    padding: 3px 8px;
 }

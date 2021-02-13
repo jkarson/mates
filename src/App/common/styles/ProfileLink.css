@@ -1,7 +1,7 @@
 .profile-link-container {
     position: absolute;
     right: 5vw;
-    top: 2vh;
+    top: 1.25rem;
     padding: 0.5vh 1vw;
     color: dodgerblue;
     font-weight: bold;

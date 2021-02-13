@@ -1,11 +1,10 @@
 .profile-code-cell-container {
     display: flex;
     flex-direction: column;
-    height: 100%;
 }
 
 .profile-code-cell-description-container {
-    margin: 0 auto;
+    margin: 1rem auto 0;
     width: 45rem;
     padding: 1.2rem;
     text-align: center;
@@ -38,10 +37,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    margin: 2rem 0;
 }
 
 .profile-code-cell-code-container span {
     color: dodgerblue;
     font-size: calc(5rem + 5vw);
-    margin-top: -20vh;
 }

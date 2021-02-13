@@ -1,6 +1,51 @@
 .time-input-cell-container {
+    width: fit-content;
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: flex-end;
 }
-.time-input-cell-input-container {
+
+.time-input-cell-container span {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1rem;
+    line-height: 1.2rem;
 }
+
+.time-input-cell-colon-container {
+    width: 1.5rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.time-input-cell-colon-container > span {
+    font-weight: bold;
+}
+
+.time-input-cell-ampm-container {
+    background-color: rgba(128, 128, 128, 0.3);
+    cursor: pointer;
+    width: 2.2rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin: 0 0.25rem;
+    padding: 0.25rem 0;
+    border-radius: 1em;
+}
+
+.time-input-cell-ampm-container:hover {
+    box-shadow: 1px 1px 2px black;
+}
+
 .time-input-cell-reset-button-container {
+    align-self: center;
+}
+
+.time-input-cell-reset-button-container button {
+    font-size: 0.9rem;
+    padding: 3px 8px;
 }

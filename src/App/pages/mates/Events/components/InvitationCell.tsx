@@ -18,11 +18,25 @@ const InvitationCell: React.FC<InvitationCellProps> = ({
 }) => {
     return (
         <div className="invitation-cell-container">
-            <span>{invitation.title}</span>
-            <span>{getFormattedDateTimeString(invitation.time)}</span>
-            <span>{'Created by ' + invitation.creator}</span>
-            <SimpleButton onClick={() => handleAccept(invitation)} text={'Accept Invitation'} />
-            <SimpleButton onClick={() => handleDelete(invitation)} text={'Reject Invitation'} />
+            <div className="invitation-cell-info-container">
+                <div className="invitation-cell-title-container">
+                    <span>{invitation.title}</span>
+                </div>
+                <div className="invitation-cell-date-container">
+                    <span>{getFormattedDateTimeString(invitation.time)}</span>
+                </div>
+                <div className="invitation-cell-host-container">
+                    <span>{'Hosted by '}</span>
+                    <i className="fa fa-home" />
+                    <span>{invitation.creator}</span>
+                </div>
+            </div>
+            <div className="invitation-cell-accept-button-container">
+                <SimpleButton onClick={() => handleAccept(invitation)} text={'Accept Invitation'} />
+            </div>
+            <div className="invitation-cell-reject-button-container">
+                <SimpleButton onClick={() => handleDelete(invitation)} text={'Reject Invitation'} />
+            </div>
         </div>
     );
 };

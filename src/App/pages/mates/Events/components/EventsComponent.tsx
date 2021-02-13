@@ -10,6 +10,7 @@ import { initializeServerEventsInfo } from '../utilities';
 import EventCell from './EventCell';
 
 import '../styles/EventsComponent.css';
+import StandardStyledText from '../../../../common/components/StandardStyledText';
 
 interface EventsComponentProps {
     displayEvents: ApartmentEvent[];
@@ -20,7 +21,6 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents, tab })
     const { matesUser: user, setMatesUser: setUser } = useContext(
         MatesUserContext,
     ) as MatesUserContextType;
-    //const allEvents = user.apartment.eventsInfo.events;
 
     const [redirect, setRedirect] = useState(false);
     const [message, setMessage] = useState('');
@@ -110,7 +110,7 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents, tab })
                     ...user,
                     apartment: { ...user.apartment, eventsInfo: formattedEventsInfo },
                 });
-                setMessage('Attendee removed from event');
+                setMessage('Attendee removed from event.');
             });
     };
 
@@ -139,7 +139,7 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents, tab })
                     ...user,
                     apartment: { ...user.apartment, eventsInfo: formattedEventsInfo },
                 });
-                setMessage('You have left the event');
+                setMessage('You have left the event.');
             });
     };
 
@@ -165,8 +165,18 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents, tab })
                     ...user,
                     apartment: { ...user.apartment, eventsInfo: formattedEventsInfo },
                 });
-                setMessage('Event Deleted');
+                setMessage('Event Deleted.');
             });
+    };
+
+    const areApartmentsToInvite = (event: ApartmentEvent) => {
+        const uninvitedFriends = user.apartment.friendsInfo.friends.filter((apartment) => {
+            const apartmentId = apartment.apartmentId;
+            const attendeeIds = event.attendees.map((attendee) => attendee.apartmentId);
+            const inviteeIds = event.invitees.map((invitee) => invitee.apartmentId);
+            return !attendeeIds.includes(apartmentId) && !inviteeIds.includes(apartmentId);
+        });
+        return uninvitedFriends.length > 0;
     };
 
     const content = displayEvents.map((event) => (
@@ -176,14 +186,32 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents, tab })
             canRemoveEvent={
                 event.hostApartmentId === user.apartment._id && event.creatorId === user.userId
             }
+            areApartmentsToInvite={areApartmentsToInvite(event)}
             canRemoveFromEvent={event.hostApartmentId === user.apartment._id}
             handleRemoveEvent={handleDeleteEvent}
             handleInvite={handleInvite}
             handleRemoveAttendee={handleRemoveAttendee}
             handleRemoveInvitee={handleRemoveInvitee}
             handleLeaveEvent={handleLeaveEvent}
+            setMessage={setMessage}
         />
     ));
+
+    let eventsDescription: string;
+    switch (tab) {
+        case 'Past':
+            eventsDescription =
+                'A list of all events more than 24 hours in the past. Other apartments cannot be invited to these events, but enjoy your trip down memory lane.';
+            break;
+        case 'Present':
+            eventsDescription = 'A list of all events within 24 hours of now.';
+            break;
+        case 'Future':
+            eventsDescription = 'A list of all events more than 24 hours in the future.';
+            break;
+        default:
+            eventsDescription = '';
+    }
 
     if (redirect) {
         return <Redirect to="/" />;
@@ -191,6 +219,9 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents, tab })
 
     return (
         <div className="events-component-container">
+            <div className="events-component-description-container">
+                <StandardStyledText text={eventsDescription} />
+            </div>
             <div className="events-component-error-container">
                 {message.length === 0 ? null : <RedMessageCell message={message} />}
             </div>

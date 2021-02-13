@@ -6,13 +6,14 @@
 
 .profile-cell-apartment-container {
     flex: 0 auto;
-    margin-top: 1vh;
+    margin-top: 1rem;
     display: flex;
+    word-wrap: break-word;
     justify-content: center;
     align-items: center;
 }
 
 .profile-cell-tenants-container {
-    margin-top: 2vh;
+    margin-top: 1rem;
     flex: 1;
 }

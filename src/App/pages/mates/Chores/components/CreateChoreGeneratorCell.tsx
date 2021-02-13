@@ -1,15 +1,18 @@
 import React, { useContext, useState } from 'react';
 import { Redirect } from 'react-router-dom';
+import BiggerSimpleButton from '../../../../common/components/BiggerSimpleButton';
 import DateInputCell from '../../../../common/components/DateInputCell';
+import FauxSimpleButton, {
+    BiggerFauxSimpleButton,
+} from '../../../../common/components/FauxSimpleButton';
 import FrequencySelectCell from '../../../../common/components/FrequencySelectCell';
+import RedMessageCell from '../../../../common/components/RedMessageCell';
+import StyledInput from '../../../../common/components/StyledInput';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
-import { Tenant, UserId } from '../../../../common/models';
-import { StateProps } from '../../../../common/types';
+import { UserId } from '../../../../common/models';
 import {
     getTodaysDate,
     getYesterdaysDateFromDate,
-    getTenantByTenantId,
-    formatNames,
     getMaxDate,
     getPostOptions,
 } from '../../../../common/utilities';
@@ -20,6 +23,10 @@ import {
     getChoresWithoutIdFromChoreGeneratorWithoutId,
     initializeServerChoresInfo,
 } from '../utilities';
+import SimpleButton from '../../../../common/components/SimpleButton';
+import AssignAssigneeModal from './AssignAssigneeModal';
+
+import '../styles/CreateChoreGeneratorCell.css';
 
 interface CreateChoreGeneratorInput {
     name: string;
@@ -51,6 +58,9 @@ const CreateChoreGeneratorCell: React.FC<CreateChoreGeneratorCellProps> = ({ set
 
     const [input, setInput] = useState<CreateChoreGeneratorInput>(initialCreateChoreGeneratorInput);
 
+    const [showAssignModal, setShowAssignModal] = useState(false);
+    const [showAssigneesModal, setShowAssigneesModal] = useState(false);
+
     const handleSetAssigneeIds = (assigneeIds: UserId[]) => {
         setInput({ ...input, assigneeIds: [...assigneeIds] });
     };
@@ -65,7 +75,9 @@ const CreateChoreGeneratorCell: React.FC<CreateChoreGeneratorCellProps> = ({ set
 
     const handleChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
-        setInput({ ...input, name: value });
+        if (value !== ' ') {
+            setInput({ ...input, name: value.trimStart() });
+        }
     };
 
     const toggleShowUntilCompleted = () => {
@@ -73,18 +85,18 @@ const CreateChoreGeneratorCell: React.FC<CreateChoreGeneratorCellProps> = ({ set
         setInput({ ...input, showUntilCompleted: newShowUntilCompleted });
     };
 
+    const canCreate = () => input.name.length > 0 && input.assigneeIds.length > 0;
+
     const createChoreGenerator = () => {
-        if (!input.name) {
+        if (input.name.length === 0 || input.assigneeIds.length === 0) {
             return;
         }
-        const assigneeIds: UserId[] =
-            input.assigneeIds.length > 0
-                ? input.assigneeIds
-                : user.apartment.tenants.map((tenant) => tenant.userId);
         const starting = new Date(input.starting.getTime());
+        input.name = input.name.trim();
+
         const newChoreGenerator: ChoreGeneratorWithoutId = {
             name: input.name,
-            assigneeIds: [...assigneeIds],
+            assigneeIds: [...input.assigneeIds],
             frequency: input.frequency,
             starting: starting,
             showUntilCompleted: input.showUntilCompleted,
@@ -137,108 +149,100 @@ const CreateChoreGeneratorCell: React.FC<CreateChoreGeneratorCellProps> = ({ set
     }
 
     return (
-        <div>
-            {error.length === 0 ? null : <p style={{ color: 'red' }}>{error}</p>}
-            <label>
-                {'Chore Title: '}
-                <input
-                    type="text"
-                    value={input.name}
-                    placeholder={'*Required'}
-                    name="name"
-                    onChange={handleChangeName}
+        <div className="create-chore-generator-cell-container">
+            {!showAssignModal ? null : (
+                <AssignAssigneeModal
+                    setShow={setShowAssignModal}
+                    mode={'Assign'}
+                    assigned={input.assigneeIds}
+                    handleSetAssigned={handleSetAssigneeIds}
                 />
-            </label>
-            <br />
-            <ChoreGeneratorAssignmentCell
-                state={input.assigneeIds}
-                setState={handleSetAssigneeIds}
-            />
-            <FrequencySelectCell<ChoreFrequency>
-                state={input.frequency}
-                setState={handleSetFrequency}
-                frequencies={choreFrequencies}
-            />
-            <DateInputCell state={input.starting} setState={handleSetDate} showReset={true} />
-            <p>
-                {'Show until completed: '}
-                <span style={{ fontWeight: 'bold' }}>
-                    {input.showUntilCompleted ? 'YES' : 'NO'}
-                </span>
-                <button onClick={toggleShowUntilCompleted}>{'Toggle'}</button>
-            </p>
-            <p style={{ fontWeight: 'bold' }}>
-                {input.showUntilCompleted
-                    ? 'These chores will remain in your chore list until they are completed, even if their date passes.'
-                    : 'These chores will be automatically deleted when their date passes, whether or not they have been completed.'}
-            </p>
-            <button onClick={createChoreGenerator}>{'Create Chore Set'}</button>
-        </div>
-    );
-};
-
-const ChoreGeneratorAssignmentCell: React.FC<StateProps<Array<UserId>>> = ({ state, setState }) => {
-    const { matesUser: user } = useContext(MatesUserContext) as MatesUserContextType;
-    const assignees = state
-        .map((tenantId) => getTenantByTenantId(user, tenantId))
-        .filter((tenant) => tenant) as Tenant[];
-
-    const assigneeNames = assignees.map((tenant) => tenant.name);
-
-    const tenants = user.apartment.tenants;
-
-    const toggleAssign = (tenantId: UserId) => {
-        if (state.includes(tenantId)) {
-            const tenantIdIndex = state.indexOf(tenantId);
-            state.splice(tenantIdIndex, 1);
-            setState(state);
-        } else {
-            state.push(tenantId);
-            setState(state);
-        }
-    };
-
-    const tenantAssignmentCells = tenants.map((tenant) => (
-        <TenantAssignmentCell
-            key={tenant.userId}
-            tenant={tenant}
-            assigned={assignees.includes(tenant)}
-            toggleAssign={toggleAssign}
-        />
-    ));
-    return (
-        <div>
-            {assignees.length > 0 ? (
-                <p>{'Assigned to ' + formatNames(assigneeNames)}</p>
-            ) : (
-                <p style={{ fontWeight: 'bold' }}>
-                    {
-                        'This chore has not yet been assigned to anyone. If left unassigned, it will be automatically assigned to all tenants.'
-                    }
-                </p>
             )}
-            <div style={{ display: 'flex' }}>{tenantAssignmentCells}</div>
-        </div>
-    );
-};
-
-interface TenantAssignmentCellProps {
-    tenant: Tenant;
-    assigned: boolean;
-    toggleAssign: (tenantId: UserId) => void;
-}
-
-const TenantAssignmentCell: React.FC<TenantAssignmentCellProps> = ({
-    tenant,
-    assigned,
-    toggleAssign,
-}) => {
-    return (
-        <div style={{ paddingLeft: 20, paddingRight: 20 }}>
-            <h3>{tenant.name}</h3>
-            <button onClick={() => toggleAssign(tenant.userId)}>
-                {assigned ? 'Unassign' : 'Assign'}
-            </button>
+            {!showAssigneesModal ? null : (
+                <AssignAssigneeModal
+                    setShow={setShowAssigneesModal}
+                    mode="Assignees"
+                    assigned={input.assigneeIds}
+                    handleSetAssigned={handleSetAssigneeIds}
+                />
+            )}
+            <div className="create-chore-generator-cell-main-content-container">
+                <div className="create-chore-generator-cell-main-content-inner">
+                    <div className="create-chore-generator-cell-input-container">
+                        <StyledInput
+                            type="text"
+                            value={input.name}
+                            placeholder={'*Chore Name'}
+                            name="name"
+                            onChange={handleChangeName}
+                        />
+                    </div>
+                    <div className="create-chore-generator-cell-starting-repeat-container">
+                        <div className="create-chore-generator-cell-starting-container">
+                            <span>{'Starting: '}</span>
+                            <DateInputCell
+                                state={input.starting}
+                                setState={handleSetDate}
+                                showReset={false}
+                            />
+                        </div>
+                        <FrequencySelectCell<ChoreFrequency>
+                            state={input.frequency}
+                            setState={handleSetFrequency}
+                            frequencies={choreFrequencies}
+                        />
+                    </div>
+                    <div className="create-chore-generator-cell-assignment-container">
+                        {input.assigneeIds.length < user.apartment.tenants.length ? (
+                            <SimpleButton
+                                onClick={() => setShowAssignModal(true)}
+                                text={'Assign Chore'}
+                            />
+                        ) : (
+                            <FauxSimpleButton text="Assign Chore" />
+                        )}
+                        {input.assigneeIds.length > 0 ? (
+                            <SimpleButton
+                                onClick={() => setShowAssigneesModal(true)}
+                                text="View Assignees"
+                            />
+                        ) : (
+                            <FauxSimpleButton text="View Assignees" />
+                        )}
+                    </div>
+                    <div className="create-chore-generator-cell-show-container">
+                        <div className="create-chore-generator-cell-show-first-line">
+                            <span>{'Show until completed: '}</span>
+                            <div
+                                className="create-chore-generator-cell-show-toggle-container"
+                                onClick={toggleShowUntilCompleted}
+                            >
+                                <span>{input.showUntilCompleted ? 'YES' : 'NO'}</span>
+                            </div>
+                        </div>
+                        <div className="create-chore-generator-cell-show-second-line">
+                            <span>
+                                {input.showUntilCompleted
+                                    ? '(These chores will remain in your chore list until they are completed, even if their date passes.)'
+                                    : '(These chores will be automatically deleted when their date passes, whether or not they have been completed.)'}
+                            </span>
+                        </div>
+                    </div>
+                    <div className="create-chore-generator-cell-create-buttons-container">
+                        {canCreate() ? (
+                            <BiggerSimpleButton
+                                onClick={createChoreGenerator}
+                                text="Create Chore Set"
+                            />
+                        ) : (
+                            <BiggerFauxSimpleButton text="Create Chore Set" />
+                        )}
+                    </div>
+                </div>
+            </div>
+            <div className="create-chore-generator-error-container">
+                {error.length === 0 ? null : <RedMessageCell message={error} />}
+            </div>
         </div>
     );
 };

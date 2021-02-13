@@ -13,7 +13,9 @@ interface AddFriendCellProps {
 const AddFriendCell: React.FC<AddFriendCellProps> = ({ potentialFriend, handleAdd }) => (
     <div className="add-friend-cell-container">
         <ApartmentSummaryCell friend={potentialFriend} />
-        <SimpleButton onClick={() => handleAdd(potentialFriend)} text={'Send Friend Request'} />
+        <div className="add-friend-cell-button-container">
+            <SimpleButton onClick={() => handleAdd(potentialFriend)} text={'Send Friend Request'} />
+        </div>
     </div>
 );
 

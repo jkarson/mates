@@ -33,8 +33,7 @@ const TimeInputCell: React.FC<TimeInputCellProps> = ({ state, setState, showRese
     const getHourOptions = () => {
         const options: JSX.Element[] = [];
         let i: number;
-        options.push(<option value={12}>{12}</option>);
-        for (i = 1; i <= 11; i++) {
+        for (i = 1; i <= 12; i++) {
             options.push(<option value={i}>{i}</option>);
         }
         return options;
@@ -54,23 +53,23 @@ const TimeInputCell: React.FC<TimeInputCellProps> = ({ state, setState, showRese
 
     return (
         <div className="time-input-cell-container">
-            <div className="time-input-cell-input-container">
-                <span>{'Time: '}</span>
-                <StyledSelect
-                    value={timeInput.hour}
-                    name="hour"
-                    onChange={handleChangeTime}
-                    options={getHourOptions()}
-                />
-                <span>{' : '}</span>
-                <StyledSelect
-                    value={timeInput.minute}
-                    name="minute"
-                    onChange={handleChangeTime}
-                    options={getMinuteOptions()}
-                />
+            <StyledSelect
+                value={timeInput.hour}
+                name="hour"
+                onChange={handleChangeTime}
+                options={getHourOptions()}
+            />
+            <div className="time-input-cell-colon-container">
+                <span>{':'}</span>
+            </div>
+            <StyledSelect
+                value={timeInput.minute}
+                name="minute"
+                onChange={handleChangeTime}
+                options={getMinuteOptions()}
+            />
+            <div className="time-input-cell-ampm-container" onClick={handleToggleAMPM}>
                 <span>{' ' + timeInput.ampm + ' '}</span>
-                <SimpleButton onClick={handleToggleAMPM} text={'Toggle'} />
             </div>
             <div className="time-input-cell-reset-button-container">
                 {showReset ? <SimpleButton onClick={handleClickReset} text={'Reset Time'} /> : null}

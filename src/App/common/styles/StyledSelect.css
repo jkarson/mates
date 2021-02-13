@@ -1,2 +1,33 @@
 .styled-select-container {
+    position: relative;
+    width: fit-content;
+    border-bottom: 1px solid black;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1rem;
+    line-height: 1.2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.styled-select-container > select {
+    appearance: none;
+    background-color: transparent;
+    border: none;
+    margin: 0;
+    width: min-content;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: inherit;
+    line-height: inherit;
+    outline: none;
+    text-align: left;
+    text-align-last: left;
+    padding: 0.25rem 1.25rem 0.25rem 0rem;
+}
+
+.styled-select-icon-container {
+    position: absolute;
+    right: 0.25rem;
+    pointer-events: none;
 }

@@ -7,15 +7,14 @@ import {
 } from '../../../../common/utilities';
 import { ApartmentSummary } from '../models/FriendsInfo';
 import { FriendsTabType } from '../models/FriendsTabs';
-import ApartmentSummaryCell from './ApartmentSummaryCell';
-
-import '../styles/CreateFriendRequestCell.css';
 import StandardStyledText from '../../../../common/components/StandardStyledText';
 import LastWordBoldTextCell from '../../../../common/components/LastWordBoldTextCell';
 import StyledInput from '../../../../common/components/StyledInput';
 import BiggerSimpleButton from '../../../../common/components/BiggerSimpleButton';
 import RedMessageCell from '../../../../common/components/RedMessageCell';
 import AddFriendCell from './AddFriendCell';
+
+import '../styles/CreateFriendRequestCell.css';
 
 interface CreateFriendRequestCellProps {
     setTab: React.Dispatch<React.SetStateAction<FriendsTabType>>;
@@ -105,29 +104,31 @@ const CreateFriendRequestCell: React.FC<CreateFriendRequestCellProps> = ({ setTa
 
     return (
         <div className="create-friend-request-cell-container">
-            <div className="create-friend-request-cell-text-container">
-                <StandardStyledText text={'Search for other apartments by unique code.'} />
-                <div className="create-friend-request-cell-line-break" />
-                <LastWordBoldTextCell
-                    mainText={" Your apartment's unique code is: "}
-                    lastWord={user.apartment.profile.code}
-                />
-            </div>
-            <div className="create-friend-request-cell-search-container">
-                <StyledInput type="text" value={input} onChange={handleChange} />
-                <BiggerSimpleButton onClick={handleSearchCode} text={'Search'} />
-                {searchError.length === 0 ? null : <RedMessageCell message={searchError} />}
-            </div>
-            <div className="create-friend-request-cell-add-friend-container">
-                {!friendSummary ? null : (
-                    <AddFriendCell
-                        potentialFriend={friendSummary}
-                        handleAdd={handleSendFriendRequest}
+            <div className="create-friend-request-cell-content-container">
+                <div className="create-friend-request-cell-text-container">
+                    <StandardStyledText text={'Search for other apartments by unique code.'} />
+                    <div className="create-friend-request-cell-line-break" />
+                    <LastWordBoldTextCell
+                        mainText={" Your apartment's unique code is: "}
+                        lastWord={user.apartment.profile.code}
                     />
-                )}
-            </div>
-            <div className="create-friend-request-cell-error-container">
-                {footerError.length === 0 ? null : <RedMessageCell message={footerError} />}
+                </div>
+                <div className="create-friend-request-cell-search-container">
+                    <StyledInput type="text" value={input} onChange={handleChange} />
+                    <BiggerSimpleButton onClick={handleSearchCode} text={'Search'} />
+                    {searchError.length === 0 ? null : <RedMessageCell message={searchError} />}
+                </div>
+                <div className="create-friend-request-cell-add-friend-container">
+                    {!friendSummary ? null : (
+                        <AddFriendCell
+                            potentialFriend={friendSummary}
+                            handleAdd={handleSendFriendRequest}
+                        />
+                    )}
+                </div>
+                <div className="create-friend-request-cell-error-container">
+                    {footerError.length === 0 ? null : <RedMessageCell message={footerError} />}
+                </div>
             </div>
         </div>
     );

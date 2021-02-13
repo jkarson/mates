@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import BiggerSimpleButton from '../../common/components/BiggerSimpleButton';
-import FooterButton from '../../common/components/FooterButton';
-import FooterComponent from '../../common/components/FooterComponent';
 import PageCell from '../../common/components/PageCell';
 import StandardStyledText from '../../common/components/StandardStyledText';
 import DemoMates from './components/DemoMates';

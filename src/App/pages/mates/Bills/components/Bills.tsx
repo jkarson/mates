@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useLayoutEffect, useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import DescriptionCell from '../../../../common/components/DescriptionCell';
+import RedMessageCell from '../../../../common/components/RedMessageCell';
 import Tabs from '../../../../common/components/Tabs';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { UserId } from '../../../../common/models';
@@ -12,7 +13,7 @@ import {
     getDeleteOptions,
 } from '../../../../common/utilities';
 import { AmountOwed } from '../models/AmountOwed';
-import { BillId, BillGeneratorID, Bill, BillGenerator } from '../models/BillsInfo';
+import { BillId, BillGeneratorID, Bill } from '../models/BillsInfo';
 import { billsTabNames, BillsTabType } from '../models/BillsTabs';
 import {
     purgeOldBills,
@@ -21,8 +22,10 @@ import {
     initializeServerBillsInfo,
 } from '../utilities';
 import BillCell from './BillCell';
-import BillGeneratorCell from './BillGeneratorCell';
+import BillSummaryCell from './BillSummaryCell';
 import CreateBillGeneratorCell from './CreateBillGeneratorCell';
+
+import '../styles/Bills.css';
 
 //EXTENSION: make bills editable
 
@@ -392,19 +395,39 @@ const Bills: React.FC = () => {
     let content: JSX.Element;
     switch (tab) {
         case 'Overdue':
-            content = <div>{getOverdueBills().map(getBillCell)}</div>;
+            content = (
+                <div className="bills-content-list-container">
+                    {getOverdueBills().map(getBillCell)}
+                </div>
+            );
             break;
         case 'Unresolved':
-            content = <div>{getUnresolvedBills().map(getBillCell)}</div>;
+            content = (
+                <div className="bills-content-list-container">
+                    {getUnresolvedBills().map(getBillCell)}
+                </div>
+            );
             break;
         case 'Upcoming':
-            content = <div>{getUpcomingBills().map(getBillCell)}</div>;
+            content = (
+                <div className="bills-content-list-container">
+                    {getUpcomingBills().map(getBillCell)}
+                </div>
+            );
             break;
         case 'Future':
-            content = <div>{getFutureBills().map(getBillCell)}</div>;
+            content = (
+                <div className="bills-content-list-container">
+                    {getFutureBills().map(getBillCell)}
+                </div>
+            );
             break;
         case 'Resolved':
-            content = <div>{getResolvedBills().map(getBillCell)}</div>;
+            content = (
+                <div className="bills-content-list-container">
+                    {getResolvedBills().map(getBillCell)}
+                </div>
+            );
             break;
         case 'Summary':
             content = (
@@ -426,11 +449,21 @@ const Bills: React.FC = () => {
     }
 
     return (
-        <div>
-            <Tabs currentTab={tab} setTab={setTab} tabNames={billsTabNames} />
-            <BillsDescriptionCell tab={tab} />
-            {message.length === 0 ? null : <p style={{ color: 'red' }}>{message}</p>}
-            <div>{content}</div>
+        <div className="bills-container">
+            <div className="bills-tabs-container">
+                <Tabs currentTab={tab} setTab={setTab} tabNames={billsTabNames} />
+            </div>
+            {tab !== 'Create New' ? (
+                <div className="bills-description-container">
+                    <BillsDescriptionCell tab={tab} />
+                </div>
+            ) : null}
+            {message.length === 0 ? null : (
+                <div className="bills-error-container">
+                    <RedMessageCell message={message} />
+                </div>
+            )}
+            <div className="bills-content-container">{content}</div>
         </div>
     );
 };
@@ -447,7 +480,8 @@ const BillsDescriptionCell: React.FC<BillsDescriptionCellProps> = ({ tab }) => {
                 'These bills have an outstanding payable balance. Private bills will be highlighted in red.';
             break;
         case 'Unresolved':
-            content = 'These bills have been paid but still contain debts among roommates.';
+            content =
+                'These bills have been paid, but their date has passed and they still contain debts among roommates.';
             break;
         case 'Upcoming':
             content =
@@ -471,24 +505,6 @@ const BillsDescriptionCell: React.FC<BillsDescriptionCellProps> = ({ tab }) => {
             assertUnreachable(tab);
     }
     return <DescriptionCell content={content} />;
-};
-
-interface BillSummaryCellProps {
-    billGenerators: BillGenerator[];
-    handleDeleteBillSeries: (bgId: BillGeneratorID) => void;
-}
-
-const BillSummaryCell: React.FC<BillSummaryCellProps> = ({
-    billGenerators,
-    handleDeleteBillSeries,
-}) => {
-    const billGeneratorCells = billGenerators.map((billGenerator) => (
-        <BillGeneratorCell
-            billGenerator={billGenerator}
-            handleDeleteBillSeries={handleDeleteBillSeries}
-        />
-    ));
-    return <div>{billGeneratorCells}</div>;
 };
 
 export default Bills;

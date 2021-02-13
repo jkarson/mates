@@ -1,6 +1,58 @@
 .create-event-cell-container {
+    /* background-color: red; */
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
+
+.create-event-cell-input-container {
+    flex: 1;
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.create-event-cell-input-container .styled-input {
+    margin-block-start: 0;
+}
+
+.create-event-cell-input-container textarea {
+    width: 80%;
+    box-sizing: border-box;
+    line-height: 1.5rem;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    border: none;
+    resize: none;
+    padding: 0.5rem 1.5rem;
+    background-color: unset;
+    border: 1px solid black;
+}
+
+.create-event-cell-input-container textarea:focus {
+    outline: none;
+}
+
+.create-event-cell-date-time-container {
+    margin: 0 0 2rem 0;
+}
+
+.create-event-cell-friends-buttons-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 80%;
+    margin-top: 2rem;
+}
+
 .create-event-cell-error-container {
+    margin-top: -0.25rem;
+    margin-bottom: 1rem;
 }
 .create-event-cell-button-container {
+    padding: 1rem 0;
 }

@@ -1,0 +1,25 @@
+.tenant-assignment-cell-container {
+    padding: 1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    overflow-wrap: break-word;
+}
+
+.tenant-assignment-cell-container > span {
+    min-width: 1%;
+}
+
+.tenant-assignment-cell-button-container {
+    margin-left: 1rem;
+}
+
+.tenant-assignment-cell-unassign-button-container button {
+    background-color: rgb(52, 189, 155);
+}
+
+.tenant-assignment-cell-unassign-button-container button:active {
+    color: rgb(52, 189, 155);
+}

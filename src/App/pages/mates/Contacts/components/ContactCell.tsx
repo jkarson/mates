@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { formatPhoneNumber } from '../../../../common/utilities';
 import { Contact } from '../models/Contact';
 import { getInitials } from '../utilities';
-import SimpleButton from '../../../../common/components/SimpleButton';
 
 import '../styles/ContactCell.css';
 import YesNoMessageModal from '../../../../common/components/YesNoMessageModal';
+import SimpleButton from '../../../../common/components/SimpleButton';
 
 interface ContactCellProps {
     contact: Contact;
@@ -32,13 +32,23 @@ const ContactCell: React.FC<ContactCellProps> = ({ contact, handleDelete }) => {
                 <Initials name={contact.name} />
             </div>
             <div className="contact-cell-content-container">
-                <span>{contact.name}</span>
-                {contact.number ? <span>{formatPhoneNumber(contact.number)}</span> : null}
-                {contact.email ? <span>{contact.email}</span> : null}
+                <div className="contact-cell-name-container">
+                    <span>{contact.name}</span>
+                </div>
+                {contact.number ? (
+                    <div className="contact-cell-number-container">
+                        <span>{formatPhoneNumber(contact.number)}</span>
+                    </div>
+                ) : null}
+                {contact.email ? (
+                    <div className="contact-cell-email-container">
+                        <span>{contact.email}</span>
+                    </div>
+                ) : null}
             </div>
             <div className="contact-cell-delete-button-container">
                 {contact.manuallyAdded ? (
-                    <span onClick={() => setShowModal(true)}>{'X'}</span>
+                    <SimpleButton onClick={() => setShowModal(true)} text="Delete Contact" />
                 ) : null}
             </div>
         </div>

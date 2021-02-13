@@ -1,4 +1,6 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
+import SimpleButton from '../../../../common/components/SimpleButton';
+import YesNoMessageModal from '../../../../common/components/YesNoMessageModal';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { Tenant } from '../../../../common/models';
 import {
@@ -7,6 +9,15 @@ import {
     formatNames,
 } from '../../../../common/utilities';
 import { ChoreGenerator, ChoreGeneratorID } from '../models/ChoresInfo';
+
+import '../styles/ChoreGeneratorCell.css';
+
+/*PICKUP: 
+
+2. Style ChoreCell
+3. On to Bills
+
+*/
 
 interface ChoreGeneratorCellProps {
     choreGenerator: ChoreGenerator;
@@ -23,19 +34,42 @@ const ChoreGeneratorCell: React.FC<ChoreGeneratorCellProps> = ({
     const tenantAssignees = choreGenerator.assigneeIds
         .map((assignee) => getTenantByTenantId(matesUser, assignee))
         .filter((assignee) => assignee !== undefined) as Tenant[];
+
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     return (
-        <div style={{ borderTop: '1px solid black' }}>
-            <h3 style={assignedToUser ? { color: 'red' } : {}}>{choreGenerator.name}</h3>
-            <p style={{ fontWeight: 'bold' }}>
-                {choreGenerator.frequency +
-                    ', beginning ' +
-                    getFormattedDateString(choreGenerator.starting)}
-            </p>
-            <p>{'Assigned to ' + formatNames(tenantAssignees.map((tenant) => tenant.name))}</p>
-            <p>{'Show until completed: ' + (choreGenerator.showUntilCompleted ? 'Yes' : 'No')}</p>
-            <button onClick={() => handleDeleteSeries(choreGenerator._id)}>
-                {'Delete chore series'}
-            </button>
+        <div className="chore-generator-cell-container">
+            <YesNoMessageModal
+                show={showDeleteModal}
+                setShow={setShowDeleteModal}
+                message="Are you sure you want to delete this chore series? All associated chores will be deleted."
+                yesText="Delete Chore Series"
+                onClickYes={() => handleDeleteSeries(choreGenerator._id)}
+            />
+            <div className="chore-generator-cell-info-container">
+                <div className="chore-generator-cell-title-container">
+                    <span
+                        className={assignedToUser ? 'chore-generator-cell-title-red-container' : ''}
+                    >
+                        {choreGenerator.name}
+                    </span>
+                </div>
+                <div className="chore-generator-cell-frequency-container">
+                    <span>
+                        {choreGenerator.frequency +
+                            ', beginning ' +
+                            getFormattedDateString(choreGenerator.starting)}
+                    </span>
+                </div>
+                <div className="chore-generator-cell-assignment-container">
+                    <span>
+                        {'Assigned to: ' +
+                            formatNames(tenantAssignees.map((tenant) => tenant.name))}
+                    </span>
+                </div>
+            </div>
+            <div className="chore-generator-cell-button-container">
+                <SimpleButton onClick={() => setShowDeleteModal(true)} text="Delete Chore Series" />
+            </div>
         </div>
     );
 };

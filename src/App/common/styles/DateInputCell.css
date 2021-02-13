@@ -1,6 +1,32 @@
 .date-input-cell-container {
+    width: fit-content;
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: flex-end;
 }
-.date-input-cell-input-container {
+
+.date-input-cell-container > span {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1rem;
+    line-height: 1.2rem;
+    padding: 0.25rem 0rem;
+    margin-right: 1rem;
 }
+
+.date-input-cell-container .styled-select-container {
+    margin-right: 1rem;
+}
+
+.date-input-cell-year-container .styled-select-container {
+    margin-right: 0;
+}
+
 .date-input-cell-reset-button-container {
+    margin-left: 1rem;
+}
+
+.date-input-cell-reset-button-container button {
+    font-size: 0.9rem;
+    padding: 3px 8px;
 }

@@ -4,7 +4,7 @@
     flex-direction: row-reverse;
     justify-content: flex-start;
     align-items: center;
-    width: calc(21rem + 20vw);
+    width: calc(21rem + 15vw);
     padding: 1.5rem 1rem;
     border-left: 1px solid black;
     border-right: 1px solid black;
@@ -18,13 +18,14 @@
 .incoming-request-cell-apartment-container {
     flex: 1;
     overflow-wrap: break-word;
-    word-break: break-all;
+    word-break: break-word;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 1.2rem;
     font-weight: bold;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+    margin-right: 1rem;
 }
 
 .incoming-request-cell-buttons-container {
@@ -47,7 +48,7 @@
 }
 /* OutgoingRequestCell styles */
 .outgoing-request-cell-container {
-    width: 100%;
+    max-width: 100%;
     box-sizing: border-box;
     padding: 1rem;
     display: flex;
@@ -57,6 +58,11 @@
 
 .outgoing-request-cell-apartment-container {
     flex: 1;
+    display: flex;
+    justify-content: flex-start;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    min-width: 1%;
 }
 
 .outgoing-request-cell-delete-button-container {

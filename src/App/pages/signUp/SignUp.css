@@ -74,11 +74,19 @@
     width: calc(5rem + 20vw);
 }
 
-.signup-container > *:nth-child(7) {
+.button-container {
     grid-area: button;
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 3rem 0;
+}
+
+.create-error {
+    position: absolute;
+    text-align: center;
+    bottom: 1rem;
 }
 
 .password-and-verification {
@@ -114,14 +122,6 @@
     justify-content: center;
     align-items: flex-start;
     text-align: center;
-}
-
-.create-error {
-    position: absolute;
-    bottom: calc(3rem + 2vw);
-    text-align: center;
-    left: 0;
-    right: 0;
 }
 
 .create-account-faux-button-container button {
