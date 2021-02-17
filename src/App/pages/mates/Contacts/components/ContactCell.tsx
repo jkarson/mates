@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { formatPhoneNumber } from '../../../../common/utilities';
 import { Contact } from '../models/Contact';
-import { getInitials } from '../utilities';
+import YesNoMessageModal from '../../../../common/components/YesNoMessageModal';
+import { SimpleButton } from '../../../../common/components/SimpleButtons';
+import Initials from './Initials';
 
 import '../styles/ContactCell.css';
-import YesNoMessageModal from '../../../../common/components/YesNoMessageModal';
-import SimpleButton from '../../../../common/components/SimpleButton';
 
 interface ContactCellProps {
     contact: Contact;
@@ -28,7 +28,7 @@ const ContactCell: React.FC<ContactCellProps> = ({ contact, handleDelete }) => {
                     message={'Delete contact?'}
                 />
             </div>
-            <div className="contact-cell-initials-container">
+            <div>
                 <Initials name={contact.name} />
             </div>
             <div className="contact-cell-content-container">
@@ -50,21 +50,6 @@ const ContactCell: React.FC<ContactCellProps> = ({ contact, handleDelete }) => {
                 {contact.manuallyAdded ? (
                     <SimpleButton onClick={() => setShowModal(true)} text="Delete Contact" />
                 ) : null}
-            </div>
-        </div>
-    );
-};
-
-interface InitialsProps {
-    name: string;
-}
-//to do: modularize
-const Initials: React.FC<InitialsProps> = ({ name }) => {
-    const initials = getInitials(name);
-    return (
-        <div className="contact-cell-initials-container">
-            <div className="contact-cell-initials-circle">
-                <span className="contact-cell-initials-content">{initials}</span>
             </div>
         </div>
     );

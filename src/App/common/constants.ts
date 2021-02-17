@@ -22,5 +22,3 @@ export const weekdays = [
     'Friday',
     'Saturday',
 ] as const;
-
-export const yankeeBlue = '#1e90ff';

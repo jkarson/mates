@@ -1,10 +1,10 @@
 import React from 'react';
 import { StateProps, TimeInputType } from '../types';
 import { getCurrentTime } from '../utilities';
-import SimpleButton from './SimpleButton';
+import StyledSelect from './StyledSelect';
+import { SimpleButton } from './SimpleButtons';
 
 import '../styles/TimeInputCell.css';
-import StyledSelect from './StyledSelect';
 
 interface TimeInputCellProps extends StateProps<TimeInputType> {
     showReset?: boolean;
@@ -34,7 +34,11 @@ const TimeInputCell: React.FC<TimeInputCellProps> = ({ state, setState, showRese
         const options: JSX.Element[] = [];
         let i: number;
         for (i = 1; i <= 12; i++) {
-            options.push(<option value={i}>{i}</option>);
+            options.push(
+                <option value={i} key={i}>
+                    {i}
+                </option>,
+            );
         }
         return options;
     };
@@ -43,10 +47,18 @@ const TimeInputCell: React.FC<TimeInputCellProps> = ({ state, setState, showRese
         const options: JSX.Element[] = [];
         let i: number;
         for (i = 0; i < 10; i++) {
-            options.push(<option value={i}>{'0' + i}</option>);
+            options.push(
+                <option value={i} key={i}>
+                    {'0' + i}
+                </option>,
+            );
         }
         for (i = 10; i < 60; i++) {
-            options.push(<option value={i}>{i}</option>);
+            options.push(
+                <option value={i} key={i}>
+                    {i}
+                </option>,
+            );
         }
         return options;
     };

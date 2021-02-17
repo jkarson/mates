@@ -1,23 +1,23 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { getTotalCurrentAssignedValue } from '../utilities';
-import { AmountOwed } from '../models/AmountOwed';
-import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
-import { getFormattedDateString, getTenantByTenantId } from '../../../../common/utilities';
+import { getFormattedDateString } from '../../../../common/utilities';
 import { UserId } from '../../../../common/models';
 import { Bill, BillId, BillGeneratorID } from '../models/BillsInfo';
-
-import '../styles/BillCell.css';
-import SimpleButton from '../../../../common/components/SimpleButton';
 import YesNoMessageModal from '../../../../common/components/YesNoMessageModal';
 import PayableToDisplayCell from './PayableToDisplayCell';
 import AmountsOwedDisplayCell from './AmountsOwedDisplayCell';
+import { SimpleButton } from '../../../../common/components/SimpleButtons';
+
+import '../styles/BillCell.css';
 
 interface BillCellProps {
     bill: Bill;
+    includesUser: boolean;
     isPaid: boolean;
     isPrivate: boolean;
     isResolved: boolean;
     userPortionIsPaid: boolean;
+    userPortionOwed: number;
     handleDeleteBill: (billId: BillId) => void;
     handleDeleteBillSeries: (bgId: BillGeneratorID) => void;
     handleResolveBill: (billId: BillId) => void;
@@ -29,10 +29,12 @@ interface BillCellProps {
 
 const BillCell: React.FC<BillCellProps> = ({
     bill,
+    includesUser,
     isPaid,
     isPrivate,
     isResolved,
     userPortionIsPaid,
+    userPortionOwed,
     handleDeleteBill,
     handleDeleteBillSeries,
     handleResolveBill,
@@ -63,7 +65,12 @@ const BillCell: React.FC<BillCellProps> = ({
             />
             <div className="bill-cell-top-line-container">
                 <div className="bill-cell-delete-bill-button-container">
-                    <SimpleButton text="Delete Bill" onClick={() => setShowDeleteBillModal(true)} />
+                    {!includesUser ? null : (
+                        <SimpleButton
+                            text="Delete Bill"
+                            onClick={() => setShowDeleteBillModal(true)}
+                        />
+                    )}
                 </div>
                 <div
                     className={
@@ -75,10 +82,12 @@ const BillCell: React.FC<BillCellProps> = ({
                     <span>{bill.name}</span>
                 </div>
                 <div className="bill-cell-delete-series-button-container">
-                    <SimpleButton
-                        text="Delete Bill Series"
-                        onClick={() => setShowDeleteSeriesModal(true)}
-                    />
+                    {!includesUser ? null : (
+                        <SimpleButton
+                            text="Delete Bill Series"
+                            onClick={() => setShowDeleteSeriesModal(true)}
+                        />
+                    )}
                 </div>
             </div>
             <div className="bill-cell-date-container">
@@ -88,10 +97,12 @@ const BillCell: React.FC<BillCellProps> = ({
             <div className="bill-cell-payable-to-container">
                 <PayableToDisplayCell
                     billId={bill._id}
+                    includesUser={includesUser}
                     payableTo={bill.payableTo}
                     isPaid={isPaid}
                     isPrivate={isPrivate}
                     userPortionIsPaid={userPortionIsPaid}
+                    userPortionOwed={userPortionOwed}
                     totalOwed={getTotalCurrentAssignedValue(bill.amountsOwed)}
                     handlePayPortionToPayable={handlePayPortionToPayable}
                     handlePayBalance={handlePayBalance}
@@ -100,19 +111,28 @@ const BillCell: React.FC<BillCellProps> = ({
             <div className="bill-cell-amounts-owed-container">
                 <AmountsOwedDisplayCell
                     amountsOwed={bill.amountsOwed}
+                    includesUser={includesUser}
                     userPortionIsPaid={userPortionIsPaid}
-                    isPrivate={isPrivate}
                     handlePayPortionToTenant={handlePayPortionToTenantBound}
                 />
             </div>
             <div className="bill-cell-footer-buttons-container">
-                {isPrivate || isResolved ? null : (
+                {!includesUser || isPrivate || isResolved ? null : (
                     <SimpleButton
-                        onClick={() => handleResolveBill(bill._id)}
+                        onClick={() => {
+                            handleResolveBill(bill._id);
+                        }}
                         text="Resolve All Debts"
                     />
                 )}
-                <SimpleButton onClick={() => handleResetBill(bill._id)} text="Reset All Payments" />
+                {!includesUser ? null : (
+                    <SimpleButton
+                        onClick={() => {
+                            handleResetBill(bill._id);
+                        }}
+                        text="Reset All Payments"
+                    />
+                )}
             </div>
         </div>
     );

@@ -1,11 +1,12 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { Redirect, RouteComponentProps } from 'react-router-dom';
 import ApartmentLink from '../../common/components/ApartmentLink';
-import BiggerSimpleButton from '../../common/components/BiggerSimpleButton';
+import { RedMessageCell } from '../../common/components/ColoredMessageCells';
+import LoadingPageCell from '../../common/components/LoadingPageCell';
 import PageCell from '../../common/components/PageCell';
 import ProfileLink from '../../common/components/ProfileLink';
-import RedMessageCell from '../../common/components/RedMessageCell';
-import SimpleButton from '../../common/components/SimpleButton';
+import ServerErrorPageCell from '../../common/components/ServerErrorPageCell';
+import { BiggerSimpleButton, SimpleButton } from '../../common/components/SimpleButtons';
 import StandardStyledText from '../../common/components/StandardStyledText';
 import YesNoMessageModal from '../../common/components/YesNoMessageModal';
 import { getDeleteOptions, getPostOptions } from '../../common/utilities';
@@ -19,12 +20,14 @@ const AccountSettings: React.FC<RouteComponentProps> = (props) => {
     const [selectedApartmentName, setSelectedApartmentName] = useState<null | string>(null);
     const [showModal, setShowModal] = useState(false);
     const [footerMessage, setFooterMessage] = useState('');
+    const [serverError, setServerError] = useState(false);
+    const [serverCallMade, setServerCallMade] = useState(false);
 
     useLayoutEffect(() => {
         fetch('/account-settings')
             .then((response) => response.json())
             .then((json) => {
-                console.log(json);
+                setServerError(false);
                 const { authenticated } = json;
                 if (!authenticated) {
                     setRedirect(true);
@@ -34,29 +37,43 @@ const AccountSettings: React.FC<RouteComponentProps> = (props) => {
                 setUserId(userId);
                 setSelectedApartmentName(selectedApartmentName);
             })
-            .catch((err) => console.error(err));
+            .catch(() => setServerError(true));
     }, []);
 
-    //to do: technically api should be called on account-settings route but idt it matters for the moment
     const handleClickLogOut = () => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const options = getPostOptions({});
-        fetch('/account/logOutUser', options).then(() => setRedirect(true));
+        fetch('/account-settings/logOutUser', options)
+            .then((res) => res.json())
+            .then(() => {
+                setServerCallMade(false);
+                setRedirect(true);
+            })
+            .catch(() => setFooterMessage('Sorry, our server seems to be down.'));
     };
 
     const deleteAccount = () => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const data = { userId: userId };
         const options = getDeleteOptions(data);
         fetch('/account-settings/deleteAccount', options)
             .then((res) => res.json())
             .then((json) => {
-                console.log(json);
+                setServerCallMade(false);
                 const { success } = json;
                 if (!success) {
                     setFooterMessage('Your account could not be deleted at this time');
                 } else {
                     setRedirect(true);
                 }
-            });
+            })
+            .catch(() => setFooterMessage('Sorry, our server seems to be down.'));
     };
 
     if (redirect) {
@@ -64,7 +81,11 @@ const AccountSettings: React.FC<RouteComponentProps> = (props) => {
     }
 
     if (!username || !userId) {
-        return null;
+        if (!serverError) {
+            return <LoadingPageCell />;
+        } else {
+            return <ServerErrorPageCell />;
+        }
     }
 
     const messageToUser = 'Hello, ' + username + '. We hope you are enjoying Mates!';

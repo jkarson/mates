@@ -23,13 +23,13 @@ import {
     getYesterdaysDateFromDate,
 } from '../../../../common/utilities';
 import { Redirect } from 'react-router-dom';
-import StyledInput from '../../../../common/components/StyledInput';
-import { BiggerFauxSimpleButton } from '../../../../common/components/FauxSimpleButton';
-import RedMessageCell from '../../../../common/components/RedMessageCell';
-import BiggerSimpleButton from '../../../../common/components/BiggerSimpleButton';
+import { BiggerFauxSimpleButton } from '../../../../common/components/FauxSimpleButtons';
+import { BillGeneratorWithoutId, BillWithoutId, Bill, BillGenerator } from '../models/BillsInfo';
+import { BiggerSimpleButton } from '../../../../common/components/SimpleButtons';
+import { StyledInput } from '../../../../common/components/StyledInputs';
+import { RedMessageCell } from '../../../../common/components/ColoredMessageCells';
 
 import '../styles/CreateBillGeneratorCell.css';
-import { BillGeneratorWithoutId, BillWithoutId, Bill, BillGenerator } from '../models/BillsInfo';
 
 interface CreateBillGeneratorInput {
     name: string;
@@ -61,6 +61,7 @@ const CreateBillGeneratorCell: React.FC<CreateBillGeneratorCellProps> = ({ setTa
 
     const [redirect, setRedirect] = useState(false);
     const [error, setError] = useState('');
+    const [serverCallMade, setServerCallMade] = useState(false);
 
     const [input, setInput] = useState<CreateBillGeneratorInput>(initialCreateBillGeneratorInput);
     const totalValue = isNaN(parseFloat(input.total))
@@ -131,6 +132,10 @@ const CreateBillGeneratorCell: React.FC<CreateBillGeneratorCellProps> = ({ setTa
     };
 
     const handleCreate = () => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const newBillGenerator: BillGeneratorWithoutId = {
             name: input.name,
             payableTo: input.payableTo,
@@ -138,20 +143,16 @@ const CreateBillGeneratorCell: React.FC<CreateBillGeneratorCellProps> = ({ setTa
             privateTenantId: input.isPrivate ? user.userId : undefined,
             frequency: input.frequency,
             amountsWithPercentOwed: input.isPrivate
-                ? getInitialAmountsWithPercentOwed(user).map((aWPO) => {
-                      if (user.userId === aWPO.userId) {
-                          return {
-                              userId: aWPO.userId,
-                              amount: totalValue.toFixed(2),
-                              amountValue: totalValue,
-                              percentValue: 100,
-                              percent: '100',
-                          };
-                      } else {
-                          return aWPO;
-                      }
-                  })
-                : [...input.amountsWithPercentOwed],
+                ? [
+                      {
+                          userId: user.userId,
+                          amount: totalValue.toFixed(2),
+                          amountValue: totalValue,
+                          percentValue: 100,
+                          percent: '100',
+                      },
+                  ]
+                : [...input.amountsWithPercentOwed.filter((awpo) => awpo.amountValue > 0)],
             starting: new Date(input.starting.getTime()),
             updatedThrough: getYesterdaysDateFromDate(input.starting),
         };
@@ -168,6 +169,7 @@ const CreateBillGeneratorCell: React.FC<CreateBillGeneratorCellProps> = ({ setTa
         fetch('/mates/createBillGenerator', options)
             .then((response) => response.json())
             .then((json) => {
+                setServerCallMade(false);
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
@@ -177,9 +179,6 @@ const CreateBillGeneratorCell: React.FC<CreateBillGeneratorCellProps> = ({ setTa
                     setError('Sorry, the bill series could not be created');
                     return;
                 }
-                console.log('success!');
-                console.log('json response:');
-                console.log(json);
 
                 const { billsInfo } = json;
                 initializeServerBillsInfo(billsInfo);
@@ -196,7 +195,8 @@ const CreateBillGeneratorCell: React.FC<CreateBillGeneratorCellProps> = ({ setTa
                 setError('');
                 setInput(initialCreateBillGeneratorInput);
                 setTab('Summary');
-            });
+            })
+            .catch(() => setError('Sorry, our server seems to be down.'));
     };
 
     if (redirect) {

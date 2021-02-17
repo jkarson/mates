@@ -5,8 +5,8 @@ import ApartmentSummaryCell from './ApartmentSummaryCell';
 
 import '../styles/FriendCell.css';
 import StaticApartmentProfileModal from '../../Profile/components/StaticApartmentProfileModal';
-import SimpleButton from '../../../../common/components/SimpleButton';
 import YesNoMessageModal from '../../../../common/components/YesNoMessageModal';
+import { SimpleButton } from '../../../../common/components/SimpleButtons';
 
 interface FriendCellProps {
     friend: FriendProfile;

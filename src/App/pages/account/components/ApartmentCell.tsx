@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import BiggerSimpleButton from '../../../common/components/BiggerSimpleButton';
-import Modal from '../../../common/components/Modal';
-import SimpleButton from '../../../common/components/SimpleButton';
-import StandardStyledText from '../../../common/components/StandardStyledText';
+import { SimpleButton } from '../../../common/components/SimpleButtons';
 import YesNoMessageModal from '../../../common/components/YesNoMessageModal';
 import { ApartmentId } from '../../../common/models';
 import ApartmentSummaryCell from '../../mates/Friends/components/ApartmentSummaryCell';

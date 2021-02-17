@@ -1,5 +1,5 @@
 import React from 'react';
-import StyledInput from '../../../../common/components/StyledInput';
+import { StyledInput } from '../../../../common/components/StyledInputs';
 import { Tenant } from '../../../../common/models';
 import { StateProps } from '../../../../common/types';
 import {
@@ -63,14 +63,14 @@ const InputTenantCell: React.FC<StateProps<Tenant>> = ({ state, setState }) => {
                 <StyledInput
                     name="email"
                     type="text"
-                    value={state.email}
+                    value={state.email ? state.email : ''}
                     onChange={handleChange}
                     placeholder={'E-Mail'}
                 />
                 <StyledInput
                     name="number"
-                    type="tel"
-                    value={state.number ? formatPhoneNumber(state.number) : state.number}
+                    type="text"
+                    value={state.number ? formatPhoneNumber(state.number) : ''}
                     onChange={handleChangePhoneNumber}
                     placeholder={'Phone Number'}
                 />

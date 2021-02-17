@@ -66,7 +66,7 @@ export const updateBillsFromBillGenerators = (
     // Only proceed if there are bills that actually need to be updated.
     if (
         billGenerators.filter(
-            (billGenerator) => !isSameDayMonthYear(billGenerator.updatedThrough, getMaxDate()), //getLaterDateToTest()), //getMaxDate()), //,
+            (billGenerator) => !isSameDayMonthYear(billGenerator.updatedThrough, getMaxDate()), //getLaterDateToTest())
         ).length === 0
     ) {
         return false;
@@ -76,7 +76,7 @@ export const updateBillsFromBillGenerators = (
         const generatedBills = getBillsWithoutIdFromBillGenerator(billGenerator);
         newBills.push(...generatedBills);
     });
-    const updatedThrough = getMaxDate(); //getLaterDateToTest();
+    const updatedThrough = getMaxDate();
     const data = {
         updatedThrough: updatedThrough,
         newBills: newBills,
@@ -86,7 +86,6 @@ export const updateBillsFromBillGenerators = (
     fetch('/mates/addBillsAndUpdateBillGenerators', options)
         .then((res) => res.json())
         .then((json) => {
-            console.log(json);
             const { authenticated, success } = json;
             if (!authenticated) {
                 return true;
@@ -173,7 +172,6 @@ export const purgeOldBills = (
     matesUser: MatesUser,
     setMatesUser: React.Dispatch<React.SetStateAction<MatesUser>>,
 ) => {
-    console.log('hi from purge on client');
     const bills = matesUser.apartment.billsInfo.bills;
     const billDeletionIds: string[] = [];
 
@@ -187,7 +185,6 @@ export const purgeOldBills = (
     });
 
     if (billDeletionIds.length === 0) {
-        console.log('no bills to purge');
         return false;
     }
 
@@ -199,7 +196,6 @@ export const purgeOldBills = (
     fetch('/mates/deleteOldBills', options)
         .then((res) => res.json())
         .then((json) => {
-            console.log(json);
             const { authenticated, success } = json;
             if (!authenticated) {
                 return true;
@@ -217,9 +213,6 @@ export const purgeOldBills = (
             });
             return false;
         });
-
-    //setMatesUser({ ...matesUser });
-    //}
 };
 
 // Resolved bills will be deleted after they are 3 month old.

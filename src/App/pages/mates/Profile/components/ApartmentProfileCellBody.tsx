@@ -10,11 +10,15 @@ interface ApartmentProfileCellBodyProps {
 const ApartmentProfileCellBody: React.FC<ApartmentProfileCellBodyProps> = ({ apartment }) => (
     <div className="apartment-profile-cell-body-container">
         <span>{apartment.name}</span>
-        {apartment.address ? <span>{apartment.address}</span> : null}
+        {apartment.address ? (
+            <div className="apartment-profile-cell-body-address-container">
+                <span>{apartment.address}</span>
+            </div>
+        ) : null}
         {apartment.quote ? (
-            <span className="apartment-profile-cell-body-quote-container">
-                {'"' + apartment.quote + '"'}
-            </span>
+            <div className="apartment-profile-cell-body-quote-container">
+                <span>{'"' + apartment.quote + '"'}</span>
+            </div>
         ) : null}
     </div>
 );

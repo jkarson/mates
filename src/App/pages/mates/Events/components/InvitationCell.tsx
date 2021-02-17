@@ -1,5 +1,5 @@
 import React from 'react';
-import SimpleButton from '../../../../common/components/SimpleButton';
+import { SimpleButton } from '../../../../common/components/SimpleButtons';
 import { getFormattedDateTimeString } from '../../../../common/utilities';
 import { ApartmentEvent } from '../models/EventsInfo';
 
@@ -32,10 +32,20 @@ const InvitationCell: React.FC<InvitationCellProps> = ({
                 </div>
             </div>
             <div className="invitation-cell-accept-button-container">
-                <SimpleButton onClick={() => handleAccept(invitation)} text={'Accept Invitation'} />
+                <SimpleButton
+                    onClick={() => {
+                        handleAccept(invitation);
+                    }}
+                    text={'Accept Invitation'}
+                />
             </div>
             <div className="invitation-cell-reject-button-container">
-                <SimpleButton onClick={() => handleDelete(invitation)} text={'Reject Invitation'} />
+                <SimpleButton
+                    onClick={() => {
+                        handleDelete(invitation);
+                    }}
+                    text={'Reject Invitation'}
+                />
             </div>
         </div>
     );

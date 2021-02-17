@@ -1,7 +1,7 @@
 .demo-about-container {
     height: 100%;
     display: grid;
-    padding-top: 2rem;
+    padding-top: 1rem;
     box-sizing: border-box;
     grid-template-rows: 3fr 1fr;
     grid-template-columns: 1fr 1fr;
@@ -50,19 +50,37 @@
     justify-content: flex-start;
     align-items: center;
     text-align: center;
-    line-height: 2rem;
+    line-height: 2.2rem;
 }
 
 .demo-about-text-inner-container span {
-    font-size: 1rem;
+    font-size: 1.1rem;
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 820px) {
     .demo-about-text-inner-container span {
         font-size: 0.9rem;
+        line-height: 2rem;
     }
 
     .demo-about-text-inner-container h1 {
         font-size: 1.6rem;
+    }
+    .demo-about-container {
+        grid-template-rows: 1fr 1fr 1fr;
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            'first'
+            'second'
+            'button';
+    }
+
+    .demo-about-text-inner-container {
+        height: fit-content;
+        padding-bottom: 1rem;
+    }
+
+    .demo-about-text-container-two {
+        margin-top: 2rem;
     }
 }

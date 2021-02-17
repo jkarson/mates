@@ -1,6 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { Redirect } from 'react-router-dom';
-import RedMessageCell from '../../../../common/components/RedMessageCell';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { ApartmentId } from '../../../../common/models';
 import { getPutOptions, getDeleteOptions } from '../../../../common/utilities';
@@ -8,9 +7,10 @@ import { ApartmentEvent } from '../models/EventsInfo';
 import { EventsTabType } from '../models/EventsTabs';
 import { initializeServerEventsInfo } from '../utilities';
 import EventCell from './EventCell';
+import StandardStyledText from '../../../../common/components/StandardStyledText';
+import { RedMessageCell } from '../../../../common/components/ColoredMessageCells';
 
 import '../styles/EventsComponent.css';
-import StandardStyledText from '../../../../common/components/StandardStyledText';
 
 interface EventsComponentProps {
     displayEvents: ApartmentEvent[];
@@ -24,12 +24,20 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents, tab })
 
     const [redirect, setRedirect] = useState(false);
     const [message, setMessage] = useState('');
+    const [serverCallMade, setServerCallMade] = useState(false);
 
     useEffect(() => {
-        setMessage('');
+        if (message !== 'Sorry, our server seems to be down.') {
+            setMessage('');
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tab]);
 
     const handleInvite = (event: ApartmentEvent, inviteeId: ApartmentId) => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const data = {
             apartmentId: user.apartment._id,
             eventId: event._id,
@@ -39,6 +47,7 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents, tab })
         fetch('/mates/inviteFriendToEvent', options)
             .then((res) => res.json())
             .then((json) => {
+                setServerCallMade(false);
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
@@ -54,17 +63,22 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents, tab })
                     ...user,
                     apartment: { ...user.apartment, eventsInfo: formattedEventsInfo },
                 });
-                setMessage('Invitation Sent');
-            });
+                setMessage('Invitation sent.');
+            })
+            .catch(() => setMessage('Sorry, our server seems to be down.'));
     };
 
     const handleRemoveInvitee = (event: ApartmentEvent, inviteeId: ApartmentId) => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const data = { apartmentId: user.apartment._id, eventId: event._id, inviteeId: inviteeId };
         const options = getPutOptions(data);
         fetch('/mates/removeEventInvitation', options)
             .then((res) => res.json())
             .then((json) => {
-                console.log(json);
+                setServerCallMade(false);
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
@@ -80,11 +94,16 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents, tab })
                     ...user,
                     apartment: { ...user.apartment, eventsInfo: formattedEventsInfo },
                 });
-                setMessage('Invitation removed');
-            });
+                setMessage('Invitation removed.');
+            })
+            .catch(() => setMessage('Sorry, our server seems to be down.'));
     };
 
     const handleRemoveAttendee = (event: ApartmentEvent, attendeeId: ApartmentId) => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const data = {
             apartmentId: user.apartment._id,
             eventId: event._id,
@@ -94,7 +113,7 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents, tab })
         fetch('/mates/removeEventAttendee', options)
             .then((res) => res.json())
             .then((json) => {
-                console.log(json);
+                setServerCallMade(false);
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
@@ -111,10 +130,15 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents, tab })
                     apartment: { ...user.apartment, eventsInfo: formattedEventsInfo },
                 });
                 setMessage('Attendee removed from event.');
-            });
+            })
+            .catch(() => setMessage('Sorry, our server seems to be down.'));
     };
 
     const handleLeaveEvent = (event: ApartmentEvent) => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const data = {
             apartmentId: user.apartment._id,
             eventId: event._id,
@@ -123,7 +147,7 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents, tab })
         fetch('/mates/leaveEvent', options)
             .then((res) => res.json())
             .then((json) => {
-                console.log(json);
+                setServerCallMade(false);
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
@@ -140,16 +164,21 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents, tab })
                     apartment: { ...user.apartment, eventsInfo: formattedEventsInfo },
                 });
                 setMessage('You have left the event.');
-            });
+            })
+            .catch(() => setMessage('Sorry, our server seems to be down.'));
     };
 
     const handleDeleteEvent = (event: ApartmentEvent) => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const data = { apartmentId: user.apartment._id, eventId: event._id };
         const options = getDeleteOptions(data);
         fetch('mates/deleteEvent', options)
             .then((res) => res.json())
             .then((json) => {
-                console.log(json);
+                setServerCallMade(false);
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
@@ -165,8 +194,9 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents, tab })
                     ...user,
                     apartment: { ...user.apartment, eventsInfo: formattedEventsInfo },
                 });
-                setMessage('Event Deleted.');
-            });
+                setMessage('Event deleted.');
+            })
+            .catch(() => setMessage('Sorry, our server seems to be down.'));
     };
 
     const areApartmentsToInvite = (event: ApartmentEvent) => {
@@ -194,6 +224,7 @@ const EventsComponent: React.FC<EventsComponentProps> = ({ displayEvents, tab })
             handleRemoveInvitee={handleRemoveInvitee}
             handleLeaveEvent={handleLeaveEvent}
             setMessage={setMessage}
+            key={event._id}
         />
     ));
 

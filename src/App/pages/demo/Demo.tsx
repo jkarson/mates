@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import BiggerSimpleButton from '../../common/components/BiggerSimpleButton';
 import PageCell from '../../common/components/PageCell';
+import { BiggerSimpleButton } from '../../common/components/SimpleButtons';
 import StandardStyledText from '../../common/components/StandardStyledText';
-import DemoMates from './components/DemoMates';
+import DemoMates from './DemoMates';
 
 import './Demo.css';
 
@@ -29,7 +29,7 @@ const Demo: React.FC = () => {
                                 <h1>{'About Mates'}</h1>
                                 <StandardStyledText
                                     text={
-                                        'Mates is a unique web-application designed to make roommate life easier. Mates uses a React/Typescript front-end and a Node/Express/Mongoose back-end along with a MongoDB database. The Mates demo allows you to interact with a pre-populated apartment.'
+                                        'Mates is a unique web-application designed to make roommate life easier. Mates uses a React/Typescript front-end and a Node/Express/Mongoose back-end along with a MongoDB database. The Mates demo allows you to interact with a pre-populated apartment. Mates works best on Safari and Google Chrome.'
                                     }
                                 />
                             </div>

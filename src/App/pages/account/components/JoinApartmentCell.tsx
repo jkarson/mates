@@ -1,17 +1,17 @@
 import React, { useContext, useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import BiggerSimpleButton from '../../../common/components/BiggerSimpleButton';
-import RedMessageCell from '../../../common/components/RedMessageCell';
+import { RedMessageCell } from '../../../common/components/ColoredMessageCells';
+import { BiggerSimpleButton } from '../../../common/components/SimpleButtons';
 import StandardStyledText from '../../../common/components/StandardStyledText';
-import StyledInput from '../../../common/components/StyledInput';
+import { StyledInput } from '../../../common/components/StyledInputs';
 import { AccountContext, AccountContextType } from '../../../common/context';
 import { ApartmentId } from '../../../common/models';
 import { getPostOptions } from '../../../common/utilities';
 import { ApartmentSummary } from '../../mates/Friends/models/FriendsInfo';
 import { AccountTabType } from '../models/AccountTabs';
+import JoinCell from './JoinCell';
 
 import '../styles/JoinApartmentCell.css';
-import JoinCell from './JoinCell';
 
 interface JoinApartmentCellProps {
     setTab: React.Dispatch<React.SetStateAction<AccountTabType>>;
@@ -20,63 +20,72 @@ interface JoinApartmentCellProps {
 const JoinApartmentCell: React.FC<JoinApartmentCellProps> = ({ setTab }) => {
     const [redirect, setRedirect] = useState(false);
     const [apartmentCodeInput, setApartmentCodeInput] = useState('');
-    const [showCodeError, setShowCodeError] = useState(false);
-    const [showJoinError, setShowJoinError] = useState(false);
+    const [showCodeError, setShowCodeError] = useState('');
+    const [showJoinError, setShowJoinError] = useState('');
     const [apartmentSummary, setApartmentSummary] = useState<ApartmentSummary | null>(null);
+    const [serverCallMade, setServerCallMade] = useState(false);
     const { setUser } = useContext(AccountContext) as AccountContextType;
 
     const handleChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
         setApartmentCodeInput(event.target.value);
-        setShowCodeError(false);
         setApartmentSummary(null);
-        setShowJoinError(false);
+        if (showCodeError !== 'Sorry, our server seems to be down.') {
+            setShowCodeError('');
+        }
+        setShowJoinError('');
     };
 
     const handleSearch = () => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const options = getPostOptions({ code: apartmentCodeInput });
         fetch('/account/searchCode', options)
             .then((response) => response.json())
             .then((json) => {
-                const { authenticated, success } = json;
+                setServerCallMade(false);
+                setShowCodeError('');
+                const { authenticated } = json;
                 if (!authenticated) {
                     setRedirect(true);
                     return;
                 }
                 const { apartment } = json;
                 if (!apartment) {
-                    setShowCodeError(true);
+                    setShowCodeError('Sorry, this apartment code is invalid.');
                     return;
                 }
                 setApartmentSummary(apartment);
             })
-            .catch((err) => console.error(err));
+            .catch(() => setShowCodeError('Sorry, our server seems to be down.'));
     };
 
     const handleClickJoin = (apartmentId: ApartmentId) => {
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ apartmentId: apartmentId }),
-        };
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
+        const options = getPostOptions({ apartmentId: apartmentId });
         fetch('/account/requestToJoin', options)
             .then((response) => response.json())
             .then((json) => {
+                setServerCallMade(false);
+                setShowJoinError('');
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
                     return;
                 }
                 if (!success) {
-                    setShowJoinError(true);
+                    setShowJoinError('Sorry, your join request could not be completed.');
                     return;
                 }
                 const { user } = json;
                 setUser({ ...user });
                 setTab('Your Join Requests');
             })
-            .catch((err) => console.log(err));
+            .catch(() => setShowJoinError('Sorry, our server seems to be down.'));
     };
 
     if (redirect) {
@@ -95,9 +104,7 @@ const JoinApartmentCell: React.FC<JoinApartmentCellProps> = ({ setTab }) => {
             <div className="join-apartment-cell-search">
                 <StyledInput type="text" value={apartmentCodeInput} onChange={handleChangeInput} />
                 <BiggerSimpleButton onClick={handleSearch} text={'Search'} />
-                {!showCodeError ? null : (
-                    <RedMessageCell message={'Sorry, this apartment code is invalid.'} />
-                )}
+                {showCodeError.length === 0 ? null : <RedMessageCell message={showCodeError} />}
             </div>
             <div className="join-apartment-cell-join-cell-container">
                 {!apartmentSummary ? null : (
@@ -109,11 +116,7 @@ const JoinApartmentCell: React.FC<JoinApartmentCellProps> = ({ setTab }) => {
                     </div>
                 )}
                 <div className="join-apartment-cell-error">
-                    {!showJoinError ? null : (
-                        <RedMessageCell
-                            message={'Sorry, your join request could not be completed'}
-                        />
-                    )}
+                    {showJoinError.length === 0 ? null : <RedMessageCell message={showJoinError} />}
                 </div>
             </div>
         </div>

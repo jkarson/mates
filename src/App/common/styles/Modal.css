@@ -37,6 +37,4 @@
 .modal {
     grid-area: modal;
     background-color: rgb(255, 255, 255);
-    /* border: 1px solid red; */
-    /*box-shadow: 3px 3px 1px black;*/
 }

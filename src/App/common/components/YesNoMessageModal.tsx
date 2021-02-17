@@ -1,8 +1,8 @@
 import React from 'react';
 import Modal from './Modal';
+import { SimpleButton } from './SimpleButtons';
 
 import '../styles/YesNoMessageModal.css';
-import SimpleButton from './SimpleButton';
 
 interface YesNoMessageModalProps {
     show: boolean;

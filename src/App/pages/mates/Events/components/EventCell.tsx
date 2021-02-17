@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import SimpleButton from '../../../../common/components/SimpleButton';
 import { ApartmentId } from '../../../../common/models';
 import { getFormattedDateTimeString } from '../../../../common/utilities';
 import { ApartmentEvent } from '../models/EventsInfo';
 import { isFutureEvent, isPresentEvent } from '../utilities';
+import InviteInviteeAttendeeModal from './InviteInviteeAttendeeModal';
+import { FauxSimpleButton } from '../../../../common/components/FauxSimpleButtons';
+import YesNoMessageModal from '../../../../common/components/YesNoMessageModal';
+import { SimpleButton } from '../../../../common/components/SimpleButtons';
 
 import '../styles/EventCell.css';
-import InviteInviteeAttendeeModal from './InviteInviteeAttendeeModal';
-import FauxSimpleButton from '../../../../common/components/FauxSimpleButton';
-import YesNoMessageModal from '../../../../common/components/YesNoMessageModal';
 
 interface EventCellProps {
     event: ApartmentEvent;

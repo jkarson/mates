@@ -41,7 +41,5 @@ export function initializeServerEventsInfo(serverEventsInfo: ServerEventsInfo) {
             event.invitees,
         ) as unknown) as ServerApartmentSummary[];
     });
-    console.log('server events info after formatting:');
-    console.log(serverEventsInfo);
     return (serverEventsInfo as unknown) as EventsInfo;
 }

@@ -1,6 +1,5 @@
 import React, { useContext, useLayoutEffect, useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import RedMessageCell from '../../../../common/components/RedMessageCell';
 import StandardStyledText from '../../../../common/components/StandardStyledText';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import {
@@ -12,6 +11,7 @@ import {
 import { ApartmentSummary } from '../models/FriendsInfo';
 import { FriendsTabType } from '../models/FriendsTabs';
 import RequestCell from './RequestCell';
+import { RedMessageCell } from '../../../../common/components/ColoredMessageCells';
 
 import '../styles/RequestsCell.css';
 
@@ -29,12 +29,20 @@ const RequestsCell: React.FC<RequestsCellProps> = ({ incoming, setTab, tab }) =>
     const requests = incoming ? incomingRequests : outgoingRequests;
     const [redirect, setRedirect] = useState(false);
     const [error, setError] = useState('');
+    const [serverCallMade, setServerCallMade] = useState(false);
 
     useLayoutEffect(() => {
-        setError('');
+        if (error !== 'Sorry, our server seems to be down.') {
+            setError('');
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tab]);
 
     const handleAdd = (apartment: ApartmentSummary) => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const data = {
             userApartmentId: user.apartment._id,
             friendApartmentId: apartment.apartmentId,
@@ -43,6 +51,7 @@ const RequestsCell: React.FC<RequestsCellProps> = ({ incoming, setTab, tab }) =>
         fetch('/mates/acceptFriendRequest', options)
             .then((response) => response.json())
             .then((json) => {
+                setServerCallMade(false);
                 const { success, authenticated } = json;
                 if (!authenticated) {
                     setRedirect(true);
@@ -70,9 +79,14 @@ const RequestsCell: React.FC<RequestsCellProps> = ({ incoming, setTab, tab }) =>
                 });
                 setError('');
                 setTab('Friends');
-            });
+            })
+            .catch(() => setError('Sorry, our server seems to be down.'));
     };
     const handleDelete = (apartment: ApartmentSummary) => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const data = {
             userApartmentId: user.apartment._id,
             requestApartmentId: apartment.apartmentId,
@@ -89,6 +103,7 @@ const RequestsCell: React.FC<RequestsCellProps> = ({ incoming, setTab, tab }) =>
         fetch('/mates/deleteIncomingFriendRequest', options)
             .then((response) => response.json())
             .then((json) => {
+                setServerCallMade(false);
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
@@ -112,14 +127,20 @@ const RequestsCell: React.FC<RequestsCellProps> = ({ incoming, setTab, tab }) =>
                         },
                     },
                 });
-                setError('Friend request deleted');
-            });
+                setError('Friend request deleted.');
+            })
+            .catch(() => setError('Sorry, our server seems to be down.'));
     };
 
     const deleteOutgoingRequest = (options: object) => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         fetch('/mates/deleteOutgoingFriendRequest', options)
             .then((response) => response.json())
             .then((json) => {
+                setServerCallMade(false);
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
@@ -143,8 +164,9 @@ const RequestsCell: React.FC<RequestsCellProps> = ({ incoming, setTab, tab }) =>
                         },
                     },
                 });
-                setError('Outgoing friend request deleted');
-            });
+                setError('Outgoing friend request deleted.');
+            })
+            .catch(() => setError('Sorry, our server seems to be down'));
     };
 
     const content = requests
@@ -155,6 +177,7 @@ const RequestsCell: React.FC<RequestsCellProps> = ({ incoming, setTab, tab }) =>
                 incoming={incoming}
                 handleAdd={handleAdd}
                 handleDelete={handleDelete}
+                key={request.apartmentId}
             />
         ));
 

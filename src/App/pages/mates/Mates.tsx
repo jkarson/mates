@@ -1,12 +1,4 @@
 import React, { useLayoutEffect, useState } from 'react';
-import './Mates.css';
-import Bills from './Bills/components/Bills';
-import Chores from './Chores/components/Chores';
-import Events from './Events/components/Events';
-import Friends from './Friends/components/Friends';
-import Contacts from './Contacts/components/Contacts';
-import Messages from './Messages/components/Messages';
-import Profile from './Profile/components/Profile';
 import Tabs from '../../common/components/Tabs';
 import { MatesUserContext } from '../../common/context';
 import { assertUnreachable } from '../../common/utilities';
@@ -21,42 +13,46 @@ import { initializeServerFriendsInfo } from './Friends/utilities';
 import { initializeServerChoresInfo } from './Chores/utilities';
 import { initializeServerEventsInfo } from './Events/utilities';
 import { ServerApartment } from '../../common/serverModels';
-import { ServerContact } from './Contacts/models/ServerContact';
 import ProfileLink from '../../common/components/ProfileLink';
 import ApartmentLink from '../../common/components/ApartmentLink';
+import ServerErrorPageCell from '../../common/components/ServerErrorPageCell';
+import Profile from './Profile/Profile';
+import Messages from './Messages/Messages';
+import Contacts from './Contacts/Contacts';
+import Friends from './Friends/Friends';
+import Bills from './Bills/Bills';
+import Chores from './Chores/Chores';
+import LoadingPageCell from '../../common/components/LoadingPageCell';
+import Events from './Events/Events';
 
-//EXTENSION: Tab notifications. This system may be a bit tricky and will likely involve the server.
+import './Mates.css';
 
-//TO DO (After MVP): Make transactions more safe by verifying on the server that things haven't changed
-//since the client request... if they have, we would ideally send a message telling the user to reload their page
-//especially bills
+//Extension: Tab notifications
 
-//to do: profile pics
+//Extension: profile pics
 
-//TO DO: Full code sweep! Delete unused imports, old comments / debug statements...
-//prepare code for production environment.
-
-//to do: make sure every list item has a key!
-
-// to do: we should switch from rendering client side
+// Extension: we should switch from rendering client side
 // to server side eventually, but since it requires fully
 // built react pages, let's render react-side for development
 
-//TO DO: wrap content in a scroll view or equivalent so that the tabs/description/
-//message are stuck on the top --> see Page Cell
+//Extension: "Transactionalize" server interactions
+
+//Extension: Protect against useEffect dependency array bugs
+
+//to do: root dir issue
 
 const Mates: React.FC<RouteComponentProps> = (props) => {
     const [tab, setTab] = useState<MatesTabType>('Profile');
     const [matesUser, setMatesUser] = useState<MatesUser | null>(null);
     const [redirect, setRedirect] = useState(false);
     const [accountRedirect, setAccountRedirect] = useState(false);
-    const [message, setMessage] = useState('');
+    const [serverError, setServerError] = useState(false);
 
     useLayoutEffect(() => {
         fetch('/mates')
             .then((response) => response.json())
             .then((json) => {
-                console.log(json);
+                setServerError(false);
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
@@ -68,10 +64,9 @@ const Mates: React.FC<RouteComponentProps> = (props) => {
                 }
                 const { userId, apartment, username } = json;
                 const formattedApartment = initializeServerApartment(apartment);
-                console.log('setting mates user...');
-                console.log(json);
                 setMatesUser({ userId: userId, apartment: formattedApartment, username: username });
-            });
+            })
+            .catch(() => setServerError(true));
     }, []);
 
     let currentComponent: JSX.Element | undefined;
@@ -108,7 +103,10 @@ const Mates: React.FC<RouteComponentProps> = (props) => {
         return <Redirect to="/account" />;
     }
     if (!matesUser) {
-        return null;
+        if (!serverError) {
+            return <LoadingPageCell />;
+        }
+        return <ServerErrorPageCell />;
     }
 
     const handleProfileLinkClick = () => {

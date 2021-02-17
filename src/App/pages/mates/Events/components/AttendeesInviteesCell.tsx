@@ -27,6 +27,7 @@ const AttendeesInviteesCell: React.FC<AttendeesInviteesCellProps> = ({
             apartment={apartment}
             handleClickDelete={() => handleDelete(event, apartment.apartmentId)}
             canRemoveFromEvent={canRemoveFromEvent}
+            key={apartment.apartmentId}
         />
     ));
 

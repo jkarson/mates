@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import BiggerSimpleButton from '../../../../common/components/BiggerSimpleButton';
-import { BiggerFauxSimpleButton } from '../../../../common/components/FauxSimpleButton';
-import RedMessageCell from '../../../../common/components/RedMessageCell';
-import StyledInput from '../../../../common/components/StyledInput';
+import { RedMessageCell } from '../../../../common/components/ColoredMessageCells';
+import { BiggerFauxSimpleButton } from '../../../../common/components/FauxSimpleButtons';
+import { BiggerSimpleButton } from '../../../../common/components/SimpleButtons';
+import { StyledInput } from '../../../../common/components/StyledInputs';
 import {
     countDigits,
     formatPhoneNumber,
@@ -39,7 +39,9 @@ const AddContactCell: React.FC<AddContactCellProps> = ({
     const [formInput, setFormInput] = useState<AddContactState>(emptyAddContactState);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setNewContactError('');
+        if (newContactError !== 'Sorry, our server seems to be down.') {
+            setNewContactError('');
+        }
         const value = event.target.value;
         if (value !== ' ') {
             setFormInput({

@@ -233,6 +233,7 @@ function getMaxDate() {
     return current;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getLaterDateToTest() {
     const maxDate = getMaxDate();
     maxDate.setFullYear(maxDate.getFullYear() + 1);
@@ -241,7 +242,7 @@ function getLaterDateToTest() {
 
 function generateDates(starting: Date, generationStartDate: Date, frequency: Frequency): Date[] {
     const dates: Date[] = [];
-    const ending = getMaxDate(); //getLaterDateToTest(); //getMaxDate();
+    const ending = getMaxDate(); //getLaterDateToTest();
 
     let dateIterator = new Date(starting.getTime());
     loop1: while (isPreviousDate(dateIterator, ending)) {
@@ -378,6 +379,9 @@ function verifyAndSetNumericStringInput(
 
 function verifyAgeInput(ageInput: string) {
     const lastCharacter = ageInput.charAt(ageInput.length - 1);
+    if (ageInput !== ageInput.trim()) {
+        return false;
+    }
     if (ageInput === '0') {
         return false;
     }
@@ -688,5 +692,5 @@ export {
     getDigits,
     getTwoDigitDateString,
     getNullEvent,
-    getLaterDateToTest, //TEMP
+    // getLaterDateToTest, //TEMP
 };

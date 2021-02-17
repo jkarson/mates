@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Redirect, RouteComponentProps } from 'react-router-dom';
-import BiggerSimpleButton from '../../common/components/BiggerSimpleButton';
-import GreenMessageCell from '../../common/components/GreenMessageCell';
+import { RedMessageCell, GreenMessageCell } from '../../common/components/ColoredMessageCells';
 import PageCell from '../../common/components/PageCell';
-import RedMessageCell from '../../common/components/RedMessageCell';
-import SimpleButton from '../../common/components/SimpleButton';
+import { BiggerSimpleButton, SimpleButton } from '../../common/components/SimpleButtons';
 import StandardStyledText from '../../common/components/StandardStyledText';
-import StyledInput from '../../common/components/StyledInput';
+import { StyledInput } from '../../common/components/StyledInputs';
 import VerificationCell from '../../common/components/VerificationCell';
 import { getPostOptions, isLetter } from '../../common/utilities';
 
@@ -18,6 +16,8 @@ const SignUp: React.FC<RouteComponentProps> = (props) => {
     const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
     const [redirect, setRedirect] = useState(false);
     const [error, setError] = useState<string>('');
+    const [serverCallMade, setServerCallMade] = useState(false);
+
     const handleChangeUsername = (event: React.ChangeEvent<HTMLInputElement>) => {
         setUsernameInput(event.target.value);
         setError('');
@@ -43,10 +43,11 @@ const SignUp: React.FC<RouteComponentProps> = (props) => {
     };
 
     const canCreate = () => {
-        return isValidConfirmPasswordInput() && usernameInput.length > 0;
+        return !serverCallMade && isValidConfirmPasswordInput() && usernameInput.length > 0;
     };
 
     const handleCreateAccount = () => {
+        setServerCallMade(true);
         const data = {
             username: usernameInput,
             password: passwordInput,
@@ -55,7 +56,7 @@ const SignUp: React.FC<RouteComponentProps> = (props) => {
         fetch('/signup', options)
             .then((response) => response.json())
             .then((json) => {
-                console.log(json);
+                setServerCallMade(false);
                 const created = json.created;
                 if (created) {
                     setUsernameInput('');
@@ -67,8 +68,8 @@ const SignUp: React.FC<RouteComponentProps> = (props) => {
                     setError(json.message);
                 }
             })
-            .catch((error) => {
-                console.error('Error:', error);
+            .catch(() => {
+                setError('Sorry, our server seems to be down.');
             });
         return;
     };
@@ -166,6 +167,8 @@ const AvailabilityCell: React.FC<AvailabilityCellProps> = ({ usernameInput }) =>
     const showButton = usernameInput.length > 0;
     const [showMessage, setShowMessage] = useState(false);
     const [isAvailable, setIsAvailable] = useState(false);
+    const [serverError, setServerError] = useState(false);
+    const [serverCallMade, setServerCallMade] = useState(false);
 
     useEffect(() => {
         setShowMessage(false);
@@ -173,19 +176,19 @@ const AvailabilityCell: React.FC<AvailabilityCellProps> = ({ usernameInput }) =>
     }, [usernameInput]);
 
     const checkAvailability = () => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const data = {
             username: usernameInput,
         };
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        };
+        const options = getPostOptions(data);
         fetch('/signup/checkUsernameAvailability', options)
             .then((response) => response.json())
             .then((json) => {
+                setServerCallMade(false);
+                setServerError(false);
                 const { available } = json;
                 if (available) {
                     setIsAvailable(true);
@@ -195,7 +198,7 @@ const AvailabilityCell: React.FC<AvailabilityCellProps> = ({ usernameInput }) =>
                     setShowMessage(true);
                 }
             })
-            .catch((err) => console.error(err));
+            .catch(() => setServerError(true));
     };
 
     return (
@@ -212,6 +215,8 @@ const AvailabilityCell: React.FC<AvailabilityCellProps> = ({ usernameInput }) =>
                             ) : (
                                 <RedMessageCell message="Sorry, this username is taken" />
                             )
+                        ) : serverError ? (
+                            <RedMessageCell message="Sorry, our server seems to be down." />
                         ) : null}
                     </div>
                 </div>

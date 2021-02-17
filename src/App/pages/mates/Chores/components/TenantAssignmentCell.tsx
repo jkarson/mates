@@ -1,5 +1,5 @@
 import React from 'react';
-import SimpleButton from '../../../../common/components/SimpleButton';
+import { SimpleButton } from '../../../../common/components/SimpleButtons';
 import { Tenant, UserId } from '../../../../common/models';
 import { assertUnreachable } from '../../../../common/utilities';
 

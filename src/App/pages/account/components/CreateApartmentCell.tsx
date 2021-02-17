@@ -1,9 +1,9 @@
 import React, { useContext, useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import BiggerSimpleButton from '../../../common/components/BiggerSimpleButton';
-import { SmallerStyledInput } from '../../../common/components/BiggerStyledInput';
-import RedMessageCell from '../../../common/components/RedMessageCell';
-import SimpleButton from '../../../common/components/SimpleButton';
+import { RedMessageCell } from '../../../common/components/ColoredMessageCells';
+import { BiggerFauxSimpleButton } from '../../../common/components/FauxSimpleButtons';
+import { BiggerSimpleButton, SimpleButton } from '../../../common/components/SimpleButtons';
+import { SmallerStyledInput } from '../../../common/components/StyledInputs';
 import { AccountContext, AccountContextType } from '../../../common/context';
 import {
     verifyAgeInput,
@@ -18,10 +18,6 @@ import { AccountTabType } from '../models/AccountTabs';
 import '../styles/CreateApartmentCell.css';
 
 // extension : email / address / phone # verification, if appropriate
-
-// extension: leading whitespace allowed when
-// input type=email bc internal onChange not triggered...
-// this behavior could potentially be improved
 
 interface CreateApartmentCellInput {
     apartmentName: string;
@@ -58,16 +54,15 @@ const CreateApartmentCell: React.FC<CreateApartmentCellProps> = ({ setTab }) => 
         ...emptyApartmentInput,
         ...emptyTenantInput,
     });
+    const [serverCallMade, setServerCallMade] = useState(false);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const name = event.target.name;
         const newValue = event.target.value;
-        const newChars = [...newValue];
-        if (newChars.every((char) => char === ' ')) {
-            setInput({ ...input, [name]: '' });
-        } else {
-            setInput({ ...input, [name]: newValue });
+        if (newValue === ' ') {
+            return;
         }
+        setInput({ ...input, [name]: newValue.trimStart() });
     };
 
     const handleChangeAge = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,11 +96,23 @@ const CreateApartmentCell: React.FC<CreateApartmentCellProps> = ({ setTab }) => 
     const canCreate = () => input.apartmentName.length > 0 && input.tenantName.length > 0;
 
     const handleCreateApartment = () => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
+        input.apartmentName = input.apartmentName.trim();
+        input.address = input.address.trim();
+        input.quote = input.quote.trim();
+        input.tenantName = input.tenantName.trim();
+        input.email = input.email.trim();
+        input.age = input.age.trim();
+        input.number = input.number.trim();
         const data = { ...input };
         const options = getPostOptions(data);
         fetch('/account/createApartment', options)
             .then((response) => response.json())
             .then((json) => {
+                setServerCallMade(false);
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
@@ -114,10 +121,12 @@ const CreateApartmentCell: React.FC<CreateApartmentCellProps> = ({ setTab }) => 
                 } else {
                     const { user } = json;
                     setUser({ ...user });
-                    setTab('Your Apartments');
+                    setMessage('');
                     setInput({ ...emptyApartmentInput, ...emptyTenantInput });
+                    setTab('Your Apartments');
                 }
-            });
+            })
+            .catch(() => setMessage('Sorry, our server seems to be down.'));
     };
 
     if (redirect) {
@@ -176,7 +185,7 @@ const CreateApartmentCell: React.FC<CreateApartmentCellProps> = ({ setTab }) => 
                     placeholder={'Age'}
                 />
                 <SmallerStyledInput
-                    type="email"
+                    type="text"
                     value={input.email}
                     onChange={handleChange}
                     name="email"
@@ -195,8 +204,8 @@ const CreateApartmentCell: React.FC<CreateApartmentCellProps> = ({ setTab }) => 
             </div>
             <div className="create-apartment-cell-create-button-outer-container">
                 {!canCreate() ? (
-                    <div className="create-apartment-cell-faux-create-button-container">
-                        <BiggerSimpleButton onClick={() => null} text="Create Apartment" />
+                    <div>
+                        <BiggerFauxSimpleButton text="Create Apartment" />
                     </div>
                 ) : (
                     <div className="create-apartment-cell-create-button-container">

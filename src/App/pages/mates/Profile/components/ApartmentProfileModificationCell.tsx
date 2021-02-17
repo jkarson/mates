@@ -1,11 +1,11 @@
 import React from 'react';
-import StyledInput from '../../../../common/components/StyledInput';
+import { StyledInput } from '../../../../common/components/StyledInputs';
 import { StateProps } from '../../../../common/types';
 import { ProfileInfo } from '../models/ProfileInfo';
 
 import '../styles/ApartmentProfileModificationCell.css';
+
 // EXTENSION: Add autocomplete and/or verification for address input, perhaps using Google Places API
-// https://developers.google.com/maps/documentation/javascript/places-autocomplete
 
 const ApartmentProfileModificationCell: React.FC<StateProps<ProfileInfo>> = ({
     state,

@@ -5,7 +5,6 @@ import { AmountWithPercentOwed } from '../models/AmountWithPercentOwed';
 import { getTotalAssignedValue } from '../utilities';
 
 import '../styles/AmountsWithPercentOwedDisplayCell.css';
-import TotalAssignedCell from './TotalAssignedCell';
 
 interface AmountsWithPercentOwedDisplayCellProps {
     amountsWithPercentOwed: AmountWithPercentOwed[];
@@ -20,7 +19,13 @@ const AmountsWithPercentOwedDisplayCell: React.FC<AmountsWithPercentOwedDisplayC
         .map((aWPO) => {
             const tenant = getTenantByTenantId(user, aWPO.userId);
             const tenantName = tenant ? tenant.name : 'Unknown';
-            return <TenantOwedDisplayCell name={tenantName} amountOwed={aWPO.amount} />;
+            return (
+                <TenantOwedDisplayCell
+                    name={tenantName}
+                    amountOwed={aWPO.amount}
+                    key={aWPO.userId}
+                />
+            );
         });
     const header = (
         <TotalAmountOwed amount={getTotalAssignedValue(amountsWithPercentOwed).toFixed(2)} />

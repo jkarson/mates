@@ -1,17 +1,14 @@
 import React, { useContext, useState } from 'react';
 import { Redirect, RouteComponentProps } from 'react-router-dom';
-import RedMessageCell from '../../../common/components/RedMessageCell';
+import { RedMessageCell } from '../../../common/components/ColoredMessageCells';
 import StandardStyledText from '../../../common/components/StandardStyledText';
 import { AccountContext, AccountContextType } from '../../../common/context';
 import { ApartmentId } from '../../../common/models';
 import { getPostOptions } from '../../../common/utilities';
 import { ApartmentSummary } from '../../mates/Friends/models/FriendsInfo';
-
-import '../styles/ApartmentsCell.css';
 import ApartmentCell from './ApartmentCell';
 
-//TO DO: Use word-wrap / overflow-wrap to protect
-//against long names sending the buttons out of alignment
+import '../styles/ApartmentsCell.css';
 
 const ApartmentsCell: React.FC<RouteComponentProps> = ({ history }) => {
     const userContext = useContext(AccountContext) as AccountContextType;
@@ -20,29 +17,38 @@ const ApartmentsCell: React.FC<RouteComponentProps> = ({ history }) => {
     const apartmentSummaries: ApartmentSummary[] = user.apartments;
     const [redirect, setRedirect] = useState(false);
     const [message, setMessage] = useState('');
+    const [serverCallMade, setServerCallMade] = useState(false);
 
     const handleClickViewApartment = (apartmentId: ApartmentId) => {
-        setMessage('');
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const options = getPostOptions({ apartmentId: apartmentId });
         fetch('/account/viewApartment', options)
             .then((response) => response.json())
             .then((json) => {
+                setServerCallMade(false);
+                setMessage('');
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
                     return;
                 }
                 if (!success) {
-                    setMessage('Unknown Error while trying to view apartment');
+                    setMessage('Unknown error while trying to view apartment');
                     return;
                 }
-                console.log(json);
                 history.push('/mates');
             })
-            .catch((err) => console.error(err));
+            .catch(() => setMessage('Sorry, our server seems to be down.'));
     };
 
     const handleClickLeaveApartment = (apartmentId: ApartmentId) => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const data = {
             userId: user._id,
             apartmentId: apartmentId,
@@ -51,20 +57,21 @@ const ApartmentsCell: React.FC<RouteComponentProps> = ({ history }) => {
         fetch('/account/leaveApartment', options)
             .then((res) => res.json())
             .then((json) => {
-                console.log(json);
+                setServerCallMade(false);
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
                 } else if (!success) {
                     setMessage(
-                        'Sorry, your request to leave the apartment could not be completed at this time',
+                        'Sorry, your request to leave the apartment could not be completed at this time.',
                     );
                 } else {
                     const { user } = json;
                     setMessage('You have left the apartment.');
                     setUser({ ...user });
                 }
-            });
+            })
+            .catch(() => setMessage('Sorry, our server seems to be down.'));
     };
 
     const content = apartmentSummaries.map((apartmentSummary) => (
@@ -72,6 +79,7 @@ const ApartmentsCell: React.FC<RouteComponentProps> = ({ history }) => {
             apartmentSummary={apartmentSummary}
             handleClickViewApartment={handleClickViewApartment}
             handleClickLeaveApartment={handleClickLeaveApartment}
+            key={apartmentSummary.apartmentId}
         />
     ));
 

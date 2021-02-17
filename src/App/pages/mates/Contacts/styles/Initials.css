@@ -1,0 +1,14 @@
+.initials-circle {
+    border-radius: 50%;
+    border: 2px solid black;
+    width: 5rem;
+    height: 5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.initials-content-container {
+    font-size: 2rem;
+    color: rgb(6, 114, 223);
+}

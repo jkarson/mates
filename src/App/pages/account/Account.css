@@ -1,13 +1,6 @@
 .account-content-container {
     height: 100%;
     width: 100%;
-    /* padding: 0px 2vw;
-    box-sizing: border-box;
-    display: grid;
-    grid-template-rows: 1fr 5vh;
-    grid-template-areas:
-        'main'
-        'message'; */
 }
 
 @media only screen and (max-width: 685px) {
@@ -29,16 +22,4 @@
 
 .account-content-container > *:nth-child(2) {
     grid-area: main;
-}
-
-.account-footer-message-container {
-    grid-area: message;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.account-footer-message-container > * {
-    margin-block-start: 0px;
-    margin-block-end: 0px;
 }

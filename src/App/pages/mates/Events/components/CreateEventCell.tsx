@@ -1,9 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import DateTimeInputCell from '../../../../common/components/DateTimeInputCell';
-import RedMessageCell from '../../../../common/components/RedMessageCell';
-import SimpleButton from '../../../../common/components/SimpleButton';
-import StyledInput from '../../../../common/components/StyledInput';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { Tenant } from '../../../../common/models';
 import { DateTimeInputType } from '../../../../common/types';
@@ -20,12 +17,15 @@ import { EventsTabType } from '../models/EventsTabs';
 import { initializeServerEventsInfo, isPastEvent, isPresentEvent } from '../utilities';
 
 import '../styles/CreateEventCell.css';
-import FauxSimpleButton, {
+import {
+    FauxSimpleButton,
     BiggerFauxSimpleButton,
-} from '../../../../common/components/FauxSimpleButton';
-import BiggerSimpleButton from '../../../../common/components/BiggerSimpleButton';
+} from '../../../../common/components/FauxSimpleButtons';
 import { FriendProfile } from '../../Friends/models/FriendsInfo';
 import InviteInviteeAttendeeModal from './InviteInviteeAttendeeModal';
+import { BiggerSimpleButton, SimpleButton } from '../../../../common/components/SimpleButtons';
+import { RedMessageCell } from '../../../../common/components/ColoredMessageCells';
+import { StyledInput } from '../../../../common/components/StyledInputs';
 
 interface CreateEventInputType {
     title: string;
@@ -51,9 +51,9 @@ const CreateEventCell: React.FC<CreateEventCellProps> = ({ setTab }) => {
     const [invited, setInvited] = useState<FriendProfile[]>([]);
     const [redirect, setRedirect] = useState(false);
     const [error, setError] = useState('');
-
     const [showInviteFriendsModal, setShowInviteFriendsModal] = useState(false);
     const [showInviteesModal, setShowInviteesModal] = useState(false);
+    const [serverCallMade, setServerCallMade] = useState(false);
 
     const handleChange = (
         event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>,
@@ -79,6 +79,10 @@ const CreateEventCell: React.FC<CreateEventCellProps> = ({ setTab }) => {
 
     const handleCreateEvent = () => {
         if (canCreate()) {
+            if (serverCallMade) {
+                return;
+            }
+            setServerCallMade(true);
             const tenant = getTenant(user) as Tenant;
 
             input.title = input.title.trim();
@@ -104,7 +108,7 @@ const CreateEventCell: React.FC<CreateEventCellProps> = ({ setTab }) => {
             fetch('/mates/createEvent', options)
                 .then((res) => res.json())
                 .then((json) => {
-                    console.log(json);
+                    setServerCallMade(false);
                     const { authenticated, success } = json;
                     if (!authenticated) {
                         setRedirect(true);
@@ -135,7 +139,8 @@ const CreateEventCell: React.FC<CreateEventCellProps> = ({ setTab }) => {
                         newTab = 'Future';
                     }
                     setTab(newTab);
-                });
+                })
+                .catch(() => setError('Sorry, our server seems to be down.'));
         }
     };
 

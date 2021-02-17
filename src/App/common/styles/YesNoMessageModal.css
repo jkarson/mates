@@ -1,14 +1,12 @@
 .yesnomessage-modal-container {
     height: 100%;
     width: 100%;
-    /* background-color: rgb(255, 60, 0); */
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 3fr 1fr;
     grid-template-areas:
         'message message'
         'no yes';
-    /* border: 2px dotted black; */
 }
 
 .yesnomessage-modal-message-container {
@@ -17,7 +15,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    /* background-color: green; */
 }
 
 .yesnomessage-modal-message-container span {

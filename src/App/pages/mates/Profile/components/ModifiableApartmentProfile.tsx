@@ -4,9 +4,9 @@ import { MatesUserContext, MatesUserContextType } from '../../../../common/conte
 import { getPutOptions, getFriendProfileFromApartment } from '../../../../common/utilities';
 import ApartmentProfileCellBody from './ApartmentProfileCellBody';
 import ApartmentProfileModificationCell from './ApartmentProfileModificationCell';
+import { RedMessageCell } from '../../../../common/components/ColoredMessageCells';
 
 import '../styles/ModifiableApartmentProfile.css';
-import RedMessageCell from '../../../../common/components/RedMessageCell';
 
 const ModifiableApartmentProfile: React.FC = () => {
     const { matesUser: user, setMatesUser: setUser } = useContext(
@@ -16,6 +16,7 @@ const ModifiableApartmentProfile: React.FC = () => {
     const [input, setInput] = useState(user.apartment.profile);
     const [redirect, setRedirect] = useState(false);
     const [updateProfileError, setUpdateProfileError] = useState('');
+    const [serverCallMade, setServerCallMade] = useState(false);
 
     const handleChange = () => {
         if (edit && input.name.length === 0) {
@@ -23,6 +24,10 @@ const ModifiableApartmentProfile: React.FC = () => {
             return;
         }
         if (edit) {
+            if (serverCallMade) {
+                return;
+            }
+            setServerCallMade(true);
             input.name = input.name.trim();
             input.address = input.address ? input.address.trim() : input.address;
             input.quote = input.quote ? input.quote.trim() : input.quote;
@@ -36,6 +41,7 @@ const ModifiableApartmentProfile: React.FC = () => {
             fetch('/mates/updateApartmentProfile', options)
                 .then((response) => response.json())
                 .then((json) => {
+                    setServerCallMade(false);
                     const { authenticated, success } = json;
                     if (!authenticated) {
                         setRedirect(true);
@@ -49,7 +55,8 @@ const ModifiableApartmentProfile: React.FC = () => {
                     setEdit(false);
                     setUpdateProfileError('');
                     setUser({ ...user, apartment: { ...user.apartment, profile: newProfile } });
-                });
+                })
+                .catch(() => setUpdateProfileError('Sorry, our server seems to be down.'));
         } else {
             setEdit(true);
         }

@@ -17,6 +17,7 @@ const BillSummaryCell: React.FC<BillSummaryCellProps> = ({
         <BillGeneratorCell
             billGenerator={billGenerator}
             handleDeleteBillSeries={handleDeleteBillSeries}
+            key={billGenerator._id}
         />
     ));
     return <div className="bill-summary-cell-container">{billGeneratorCells}</div>;

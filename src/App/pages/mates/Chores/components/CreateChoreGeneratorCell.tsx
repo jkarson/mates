@@ -1,13 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import BiggerSimpleButton from '../../../../common/components/BiggerSimpleButton';
 import DateInputCell from '../../../../common/components/DateInputCell';
-import FauxSimpleButton, {
-    BiggerFauxSimpleButton,
-} from '../../../../common/components/FauxSimpleButton';
 import FrequencySelectCell from '../../../../common/components/FrequencySelectCell';
-import RedMessageCell from '../../../../common/components/RedMessageCell';
-import StyledInput from '../../../../common/components/StyledInput';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { UserId } from '../../../../common/models';
 import {
@@ -23,10 +17,16 @@ import {
     getChoresWithoutIdFromChoreGeneratorWithoutId,
     initializeServerChoresInfo,
 } from '../utilities';
-import SimpleButton from '../../../../common/components/SimpleButton';
 import AssignAssigneeModal from './AssignAssigneeModal';
 
 import '../styles/CreateChoreGeneratorCell.css';
+import { BiggerSimpleButton, SimpleButton } from '../../../../common/components/SimpleButtons';
+import {
+    FauxSimpleButton,
+    BiggerFauxSimpleButton,
+} from '../../../../common/components/FauxSimpleButtons';
+import { RedMessageCell } from '../../../../common/components/ColoredMessageCells';
+import { StyledInput } from '../../../../common/components/StyledInputs';
 
 interface CreateChoreGeneratorInput {
     name: string;
@@ -47,11 +47,12 @@ const CreateChoreGeneratorCell: React.FC<CreateChoreGeneratorCellProps> = ({ set
 
     const [redirect, setRedirect] = useState(false);
     const [error, setError] = useState('');
+    const [serverCallMade, setServerCallMade] = useState(false);
 
     const initialCreateChoreGeneratorInput: CreateChoreGeneratorInput = {
         name: '',
         assigneeIds: [],
-        frequency: 'Daily',
+        frequency: 'Weekly',
         starting: getTodaysDate(),
         showUntilCompleted: true,
     };
@@ -91,6 +92,10 @@ const CreateChoreGeneratorCell: React.FC<CreateChoreGeneratorCellProps> = ({ set
         if (input.name.length === 0 || input.assigneeIds.length === 0) {
             return;
         }
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const starting = new Date(input.starting.getTime());
         input.name = input.name.trim();
 
@@ -115,7 +120,7 @@ const CreateChoreGeneratorCell: React.FC<CreateChoreGeneratorCellProps> = ({ set
         fetch('/mates/createChoreGenerator', options)
             .then((response) => response.json())
             .then((json) => {
-                console.log(json);
+                setServerCallMade(false);
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
@@ -135,13 +140,14 @@ const CreateChoreGeneratorCell: React.FC<CreateChoreGeneratorCellProps> = ({ set
                 setInput({
                     name: '',
                     assigneeIds: [],
-                    frequency: 'Daily',
+                    frequency: 'Weekly',
                     starting: getTodaysDate(),
                     showUntilCompleted: true,
                 });
                 setError('');
                 setTab('Summary');
-            });
+            })
+            .catch(() => setError('Sorry, our server seems to be down.'));
     };
 
     if (redirect) {
@@ -228,7 +234,7 @@ const CreateChoreGeneratorCell: React.FC<CreateChoreGeneratorCellProps> = ({ set
                             </span>
                         </div>
                     </div>
-                    <div className="create-chore-generator-cell-create-buttons-container">
+                    <div>
                         {canCreate() ? (
                             <BiggerSimpleButton
                                 onClick={createChoreGenerator}

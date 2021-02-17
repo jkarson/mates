@@ -1,11 +1,11 @@
 import React, { useContext, useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import RedMessageCell from '../../../common/components/RedMessageCell';
 import StandardStyledText from '../../../common/components/StandardStyledText';
 import { AccountContext } from '../../../common/context';
 import { getPostOptions } from '../../../common/utilities';
 import { ApartmentSummary } from '../../mates/Friends/models/FriendsInfo';
 import AccountJoinRequestCell from './AccountJoinRequestCell';
+import { RedMessageCell } from '../../../common/components/ColoredMessageCells';
 
 import '../styles/JoinRequestsCell.css';
 
@@ -13,6 +13,7 @@ const JoinRequestsCell: React.FC = () => {
     const userContext = useContext(AccountContext);
     const [redirect, setRedirect] = useState(false);
     const [message, setMessage] = useState('');
+    const [serverCallMade, setServerCallMade] = useState(false);
     if (!userContext) {
         return null;
     }
@@ -21,6 +22,10 @@ const JoinRequestsCell: React.FC = () => {
     const requestedApartmentSummaries: ApartmentSummary[] = user.requestedApartments;
 
     const cancelJoinRequest = (requestedApartment: ApartmentSummary) => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const data = {
             userId: user._id,
             requestedApartmentId: requestedApartment.apartmentId,
@@ -29,7 +34,8 @@ const JoinRequestsCell: React.FC = () => {
         fetch('/account/cancelJoinRequest', options)
             .then((res) => res.json())
             .then((json) => {
-                console.log(json);
+                setServerCallMade(false);
+                setMessage('');
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
@@ -42,13 +48,15 @@ const JoinRequestsCell: React.FC = () => {
                 const { user } = json;
                 setUser({ ...user });
                 setMessage('Join Request Cancelled');
-            });
+            })
+            .catch(() => setMessage('Sorry, our server seems to be down'));
     };
 
     const content = requestedApartmentSummaries.map((apartmentSummary) => (
         <AccountJoinRequestCell
             apartmentSummary={apartmentSummary}
             cancelJoinRequest={cancelJoinRequest}
+            key={apartmentSummary.apartmentId}
         />
     ));
 

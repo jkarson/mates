@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { StyledInputWithRef } from '../../../../common/components/StyledInput';
+import { StyledInputWithRef } from '../../../../common/components/StyledInputs';
 import {
     verifyAndSetNumericStringInput,
     handleFocusNumericStringInput,

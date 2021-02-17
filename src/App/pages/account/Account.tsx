@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { Redirect, RouteComponentProps } from 'react-router-dom';
 import PageCell from '../../common/components/PageCell';
 import Tabs from '../../common/components/Tabs';
@@ -9,35 +9,36 @@ import CreateApartmentCell from './components/CreateApartmentCell';
 import JoinApartmentCell from './components/JoinApartmentCell';
 import JoinRequestsCell from './components/JoinRequestsCell';
 import { AccountTabType, accountTabNames } from './models/AccountTabs';
-
-import './Account.css';
-import RedMessageCell from '../../common/components/RedMessageCell';
 import ProfileLink from '../../common/components/ProfileLink';
 import ApartmentLink from '../../common/components/ApartmentLink';
+import ServerErrorPageCell from '../../common/components/ServerErrorPageCell';
+import LoadingPageCell from '../../common/components/LoadingPageCell';
+
+import './Account.css';
 
 const Account: React.FC<RouteComponentProps> = (props) => {
     const [user, setUser] = useState<User | null>(null);
     const [redirectToLogin, setRedirectToLogin] = useState(false);
+    const [serverError, setServerError] = useState(false);
+
+    const [tab, setTab] = useState<AccountTabType>('Your Apartments');
+    const tabs = <Tabs currentTab={tab} setTab={setTab} tabNames={accountTabNames} />;
 
     useLayoutEffect(() => {
         fetch('/account')
             .then((response) => response.json())
             .then((json) => {
-                console.log(json);
+                setServerError(false);
                 const { authenticated } = json;
                 if (!authenticated) {
-                    console.log('initiating redirect');
                     setRedirectToLogin(true);
                 } else {
                     const { user } = json;
                     setUser({ ...user });
                 }
             })
-            .catch((err) => console.error(err));
+            .catch(() => setServerError(true));
     }, []);
-
-    const [tab, setTab] = useState<AccountTabType>('Your Apartments');
-    const tabs = <Tabs currentTab={tab} setTab={setTab} tabNames={accountTabNames} />;
 
     const handleProfileLinkClick = () => {
         props.history.push('account-settings');
@@ -64,7 +65,11 @@ const Account: React.FC<RouteComponentProps> = (props) => {
     }
 
     if (!user) {
-        return null;
+        if (!serverError) {
+            return <LoadingPageCell />;
+        } else {
+            return <ServerErrorPageCell />;
+        }
     }
 
     return (

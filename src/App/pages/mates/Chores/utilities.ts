@@ -22,7 +22,6 @@ export const updateChoresFromChoreGenerators = (
     matesUser: MatesUser,
     setMatesUser: React.Dispatch<React.SetStateAction<MatesUser>>,
 ) => {
-    console.log('hi from updateChores effect');
     const newChores: ChoreWithoutId[] = [];
 
     // Only proceed if user has chore generators to update
@@ -30,7 +29,6 @@ export const updateChoresFromChoreGenerators = (
         choreGenerators.filter((chore) => !isSameDayMonthYear(chore.updatedThrough, getMaxDate()))
             .length === 0
     ) {
-        console.log('nothing to update, returning');
         return false;
     }
 
@@ -44,12 +42,10 @@ export const updateChoresFromChoreGenerators = (
         updatedThrough: getMaxDate(),
         newChores: newChores,
     };
-    console.log(data);
 
     const options = getPostOptions(data);
     fetch('/mates/addChoresAndUpdateChoreGenerators', options).then((res) =>
         res.json().then((json) => {
-            console.log(json);
             const { authenticated, success } = json;
             if (!authenticated) {
                 return true;
@@ -118,7 +114,6 @@ export const purgeOldChores = (
     matesUser: MatesUser,
     setMatesUser: React.Dispatch<React.SetStateAction<MatesUser>>,
 ) => {
-    console.log('hi from purge old chores');
     const existingChores = matesUser.apartment.choresInfo.chores;
     const choreDeletionIds: string[] = [];
 
@@ -134,7 +129,6 @@ export const purgeOldChores = (
     });
 
     if (choreDeletionIds.length === 0) {
-        console.log('nothing to delete, returning');
         return false;
     }
 
@@ -145,8 +139,6 @@ export const purgeOldChores = (
     const options = getDeleteOptions(data);
     fetch('/mates/deleteOldChores', options).then((res) =>
         res.json().then((json) => {
-            console.log('delete old chores response:');
-            console.log(json);
             const { authenticated, success } = json;
             if (!authenticated) {
                 return true;

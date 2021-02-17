@@ -2,22 +2,12 @@ import React, { useContext, useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { Tenant } from '../../../../common/models';
-import { StateProps } from '../../../../common/types';
-import {
-    countDigits,
-    formatPhoneNumber,
-    getDigits,
-    getPutOptions,
-    getTenant,
-    isNumberMates,
-    verifyAgeInput,
-} from '../../../../common/utilities';
+import { getPutOptions, getTenant } from '../../../../common/utilities';
 import TenantProfileCellBody from './TenantProfileCellBody';
+import InputTenantCell from './InputTenantCell';
+import { RedMessageCell } from '../../../../common/components/ColoredMessageCells';
 
 import '../styles/TenantProfileModificationCell.css';
-import RedMessageCell from '../../../../common/components/RedMessageCell';
-import StyledInput from '../../../../common/components/StyledInput';
-import InputTenantCell from './InputTenantCell';
 
 // EXTENSION: Add e-mail / phone number verification.
 
@@ -30,6 +20,7 @@ const TenantProfileModificationCell: React.FC = () => {
     const [input, setInput] = useState<Tenant>({ ...tenant });
     const [redirect, setRedirect] = useState(false);
     const [error, setError] = useState('');
+    const [serverCallMade, setServerCallMade] = useState(false);
 
     const handleClick = () => {
         if (!edit) {
@@ -39,12 +30,18 @@ const TenantProfileModificationCell: React.FC = () => {
                 setError('Your name cannot be blank');
                 return;
             }
+            if (serverCallMade) {
+                return;
+            }
+            setServerCallMade(true);
+            input.name = input.name.trim();
             input.email = input.email ? input.email.trim() : undefined;
             const data = { apartmentId: user.apartment._id, ...input };
             const options = getPutOptions(data);
             fetch('/mates/updateTenantProfile', options)
                 .then((response) => response.json())
                 .then((json) => {
+                    setServerCallMade(false);
                     const { authenticated, success } = json;
                     if (!authenticated) {
                         setRedirect(true);
@@ -58,7 +55,8 @@ const TenantProfileModificationCell: React.FC = () => {
                     setUser({ ...user, apartment: { ...user.apartment, tenants: resultTenants } });
                     setError('');
                     setEdit(false);
-                });
+                })
+                .catch(() => setError('Sorry, our server seems to be down.'));
         }
     };
 

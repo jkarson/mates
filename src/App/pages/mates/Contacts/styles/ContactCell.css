@@ -12,13 +12,8 @@
     border-top: 1px solid black;
 }
 
-.contact-cell-initials-container {
-    /* background-color: green; */
-}
-
 .contact-cell-content-container {
     flex: 1;
-    /* height: 100%; */
     margin-left: 1rem;
     display: flex;
     flex-direction: column;
@@ -26,7 +21,6 @@
     overflow-wrap: break-word;
     word-wrap: break-word;
     min-width: 1%;
-    /* background-color: red; */
 }
 
 .contact-cell-content-container span {
@@ -68,21 +62,4 @@
 
 .contact-cell-modal-container span {
     font-size: 1.5rem;
-}
-
-/* INITIALS STYLES */
-
-.contact-cell-initials-circle {
-    border-radius: 50%;
-    border: 2px solid black;
-    width: 5rem;
-    height: 5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.contact-cell-initials-content {
-    font-size: 2rem;
-    color: rgb(6, 114, 223);
 }

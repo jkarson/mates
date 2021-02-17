@@ -76,16 +76,3 @@
     left: 0;
     right: 0;
 }
-
-.create-apartment-cell-faux-create-button-container button {
-    background-color: gray;
-}
-
-.create-apartment-cell-faux-create-button-container button:hover {
-    box-shadow: none;
-}
-
-.create-apartment-cell-faux-create-button-container button:active {
-    color: white;
-    background-color: gray;
-}

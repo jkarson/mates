@@ -1,8 +1,7 @@
 import React, { useContext, useState } from 'react';
-import SimpleButton from '../../../../common/components/SimpleButton';
+import { SimpleButton } from '../../../../common/components/SimpleButtons';
 import YesNoMessageModal from '../../../../common/components/YesNoMessageModal';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
-import { Tenant } from '../../../../common/models';
 import {
     getTenantByTenantId,
     getFormattedDateString,
@@ -11,13 +10,6 @@ import {
 import { ChoreGenerator, ChoreGeneratorID } from '../models/ChoresInfo';
 
 import '../styles/ChoreGeneratorCell.css';
-
-/*PICKUP: 
-
-2. Style ChoreCell
-3. On to Bills
-
-*/
 
 interface ChoreGeneratorCellProps {
     choreGenerator: ChoreGenerator;
@@ -31,9 +23,16 @@ const ChoreGeneratorCell: React.FC<ChoreGeneratorCellProps> = ({
     assignedToUser,
 }) => {
     const { matesUser } = useContext(MatesUserContext) as MatesUserContextType;
-    const tenantAssignees = choreGenerator.assigneeIds
+
+    const tenantNames = choreGenerator.assigneeIds
         .map((assignee) => getTenantByTenantId(matesUser, assignee))
-        .filter((assignee) => assignee !== undefined) as Tenant[];
+        .map((tenant) => {
+            if (tenant === undefined) {
+                return 'Unknown';
+            } else {
+                return tenant.name;
+            }
+        });
 
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     return (
@@ -61,10 +60,7 @@ const ChoreGeneratorCell: React.FC<ChoreGeneratorCellProps> = ({
                     </span>
                 </div>
                 <div className="chore-generator-cell-assignment-container">
-                    <span>
-                        {'Assigned to: ' +
-                            formatNames(tenantAssignees.map((tenant) => tenant.name))}
-                    </span>
+                    <span>{'Assigned to: ' + formatNames(tenantNames)}</span>
                 </div>
             </div>
             <div className="chore-generator-cell-button-container">

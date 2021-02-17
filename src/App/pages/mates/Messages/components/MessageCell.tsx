@@ -67,9 +67,6 @@ export const UserMessageCell: React.FC<UserMessageCellProps> = ({
             >
                 <span onClick={() => setShowModal(true)}>{message.content}</span>
             </div>
-            {/* <div className="user-message-cell-delete-container">
-                <button onClick={() => handleDelete(message)}>{'Delete Message'}</button>
-            </div> */}
         </div>
     );
 };

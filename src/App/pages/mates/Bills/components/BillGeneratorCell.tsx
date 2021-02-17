@@ -4,9 +4,9 @@ import { BillGenerator, BillGeneratorID } from '../models/BillsInfo';
 import AmountsWithPercentOwedDisplayCell from './AmountsWithPercentOwedDisplayCell';
 
 import '../styles/BillGeneratorCell.css';
-import SimpleButton from '../../../../common/components/SimpleButton';
 import YesNoMessageModal from '../../../../common/components/YesNoMessageModal';
 import LastWordBoldTextCell from '../../../../common/components/LastWordBoldTextCell';
+import { SimpleButton } from '../../../../common/components/SimpleButtons';
 
 interface BillGeneratorCellProps {
     billGenerator: BillGenerator;

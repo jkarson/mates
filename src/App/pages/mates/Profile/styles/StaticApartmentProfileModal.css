@@ -39,8 +39,6 @@
 
 .static-apartment-profile-modal-content-container {
     grid-area: content;
-    display: flex;
-    flex-direction: column;
     overflow-y: scroll;
     max-width: 100%;
     overflow-wrap: break-word;
@@ -48,7 +46,6 @@
 }
 
 .static-apartment-profile-modal-apartment-container {
-    height: 15vh;
     margin-top: 1vh;
     display: flex;
     justify-content: center;

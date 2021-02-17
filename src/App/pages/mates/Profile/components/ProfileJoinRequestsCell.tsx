@@ -1,15 +1,15 @@
 import React, { useContext, useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import DescriptionCell from '../../../../common/components/DescriptionCell';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { getPostOptions, getDeleteOptions } from '../../../../common/utilities';
 import { JoinRequest } from '../models/ProfileInfo';
 import { ProfileTabType } from '../models/ProfileTabs';
 import ProfileJoinRequestCell from './ProfileJoinRequestCell';
+import LastWordBoldTextCell from '../../../../common/components/LastWordBoldTextCell';
+import StandardStyledText from '../../../../common/components/StandardStyledText';
+import { RedMessageCell } from '../../../../common/components/ColoredMessageCells';
 
 import '../styles/ProfileJoinRequestsCell.css';
-import RedMessageCell from '../../../../common/components/RedMessageCell';
-import LastWordBoldTextCell from '../../../../common/components/LastWordBoldTextCell';
 
 interface ProfileJoinRequestsCellProps {
     setTab: React.Dispatch<React.SetStateAction<ProfileTabType>>;
@@ -23,13 +23,19 @@ const ProfileJoinRequestsCell: React.FC<ProfileJoinRequestsCellProps> = ({ setTa
 
     const [redirect, setRedirect] = useState(false);
     const [error, setError] = useState('');
+    const [serverCallMade, setServerCallMade] = useState(false);
 
     const handleAccept = (joinRequest: JoinRequest) => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const data = { apartmentId: user.apartment._id, joineeId: joinRequest._id };
         const options = getPostOptions(data);
         fetch('/mates/acceptJoinRequest', options)
             .then((response) => response.json())
             .then((json) => {
+                setServerCallMade(false);
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
@@ -50,15 +56,21 @@ const ProfileJoinRequestsCell: React.FC<ProfileJoinRequestsCellProps> = ({ setTa
                     },
                 });
                 setTab('Your Profile');
-            });
+            })
+            .catch(() => setError('Sorry, our server seems to be down.'));
     };
 
     const handleDelete = (joinRequest: JoinRequest) => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const data = { apartmentId: user.apartment._id, requesteeId: joinRequest._id };
         const options = getDeleteOptions(data);
         fetch('/mates/deleteJoinRequest', options)
             .then((response) => response.json())
             .then((json) => {
+                setServerCallMade(true);
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
@@ -77,7 +89,8 @@ const ProfileJoinRequestsCell: React.FC<ProfileJoinRequestsCellProps> = ({ setTa
                     },
                 });
                 setError('Join request deleted');
-            });
+            })
+            .catch(() => setError('Sorry, our server seems to be down.'));
     };
 
     const content = joinRequests.map((joinRequest) => (
@@ -85,6 +98,7 @@ const ProfileJoinRequestsCell: React.FC<ProfileJoinRequestsCellProps> = ({ setTa
             joinRequest={joinRequest}
             handleAccept={handleAccept}
             handleDelete={handleDelete}
+            key={joinRequest._id}
         />
     ));
 
@@ -95,10 +109,10 @@ const ProfileJoinRequestsCell: React.FC<ProfileJoinRequestsCellProps> = ({ setTa
         <div className="profile-join-requests-cell-container">
             <div className="profile-join-requests-cell-description-container">
                 {content.length === 0 ? (
-                    <DescriptionCell content={'No users have requested to join your apartment.'} />
+                    <StandardStyledText text={'No users have requested to join your apartment.'} />
                 ) : (
-                    <DescriptionCell
-                        content={'A list of users who have requested to join your apartment.'}
+                    <StandardStyledText
+                        text={'A list of users who have requested to join your apartment.'}
                     />
                 )}
             </div>

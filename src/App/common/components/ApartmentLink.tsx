@@ -1,7 +1,7 @@
 import React from 'react';
+import ApartmentIcon from './ApartmentIcon';
 
 import '../styles/ApartmentLink.css';
-import ApartmentIcon from './ApartmentIcon';
 
 interface ApartmentLinkProps {
     apartmentName: string;

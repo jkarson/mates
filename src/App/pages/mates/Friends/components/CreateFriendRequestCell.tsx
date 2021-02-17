@@ -9,10 +9,10 @@ import { ApartmentSummary } from '../models/FriendsInfo';
 import { FriendsTabType } from '../models/FriendsTabs';
 import StandardStyledText from '../../../../common/components/StandardStyledText';
 import LastWordBoldTextCell from '../../../../common/components/LastWordBoldTextCell';
-import StyledInput from '../../../../common/components/StyledInput';
-import BiggerSimpleButton from '../../../../common/components/BiggerSimpleButton';
-import RedMessageCell from '../../../../common/components/RedMessageCell';
 import AddFriendCell from './AddFriendCell';
+import { BiggerSimpleButton } from '../../../../common/components/SimpleButtons';
+import { RedMessageCell } from '../../../../common/components/ColoredMessageCells';
+import { StyledInput } from '../../../../common/components/StyledInputs';
 
 import '../styles/CreateFriendRequestCell.css';
 
@@ -30,20 +30,27 @@ const CreateFriendRequestCell: React.FC<CreateFriendRequestCellProps> = ({ setTa
     const [redirect, setRedirect] = useState(false);
     const [searchError, setSearchError] = useState('');
     const [footerError, setFooterError] = useState('');
+    const [serverCallMade, setServerCallMade] = useState(false);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInput(event.target.value);
-        setSearchError('');
         setFriendSummary(null);
+        if (searchError !== 'Sorry, our server seems to be down.') {
+            setSearchError('');
+        }
     };
 
     const handleSearchCode = () => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const data = { code: input, apartmentId: user.apartment._id };
         const options = getPostOptions(data);
         fetch('/mates/searchCodeFriends', options)
             .then((response) => response.json())
             .then((json) => {
-                console.log(json);
+                setServerCallMade(false);
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
@@ -55,12 +62,16 @@ const CreateFriendRequestCell: React.FC<CreateFriendRequestCellProps> = ({ setTa
                 }
                 setSearchError('');
                 const { apartmentSummary } = json;
-                console.log(apartmentSummary);
                 setFriendSummary(apartmentSummary);
-            });
+            })
+            .catch(() => setSearchError('Sorry, our server seems to be down.'));
     };
 
     const handleSendFriendRequest = (apartmentSummary: ApartmentSummary) => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const data = {
             userApartmentId: user.apartment._id,
             requesteeApartmentId: apartmentSummary.apartmentId,
@@ -69,6 +80,7 @@ const CreateFriendRequestCell: React.FC<CreateFriendRequestCellProps> = ({ setTa
         fetch('/mates/sendFriendRequest', options)
             .then((response) => response.json())
             .then((json) => {
+                setServerCallMade(false);
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
@@ -95,7 +107,8 @@ const CreateFriendRequestCell: React.FC<CreateFriendRequestCellProps> = ({ setTa
                 setFooterError('');
                 setInput('');
                 setTab('Outgoing Requests');
-            });
+            })
+            .catch(() => setFooterError('Sorry, our server seems to be down.'));
     };
 
     if (redirect) {

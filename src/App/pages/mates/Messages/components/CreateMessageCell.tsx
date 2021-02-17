@@ -1,6 +1,4 @@
 import React, { useRef } from 'react';
-import FauxSimpleButton from '../../../../common/components/FauxSimpleButton';
-import SimpleButton from '../../../../common/components/SimpleButton';
 import { UserId } from '../../../../common/models';
 import { StateProps } from '../../../../common/types';
 import { MessageWithoutId } from '../models/Message';
@@ -11,6 +9,7 @@ interface CreateMessageCellProps extends StateProps<string> {
     author: string;
     authorId: UserId;
     handleNewMessage: (message: MessageWithoutId) => void;
+    setError: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const CreateMessageCell: React.FC<CreateMessageCellProps> = ({
@@ -19,6 +18,7 @@ const CreateMessageCell: React.FC<CreateMessageCellProps> = ({
     author,
     authorId,
     handleNewMessage,
+    setError,
 }) => {
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
     const hiddenDiv = useRef<HTMLDivElement>(null);
@@ -41,6 +41,7 @@ const CreateMessageCell: React.FC<CreateMessageCellProps> = ({
     };
 
     const handleChangeInput = (event: React.ChangeEvent<HTMLTextAreaElement>): void => {
+        setError('');
         const input = event.target.value;
         if (input.length > 0 && input.charAt(input.length - 1) === '\n') {
             return handleSubmit();

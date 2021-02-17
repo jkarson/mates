@@ -7,8 +7,8 @@ import {
 } from '../../../../common/utilities';
 import { FriendProfile } from '../models/FriendsInfo';
 import FriendCell from './FriendCell';
-import RedMessageCell from '../../../../common/components/RedMessageCell';
 import StandardStyledText from '../../../../common/components/StandardStyledText';
+import { RedMessageCell } from '../../../../common/components/ColoredMessageCells';
 
 import '../styles/FriendsCell.css';
 
@@ -19,8 +19,13 @@ const FriendsCell: React.FC = () => {
     const friends = user.apartment.friendsInfo.friends;
     const [redirect, setRedirect] = useState(false);
     const [error, setError] = useState('');
+    const [serverCallMade, setServerCallMade] = useState(false);
 
     const handleDelete = (friend: FriendProfile) => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const data = {
             apartmentId: user.apartment._id,
             friendApartmentId: friend.apartmentId,
@@ -29,6 +34,7 @@ const FriendsCell: React.FC = () => {
         fetch('/mates/deleteFriend', options)
             .then((response) => response.json())
             .then((json) => {
+                setServerCallMade(false);
                 const { authenticated, success } = json;
                 if (!authenticated) {
                     setRedirect(true);
@@ -48,7 +54,8 @@ const FriendsCell: React.FC = () => {
                     },
                 });
                 setError('Friend deleted');
-            });
+            })
+            .catch(() => setError('Sorry, our server seems to be down.'));
     };
 
     const content = friends

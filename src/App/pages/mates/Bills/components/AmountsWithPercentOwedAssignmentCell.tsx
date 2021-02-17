@@ -15,10 +15,9 @@ import { AmountWithPercentOwed } from '../models/AmountWithPercentOwed';
 import { getTotalAssignedValue } from '../utilities';
 
 import '../styles/AmountsWithPercentOwedAssignmentCell.css';
-import { StyledInputWithRef } from '../../../../common/components/StyledInput';
 import TenantAmountAssignmentCell from './TenantAmountAssignmentCell';
-import TotalAssignedCell from './TotalAssignedCell';
-import SimpleButton from '../../../../common/components/SimpleButton';
+import { SimpleButton } from '../../../../common/components/SimpleButtons';
+import { StyledInputWithRef } from '../../../../common/components/StyledInputs';
 
 interface AmountsWithPercentOwedAssignmentCellProps {
     amountsWithPercentOwed: AmountWithPercentOwed[];
@@ -119,6 +118,7 @@ const AmountsWithPercentOwedAssignmentCell: React.FC<AmountsWithPercentOwedAssig
                 percent={aWPO.percent}
                 setAmount={setAmount}
                 setPercent={setPercent}
+                key={aWPO.userId}
             />
         );
     });

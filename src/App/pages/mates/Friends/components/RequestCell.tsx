@@ -1,7 +1,7 @@
 import React from 'react';
 import { ApartmentSummary } from '../models/FriendsInfo';
 import ApartmentSummaryCell from './ApartmentSummaryCell';
-import SimpleButton from '../../../../common/components/SimpleButton';
+import { SimpleButton } from '../../../../common/components/SimpleButtons';
 
 import '../styles/RequestCell.css';
 
@@ -29,36 +29,55 @@ const IncomingRequestCell: React.FC<IncomingRequestCellProps> = ({
     request,
     handleAdd,
     handleDelete,
-}) => (
-    <div className="incoming-request-cell-container">
-        <div className="incoming-request-cell-buttons-container">
-            <div className="incoming-request-cell-add-button-container">
-                <SimpleButton onClick={() => handleAdd(request)} text={'Add Friend'} />
+}) => {
+    return (
+        <div className="incoming-request-cell-container">
+            <div className="incoming-request-cell-buttons-container">
+                <div className="incoming-request-cell-add-button-container">
+                    <SimpleButton
+                        onClick={() => {
+                            handleAdd(request);
+                        }}
+                        text={'Add Friend'}
+                    />
+                </div>
+                <div className="incoming-request-cell-delete-button-container">
+                    <SimpleButton
+                        onClick={() => {
+                            handleDelete(request);
+                        }}
+                        text={'Delete Request'}
+                    />
+                </div>
             </div>
-            <div className="incoming-request-cell-delete-button-container">
-                <SimpleButton onClick={() => handleDelete(request)} text={'Delete Request'} />
+            <div className="incoming-request-cell-apartment-container">
+                <ApartmentSummaryCell friend={request} />
             </div>
         </div>
-        <div className="incoming-request-cell-apartment-container">
-            <ApartmentSummaryCell friend={request} />
-        </div>
-    </div>
-);
+    );
+};
 
 interface OutgoingRequestCellProps {
     request: ApartmentSummary;
     handleDelete: (apartment: ApartmentSummary) => void;
 }
 
-const OutgoingRequestCell: React.FC<OutgoingRequestCellProps> = ({ request, handleDelete }) => (
-    <div className="outgoing-request-cell-container">
-        <div className="outgoing-request-cell-apartment-container">
-            <ApartmentSummaryCell friend={request} />
+const OutgoingRequestCell: React.FC<OutgoingRequestCellProps> = ({ request, handleDelete }) => {
+    return (
+        <div className="outgoing-request-cell-container">
+            <div className="outgoing-request-cell-apartment-container">
+                <ApartmentSummaryCell friend={request} />
+            </div>
+            <div className="outgoing-request-cell-delete-button-container">
+                <SimpleButton
+                    onClick={() => {
+                        handleDelete(request);
+                    }}
+                    text={'Delete Friend Request'}
+                />
+            </div>
         </div>
-        <div className="outgoing-request-cell-delete-button-container">
-            <SimpleButton onClick={() => handleDelete(request)} text={'Delete Friend Request'} />
-        </div>
-    </div>
-);
+    );
+};
 
 export default RequestCell;

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { Tenant, UserId } from '../../../../common/models';
 import { assertUnreachable, getTenantByTenantId } from '../../../../common/utilities';
@@ -39,6 +39,7 @@ const AssignAssigneeModal: React.FC<AssignAssigneeModalProps> = ({
             const unassignedTenants = tenants.filter((tenant) => !assigned.includes(tenant.userId));
             assignmentCells = unassignedTenants.map((tenant) => (
                 <TenantAssignmentCell
+                    key={tenant.userId}
                     tenant={tenant}
                     mode={mode}
                     handleAssign={handleAssign}
@@ -51,6 +52,7 @@ const AssignAssigneeModal: React.FC<AssignAssigneeModalProps> = ({
                 const tenant = getTenantByTenantId(matesUser, tenantId) as Tenant;
                 return (
                     <TenantAssignmentCell
+                        key={tenant.userId}
                         tenant={tenant}
                         mode={mode}
                         handleAssign={handleAssign}
@@ -63,9 +65,11 @@ const AssignAssigneeModal: React.FC<AssignAssigneeModalProps> = ({
             assertUnreachable(mode);
     }
 
-    if (assignmentCells.length === 0) {
-        setShow(false);
-    }
+    useEffect(() => {
+        if (assignmentCells.length === 0) {
+            setShow(false);
+        }
+    }, [assignmentCells.length, setShow]);
 
     return (
         <div className="assignee-modal-container">

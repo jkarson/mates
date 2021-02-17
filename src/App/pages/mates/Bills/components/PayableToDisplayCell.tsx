@@ -1,27 +1,31 @@
 import React from 'react';
-import SimpleButton from '../../../../common/components/SimpleButton';
+import { SimpleButton } from '../../../../common/components/SimpleButtons';
 import { BillId } from '../models/BillsInfo';
 
 import '../styles/PayableToDisplayCell.css';
 
 interface PayableToDisplayCellProps {
     billId: BillId;
+    includesUser: boolean;
     payableTo: string;
     isPaid: boolean;
     isPrivate: boolean;
     totalOwed: number;
     userPortionIsPaid: boolean;
+    userPortionOwed: number;
     handlePayPortionToPayable: (billId: BillId) => void;
     handlePayBalance: (billId: BillId) => void;
 }
 
 const PayableToDisplayCell: React.FC<PayableToDisplayCellProps> = ({
     billId,
+    includesUser,
     payableTo,
     isPaid,
     isPrivate,
     totalOwed,
     userPortionIsPaid,
+    userPortionOwed,
     handlePayPortionToPayable,
     handlePayBalance,
 }) => {
@@ -57,21 +61,25 @@ const PayableToDisplayCell: React.FC<PayableToDisplayCellProps> = ({
                     </div>
                 </div>
             </div>
-            {isPaid ? null : (
+            {!includesUser || isPaid || userPortionIsPaid ? null : (
                 <div className="payable-to-display-cell-buttons-container">
                     <div className="payable-to-display-cell-buttons-container-inner">
-                        {userPortionIsPaid || isPrivate || isPaid ? null : (
+                        {isPrivate || userPortionOwed === totalOwed ? null : (
                             <SimpleButton
-                                onClick={() => handlePayPortionToPayable(billId)}
+                                onClick={() => {
+                                    handlePayPortionToPayable(billId);
+                                }}
                                 text="Pay Portion"
                             />
                         )}
-                        {isPaid ? null : (
+                        {
                             <SimpleButton
-                                onClick={() => handlePayBalance(billId)}
+                                onClick={() => {
+                                    handlePayBalance(billId);
+                                }}
                                 text="Pay Remaining Balance"
                             />
-                        )}
+                        }
                     </div>
                 </div>
             )}

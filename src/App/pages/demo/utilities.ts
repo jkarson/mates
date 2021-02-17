@@ -10,7 +10,7 @@ import { getBillsWithoutIdFromBillGenerator, getMinDate } from '../mates/Bills/u
 import { Chore, ChoreGenerator } from '../mates/Chores/models/ChoresInfo';
 import { getChoresWithoutIdFromChoreGenerator } from '../mates/Chores/utilities';
 
-export const updateBillsFromBillGeneratorsDemo = (
+export const demoUpdateBillsFromBillGenerators = (
     billGenerators: BillGenerator[],
     matesUser: MatesUser,
     setMatesUser: React.Dispatch<React.SetStateAction<MatesUser>>,
@@ -40,7 +40,7 @@ export const updateBillsFromBillGeneratorsDemo = (
     setMatesUser({ ...matesUser });
 };
 
-export const purgeOldBillsDemo = (
+export const demoPurgeOldBills = (
     matesUser: MatesUser,
     setMatesUser: React.Dispatch<React.SetStateAction<MatesUser>>,
 ) => {
@@ -57,7 +57,6 @@ export const purgeOldBillsDemo = (
     });
 
     if (billDeletionIds.length === 0) {
-        console.log('no bills to purge');
         return false;
     }
     billDeletionIds.forEach((id) => {
@@ -69,7 +68,7 @@ export const purgeOldBillsDemo = (
     setMatesUser({ ...matesUser });
 };
 
-export const updateChoresFromChoreGeneratorsDemo = (
+export const demoUpdateChoresFromChoreGenerators = (
     choreGenerators: ChoreGenerator[],
     matesUser: MatesUser,
     setMatesUser: React.Dispatch<React.SetStateAction<MatesUser>>,
@@ -102,7 +101,7 @@ export const updateChoresFromChoreGeneratorsDemo = (
     setMatesUser({ ...matesUser });
 };
 
-export const purgeOldChoresDemo = (
+export const demoPurgeOldChores = (
     matesUser: MatesUser,
     setMatesUser: React.Dispatch<React.SetStateAction<MatesUser>>,
 ) => {
@@ -121,7 +120,6 @@ export const purgeOldChoresDemo = (
     });
 
     if (choreDeletionIds.length === 0) {
-        console.log('nothing to delete, returning');
         return false;
     }
     choreDeletionIds.forEach((id) => {

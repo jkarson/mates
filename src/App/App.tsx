@@ -7,9 +7,6 @@ import LogIn from './pages/logIn/LogIn';
 import Mates from './pages/mates/Mates';
 import SignUp from './pages/signUp/SignUp';
 
-//to do: push onto stack when you go to demo, dont just redirect
-//back button in sign-up needed
-
 class App extends Component {
     render() {
         const App = () => (

@@ -8,10 +8,10 @@ import {
     getTodaysDate,
     getDayFromDayIndex,
 } from '../utilities';
+import StyledSelect from './StyledSelect';
+import { SimpleButton } from './SimpleButtons';
 
 import '../styles/DateInputCell.css';
-import SimpleButton from './SimpleButton';
-import StyledSelect from './StyledSelect';
 
 interface DateInputCellProps extends StateProps<Date> {
     showReset?: boolean;
@@ -64,7 +64,11 @@ const DateInputCell: React.FC<DateInputCellProps> = ({ state, setState, showRese
         const options: JSX.Element[] = [];
         let i: number;
         for (i = 1; i <= days; i++) {
-            options.push(<option value={i}>{i}</option>);
+            options.push(
+                <option value={i} key={i}>
+                    {i}
+                </option>,
+            );
         }
         return options;
     };

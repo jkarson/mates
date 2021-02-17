@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { ApartmentId } from '../../../../common/models';
 import { ApartmentEvent } from '../models/EventsInfo';
@@ -53,6 +53,7 @@ const InviteInviteeAttendeeModal: React.FC<InviteInviteeAttendeeModalProps> = ({
                     handleClickRemoveAttendee={() => null}
                     canRemove={canRemove}
                     mode="Invite"
+                    key={apartment.apartmentId}
                 />
             ));
             break;
@@ -65,6 +66,7 @@ const InviteInviteeAttendeeModal: React.FC<InviteInviteeAttendeeModalProps> = ({
                     handleClickRemoveAttendee={() => null}
                     canRemove={canRemove}
                     mode="Invitees"
+                    key={apartment.apartmentId}
                 />
             ));
             break;
@@ -79,6 +81,7 @@ const InviteInviteeAttendeeModal: React.FC<InviteInviteeAttendeeModalProps> = ({
                     }
                     canRemove={canRemove}
                     mode="Attendees"
+                    key={apartment.apartmentId}
                 />
             ));
             break;
@@ -101,6 +104,7 @@ const InviteInviteeAttendeeModal: React.FC<InviteInviteeAttendeeModalProps> = ({
                     handleClickRemoveAttendee={() => null}
                     canRemove={canRemove}
                     mode="Invite"
+                    key={apartment.apartmentId}
                 />
             ));
             break;
@@ -119,6 +123,7 @@ const InviteInviteeAttendeeModal: React.FC<InviteInviteeAttendeeModalProps> = ({
                     handleClickRemoveAttendee={() => null}
                     canRemove={canRemove}
                     mode="Invitees"
+                    key={apartment.apartmentId}
                 />
             ));
             break;
@@ -126,9 +131,11 @@ const InviteInviteeAttendeeModal: React.FC<InviteInviteeAttendeeModalProps> = ({
             assertUnreachable(mode);
     }
 
-    if (inviteInviteeAttendeeCells.length === 0) {
-        setShow(false);
-    }
+    useEffect(() => {
+        if (inviteInviteeAttendeeCells.length === 0) {
+            setShow(false);
+        }
+    }, [inviteInviteeAttendeeCells.length, setShow]);
 
     return (
         <div className="send-invitation-cell-modal-container">

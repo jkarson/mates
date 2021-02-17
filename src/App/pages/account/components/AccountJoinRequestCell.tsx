@@ -1,5 +1,5 @@
 import React from 'react';
-import SimpleButton from '../../../common/components/SimpleButton';
+import { SimpleButton } from '../../../common/components/SimpleButtons';
 import ApartmentSummaryCell from '../../mates/Friends/components/ApartmentSummaryCell';
 import { ApartmentSummary } from '../../mates/Friends/models/FriendsInfo';
 

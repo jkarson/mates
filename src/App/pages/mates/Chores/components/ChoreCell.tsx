@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import SimpleButton from '../../../../common/components/SimpleButton';
+import { SimpleButton } from '../../../../common/components/SimpleButtons';
 import YesNoMessageModal from '../../../../common/components/YesNoMessageModal';
 import { MatesUserContext, MatesUserContextType } from '../../../../common/context';
 import { Tenant } from '../../../../common/models';
@@ -28,9 +28,15 @@ const ChoreCell: React.FC<ChoreCellProps> = ({
     handleDeleteSeries,
 }) => {
     const { matesUser } = useContext(MatesUserContext) as MatesUserContextType;
-    const tenantAssignees = chore.assigneeIds
+    const tenantNames = chore.assigneeIds
         .map((assignee) => getTenantByTenantId(matesUser, assignee))
-        .filter((assignee) => assignee !== undefined) as Tenant[];
+        .map((tenant) => {
+            if (tenant === undefined) {
+                return 'Unknown';
+            } else {
+                return tenant.name;
+            }
+        });
     const completedBy: Tenant | undefined = chore.completedBy
         ? getTenantByTenantId(matesUser, chore.completedBy)
         : undefined;
@@ -71,16 +77,20 @@ const ChoreCell: React.FC<ChoreCellProps> = ({
             />
             <div className="chore-cell-info-container">
                 <div className="chore-cell-top-line-container">
-                    <SimpleButton
-                        onClick={() => setShowDeleteChoreModal(true)}
-                        text={'Delete Chore'}
-                    />
+                    {assignedToUser ? (
+                        <SimpleButton
+                            onClick={() => setShowDeleteChoreModal(true)}
+                            text={'Delete Chore'}
+                        />
+                    ) : null}
 
                     <div className="chore-cell-title-container">{titleContent}</div>
-                    <SimpleButton
-                        onClick={() => setShowDeleteSeriesModal(true)}
-                        text={'Delete Chore Series'}
-                    />
+                    {assignedToUser ? (
+                        <SimpleButton
+                            onClick={() => setShowDeleteSeriesModal(true)}
+                            text={'Delete Chore Series'}
+                        />
+                    ) : null}
                 </div>
                 <div className="chore-cell-date-container">
                     <span>{getFormattedDateString(chore.date)}</span>
@@ -88,7 +98,7 @@ const ChoreCell: React.FC<ChoreCellProps> = ({
                 <div className="chore-cell-assigned-container">
                     <span>
                         {'Assigned to: '}
-                        {formatNames(tenantAssignees.map((tenant) => tenant.name))}
+                        {formatNames(tenantNames)}
                     </span>
                 </div>
                 {completedBy ? (
@@ -97,29 +107,31 @@ const ChoreCell: React.FC<ChoreCellProps> = ({
                     </div>
                 ) : null}
             </div>
-            <div className="chore-cell-button-container">
-                <div
-                    className="chore-cell-toggle-button"
-                    onClick={() => {
-                        toggleCompleted(chore);
-                        setToggleClicked(true);
-                    }}
-                >
+            {!assignedToUser ? null : (
+                <div className="chore-cell-button-container">
                     <div
-                        className={
-                            chore.completed
-                                ? toggleClicked
-                                    ? 'chore-cell-toggle-button-checked-clicked-container'
-                                    : 'chore-cell-toggle-button-checked-container'
-                                : !toggleClicked
-                                ? 'chore-cell-toggle-button-unchecked-container'
-                                : 'chore-cell-toggle-button-unchecked-clicked-container'
-                        }
+                        className="chore-cell-toggle-button"
+                        onClick={() => {
+                            toggleCompleted(chore);
+                            setToggleClicked(true);
+                        }}
                     >
-                        <i className="fa fa-check" />
+                        <div
+                            className={
+                                chore.completed
+                                    ? toggleClicked
+                                        ? 'chore-cell-toggle-button-checked-clicked-container'
+                                        : 'chore-cell-toggle-button-checked-container'
+                                    : !toggleClicked
+                                    ? 'chore-cell-toggle-button-unchecked-container'
+                                    : 'chore-cell-toggle-button-unchecked-clicked-container'
+                            }
+                        >
+                            <i className="fa fa-check" />
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };

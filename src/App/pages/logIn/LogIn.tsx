@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import BiggerSimpleButton from '../../common/components/BiggerSimpleButton';
+import { RedMessageCell } from '../../common/components/ColoredMessageCells';
 import PageCell from '../../common/components/PageCell';
-import RedMessageCell from '../../common/components/RedMessageCell';
-import StyledInput from '../../common/components/StyledInput';
+import { BiggerSimpleButton } from '../../common/components/SimpleButtons';
+import { StyledInput } from '../../common/components/StyledInputs';
 import { getPostOptions } from '../../common/utilities';
+
 import './LogIn.css';
 
 const LogIn: React.FC<RouteComponentProps> = (props) => {
     const [usernameInput, setUsernameInput] = useState('');
     const [passwordInput, setPasswordInput] = useState('');
     const [error, setError] = useState('');
+    const [serverCallMade, setServerCallMade] = useState(false);
 
     const handleChangeUsername = (event: React.ChangeEvent<HTMLInputElement>) => {
         setUsernameInput(event.target.value);
@@ -23,6 +25,10 @@ const LogIn: React.FC<RouteComponentProps> = (props) => {
     };
 
     const handleLogIn = () => {
+        if (serverCallMade) {
+            return;
+        }
+        setServerCallMade(true);
         const data = {
             username: usernameInput,
             password: passwordInput,
@@ -31,6 +37,7 @@ const LogIn: React.FC<RouteComponentProps> = (props) => {
         fetch('/login', options)
             .then((response) => response.json())
             .then((json) => {
+                setServerCallMade(false);
                 const { success, message } = json;
                 if (!success) {
                     setError(message);
@@ -38,7 +45,7 @@ const LogIn: React.FC<RouteComponentProps> = (props) => {
                     props.history.push('/account');
                 }
             })
-            .catch((err) => console.error(err));
+            .catch(() => setError('Sorry, our server seems to be down.'));
         return;
     };
 
