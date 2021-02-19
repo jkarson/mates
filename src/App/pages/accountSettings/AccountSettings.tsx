@@ -24,7 +24,7 @@ const AccountSettings: React.FC<RouteComponentProps> = (props) => {
     const [serverCallMade, setServerCallMade] = useState(false);
 
     useLayoutEffect(() => {
-        fetch('/account-settings')
+        fetch('/account-settings/get')
             .then((response) => response.json())
             .then((json) => {
                 setServerError(false);

@@ -25,7 +25,7 @@ const Account: React.FC<RouteComponentProps> = (props) => {
     const tabs = <Tabs currentTab={tab} setTab={setTab} tabNames={accountTabNames} />;
 
     useLayoutEffect(() => {
-        fetch('/account')
+        fetch('/account/get')
             .then((response) => response.json())
             .then((json) => {
                 setServerError(false);
