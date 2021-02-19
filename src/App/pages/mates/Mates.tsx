@@ -49,7 +49,7 @@ const Mates: React.FC<RouteComponentProps> = (props) => {
     const [serverError, setServerError] = useState(false);
 
     useLayoutEffect(() => {
-        fetch('/mates')
+        fetch('/mates/get')
             .then((response) => response.json())
             .then((json) => {
                 setServerError(false);
