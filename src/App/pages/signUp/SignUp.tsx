@@ -184,10 +184,7 @@ const AvailabilityCell: React.FC<AvailabilityCellProps> = ({ usernameInput }) =>
             username: usernameInput,
         };
         const options = getPostOptions(data);
-        fetch(
-            'ec2-18-219-207-112.us-east-2.compute.amazonaws.com/signup/checkUsernameAvailability',
-            options,
-        )
+        fetch('/signup/checkUsernameAvailability', options)
             .then((response) => response.json())
             .then((json) => {
                 setServerCallMade(false);
