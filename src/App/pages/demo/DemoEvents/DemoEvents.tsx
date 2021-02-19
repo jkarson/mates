@@ -1,12 +1,7 @@
-import React, { useContext, useEffect, useLayoutEffect, useState } from 'react';
-import StandardStyledText from '../../../common/components/StandardStyledText';
+import React, { useContext, useLayoutEffect, useState } from 'react';
 import Tabs from '../../../common/components/Tabs';
 import { MatesUserContext, MatesUserContextType } from '../../../common/context';
-import { ApartmentId } from '../../../common/models';
-import { assertUnreachable, getApartmentSummaryFromFriendProfile } from '../../../common/utilities';
-import EventCell from '../../mates/Events/components/EventCell';
-import InvitationCell from '../../mates/Events/components/InvitationCell';
-import { ApartmentEvent } from '../../mates/Events/models/EventsInfo';
+import { assertUnreachable } from '../../../common/utilities';
 import { EventsTabType, eventsTabNames } from '../../mates/Events/models/EventsTabs';
 import { isFutureEvent, isPastEvent, isPresentEvent } from '../../mates/Events/utilities';
 import DemoCreateEventCell from './DemoCreateEventCell';

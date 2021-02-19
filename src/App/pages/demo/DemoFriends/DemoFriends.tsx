@@ -1,13 +1,8 @@
 import React, { useContext, useLayoutEffect, useState } from 'react';
-import StandardStyledText from '../../../common/components/StandardStyledText';
 import Tabs from '../../../common/components/Tabs';
 import { MatesUserContext, MatesUserContextType } from '../../../common/context';
 import { assertUnreachable } from '../../../common/utilities';
-import FriendCell from '../../mates/Friends/components/FriendCell';
-import RequestCell from '../../mates/Friends/components/RequestCell';
-import { ApartmentSummary, FriendProfile } from '../../mates/Friends/models/FriendsInfo';
 import { FriendsTabType, friendsTabNames } from '../../mates/Friends/models/FriendsTabs';
-import { potentialNewFriend } from '../mockData';
 import DemoCreateFriendRequestCell from './DemoCreateFriendRequestCell';
 import DemoFriendsCell from './DemoFriendsCell';
 import DemoRequestsCell from './DemoRequestsCell';

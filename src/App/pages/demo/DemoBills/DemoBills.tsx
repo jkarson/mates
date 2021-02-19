@@ -1,16 +1,14 @@
 import React, { useContext, useEffect, useLayoutEffect, useState } from 'react';
 import { RedMessageCell } from '../../../common/components/ColoredMessageCells';
-import StandardStyledText from '../../../common/components/StandardStyledText';
 import Tabs from '../../../common/components/Tabs';
 import { MatesUserContext, MatesUserContextType } from '../../../common/context';
 import { UserId } from '../../../common/models';
 import { getTodaysDate, isPreviousDate, assertUnreachable } from '../../../common/utilities';
 import { BillsDescriptionCell } from '../../mates/Bills/Bills';
 import BillCell from '../../mates/Bills/components/BillCell';
-import BillGeneratorCell from '../../mates/Bills/components/BillGeneratorCell';
 import BillSummaryCell from '../../mates/Bills/components/BillSummaryCell';
 import { AmountOwed } from '../../mates/Bills/models/AmountOwed';
-import { BillId, BillGeneratorID, Bill, BillGenerator } from '../../mates/Bills/models/BillsInfo';
+import { BillId, BillGeneratorID, Bill } from '../../mates/Bills/models/BillsInfo';
 import { BillsTabType, billsTabNames } from '../../mates/Bills/models/BillsTabs';
 import { getTotalCurrentAssignedValue } from '../../mates/Bills/utilities';
 import { demoPurgeOldBills, demoUpdateBillsFromBillGenerators } from '../utilities';
